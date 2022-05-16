@@ -179,6 +179,17 @@ function setTheme() {
 		}
 	}
 }
+function loadSetting(elementID,settingName) {
+	const element = document.getElementById(elementID)
+	if(element && element.nodeName === "INPUT" && element.type === "checkbox") {
+		if(localStorage[settingName] != null) {
+			element.checked = JSON.parse(localStorage[settingName])
+		}
+		element.addEventListener("input", function(evt) {
+			localStorage[settingName] = !!element.checked
+		})
+	}
+}
 
 function loadSettings() {
 	if(!storageAvailable('localStorage')) return
@@ -191,16 +202,16 @@ function loadSettings() {
 	}
 
 	// Hints
-	const hints = document.getElementById('hints')
-	if(hints && hints.nodeName === 'INPUT' && hints.type === 'checkbox') {
-		if(localStorage.hints != null) {
-			hints.checked = JSON.parse(localStorage.hints)
-		}
-		hints.addEventListener('input', function(evt) {
-			localStorage.hints = !!hints.checked
+	const hints = document.getElementsByName('hints');
+	for(const hint of hints) {
+		hint.addEventListener('click', function(e) {
+			localStorage.hints = e.target.value
 		})
+		if(localStorage.hints === hint.value) hint.checked = true
 	}
 
+	loadSetting("live_wpm","live_wpm");
+	loadSetting("show_timer", "show_timer");
 	// CPM
 	const cpm = document.getElementById('cpm')
 	if(cpm && cpm.nodeName === 'INPUT' && cpm.type === 'checkbox') {
@@ -264,5 +275,55 @@ function displayOnly(show) {
 		const displayType = tab === 'lesson' ? 'flex' : 'block';
 		document.getElementById(tab).style.display = tab === show ? displayType : 'none'
 	}
+}
+
+// ---------------------------------------------------------------------
+// Add attributes, properties, and children to a DOM node
+// (possibly creating it first).
+// args:
+//     target: an Element or a tag name (e.g. "div")
+//     then optional in any order (type determines function)
+//         Element: child
+//         string: text node child
+//         array: values are treated as args
+//         null/undefined: ignored
+//         object: set attributes and properties of `target`.
+//             string: set attribute
+//             array: set property to array[0]
+//             object: set property properties. example: N('span', {style: {color: 'red'}})
+//             function: add event listener.
+
+function N(target, ...args) {
+	const el = typeof target === 'string' ?
+		document.createElement(target) : target;
+	for(const arg of args) {
+		if(arg instanceof Element || arg instanceof Text) {
+			el.appendChild(arg);
+		} else if(Array.isArray(arg)) {
+			N(el, ...arg);
+		} else if(typeof arg === 'string') {
+			el.appendChild(document.createTextNode(arg));
+		} else if(arg instanceof Object) {
+			for(const k in arg) {
+				const v = arg[k];
+				if(Array.isArray(v)) {
+					el[k] = v[0];
+				} else if(v instanceof Function) {
+					el.addEventListener(k, v)
+				} else if(v instanceof Object) {
+					for(const vk in v) el[k][vk] = v[vk];
+				} else {
+					el.setAttribute(k, v);
+				}
+			}
+		}
+	}
+	return el;
+}
+
+function hiddenField(form, name, value) {
+	if(value === '') return
+	if(form.elements[name]) form.elements[name].value = value
+	else N(form, N('input', {type: 'hidden', name: name, value: value}))
 }
 

@@ -150,6 +150,12 @@ StenoDisplay.prototype.showTranslation = function(pseudoSteno, i0, separator) {
 	return strokes.length;
 }
 
+StenoDisplay.prototype.hide = function(){
+	this.container.style.display = 'none'
+}
+StenoDisplay.prototype.show = function () {
+	this.container.style.display = 'block'
+}
 
 // ---------------------------------------------------------------------
 

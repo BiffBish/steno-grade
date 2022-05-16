@@ -50,8 +50,7 @@ function linkNextDrill(link, fields, updateFields) {
 window.onload = function() {
 	var fields = parseQueryString(document.location.search)
 	fields.iterations = fields.iterations || 20;
-
-	var speed = {wpm: fields.wpm, cpm: fields.cpm};
+	fields.actualWords = {unit: 'strokes per minute', u: 'SPM'}
 
 	let exercise;
 	if(fields.strokes) {
@@ -67,8 +66,7 @@ window.onload = function() {
 		exercise = generateDreadedDuoDrill(fields.section, fields.drill, fields.iterations);
 	}
 
-	var jig = setExercise(exercise.name, exercise, null, speed);
-	jig.actualWords = 'strokes per minute';
+	var jig = setExercise(exercise.name, exercise, null, fields);
 
 	var next = document.getElementById('new');
 	if(fields.strokes || fields.book) next.parentNode.removeChild(next);
