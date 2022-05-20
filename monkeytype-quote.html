@@ -1,50 +1,133 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<meta charset="utf-8">
-	<title>Steno Jig</title>
-	<link href="style.css" rel="stylesheet" type="text/css">
-	<script src="type-jig.js"></script>
-	<script src="util.js"></script>
-	<script src="steno-display.js"></script>
-	<script src="plover-translations.js"></script>
-	<script src="monkeytype-quote-data.js"></script>
-<script src="chart.js"></script>
-<script src="chartjs-plugin-datalabels.js"></script>	<link rel="stylesheet" type="text/css" href="font-roboto.css">
-</head>
-<body>
+    <head>
+        <meta charset="utf-8" />
+        <title>Steno Jig</title>
+        <link href="style.css" rel="stylesheet" type="text/css" />
+        <script src="utils/type-jig.js"></script>
+        <script src="utils/util.js"></script>
+        <script src="utils/steno-display.js"></script>
+        <script src="plover-translations.js"></script>
+        <script src="data/monkeytype-quote-data.js"></script>
+        <script src="libs/jquery-3.6.0.min.js"></script>
+        <script src="libs/chart.js"></script>
+        <script src="chartjs-plugin-datalabels.js"></script>
+        <link rel="stylesheet" type="text/css" href="font-roboto.css" />
+    </head>
+    <body>
+        <div id="lesson" class="wrapper"></div>
 
-<div id="lesson" class="wrapper">
-	<div id="leftside">
-		<h3 id="lesson-name" class="center"></h3>
-		<div id="drill-content">
-			<div id="answer"></div>
-			<div id="exercise"></div>
-			<div id="results"></div>
-			<div style="height: 300px">
-				<canvas id="chartDiv" width="400" height="400"></canvas>
-			</div>
-		</div>
-	</div>
+        <script>
+            setTheme();
+            function getQuoteById(id) {
+                id = +id;
+                const quotes = monkeytype.quotes;
+                for (let i = 0; i < quotes.length; ++i) {
+                    if (quotes[i].id === id) return quotes[i];
+                }
+            }
 
-	<div id="nav">
-		<p id="stroke-hint"></p>
-		<p id="strokes"></p>
-		<p id="clock" class="clock"></p>
-		<p id="live-wpm-display" class="wpm"></p>
-		<p class="center"><a id="back" title="LeftArrow">&larr; Back to Menu <span class="shortcutkey">(LeftArrow)</span></a></p>
-		<p class="center"><a id="again" title="Enter">&#8634; Repeat Drill <span class="shortcutkey">(Enter 3x)</span></a></p>
-		<p class="center"><a id="end" title="Enter">&Cross; End Drill <span class="shortcutkey">(Tab 3x)</span></a></p>
-		<p class="center"><a id="new" title="RightArrow">&rarr; New Drill <span class="shortcutkey">(RightArrow)</span></a></p>
-		<p class="center"><a id="show-hint" title="UpArrow">Show Hint <span class="shortcutkey">(UpArrow)</span></a></p>
-		<p class="center"><a id="hide-hint" title="UpArrow">Hide Hint <span class="shortcutkey">(DownArrow)</span></a></p>
+            function getQuoteByLength(lo, hi) {
+                const quotes = monkeytype.quotes.filter(
+                    (q) => q.text.length >= lo && q.text.length <= hi
+                );
+                return quotes[Math.floor(quotes.length * Math.random())];
+            }
 
-	</div>
+            function getQuote(id, lo, hi) {
+                if (id != null) return getQuoteById(id);
+                else return getQuoteByLength(lo, hi);
+            }
 
-	<textarea id="input"></textarea>
-</div>
+            function generateExercise(id, lo, hi) {
+                const quote = getQuote(id, lo, hi);
+                const words = quote.text.trim().split(/\s+/);
+                const exercise = new TypeJig.Exercise(
+                    words,
+                    0,
+                    false,
+                    "ordered"
+                );
+                exercise.name =
+                    "Monkeytype English Quote #" +
+                    quote.id +
+                    " (from " +
+                    quote.source +
+                    ")";
+                exercise.quote = quote;
+                return exercise;
+            }
 
-<script src="monkeytype-quote.js"></script>
+            function replaceID(href, id) {
+                console.log(href, id);
+                let [h, q] = href.split("?");
+                q = (q || "").split("&").filter((x) => !/^id=/.test(x));
+                if (id) q.push("id=" + id);
+                return h + "?" + q.join("&");
+            }
+            let jig, exercise, fields;
 
-</body>
+            function getExercise(fields) {
+                console.log(fields);
+                switch (fields.length) {
+                    case "short":
+                        fields.lo = 0;
+                        fields.hi = 100;
+                        break;
+                    case "medium":
+                        fields.lo = 101;
+                        fields.hi = 300;
+                        break;
+                    case "long":
+                        fields.lo = 301;
+                        fields.hi = 600;
+                        break;
+                    case "thicc":
+                        fields.lo = 601;
+                        fields.hi = Infinity;
+                        break;
+                    case "all":
+                    default:
+                        fields.lo = 0;
+                        fields.hi = Infinity;
+                        break;
+                }
+                return generateExercise(fields.id, fields.lo, fields.hi);
+            }
+
+            function go(ex) {
+                fields = parseQueryString(document.location.search);
+                if (ex == null) {
+                    exercise = getExercise(fields);
+                } else exercise = ex;
+
+                jig = setExercise(exercise.name, exercise, null, fields, jig);
+            }
+            $(document).ready(function () {
+                populatePage();
+                loadSettings();
+
+                go();
+                window.history.replaceState(
+                    null,
+                    "",
+                    replaceID(document.location.href, exercise.quote.id)
+                );
+                initializeButtons(jig);
+
+                let another = document.getElementById("new");
+
+                let fields = parseQueryString(document.location.search);
+                fields.id = null;
+                let nextExercise = getExercise(fields);
+                another.href = replaceID(
+                    document.location.href,
+                    nextExercise?.quote?.id
+                );
+                window.addEventListener("popstate", function () {
+                    go();
+                });
+            });
+        </script>
+    </body>
 </html>

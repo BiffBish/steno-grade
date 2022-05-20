@@ -1,165 +1,260 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<meta charset="utf-8">
-	<title>Learn Plover Lessons</title>
-	<link href="style.css" rel="stylesheet" type="text/css">
-	<script src="type-jig.js"></script>
-	<script src="util.js"></script>
-	<script src="word-drill.js"></script>
-	<script src="steno-display.js"></script>
-	<script src="learn-plover.js"></script>
-	<script src="plover-translations.js"></script>
-<script src="chart.js"></script>
-<script src="chartjs-plugin-datalabels.js"></script>	<link rel="stylesheet" type="text/css" href="font-roboto.css">
-</head>
-<body>
+    <head>
+        <meta charset="utf-8" />
+        <title>Learn Plover Lessons</title>
+        <link href="style.css" rel="stylesheet" type="text/css" />
+        <script src="utils/type-jig.js"></script>
+        <script src="utils/util.js"></script>
+        <script src="word-drill.js"></script>
+        <script src="utils/steno-display.js"></script>
+        <script src="learn-plover.js"></script>
+        <script src="plover-translations.js"></script>
+        <script src="libs/chart.js"></script>
+        <script src="chartjs-plugin-datalabels.js"></script>
+        <link rel="stylesheet" type="text/css" href="font-roboto.css" />
+    </head>
+    <body>
+        <div class="wrapper">
+            <div id="form">
+                <h1>Learn Plover Exercises</h1>
+                <div class="form-section">
+                    <form id="selectDrill">
+                        <ul style="list-style-type: none">
+                            <li><select name="drill" multiple></select></li>
+                            <li>
+                                <label
+                                    ><input
+                                        name="hints"
+                                        type="checkbox"
+                                        value="yes"
+                                        checked
+                                    />
+                                    Show hints?</label
+                                >
+                            </li>
+                            <li>
+                                <label
+                                    ><input
+                                        id="randomly"
+                                        name="type"
+                                        type="radio"
+                                        value="randomly"
+                                    />
+                                    Randomly</label
+                                >
+                                for
+                                <input
+                                    name="timeLimit"
+                                    type="text"
+                                    size="2"
+                                    ,
+                                    value="10"
+                                    onfocus="selectRandomly()"
+                                />
+                                minutes.
+                            </li>
+                            <li>
+                                <label
+                                    ><input
+                                        id="ordered"
+                                        name="type"
+                                        type="radio"
+                                        value="once"
+                                        checked
+                                    />
+                                    Once in order.</label
+                                >
+                            </li>
+                            <li>
+                                <label
+                                    ><input
+                                        id="shuffled"
+                                        name="type"
+                                        type="radio"
+                                        value="shuffled"
+                                    />
+                                    Once in random order.</label
+                                >
+                            </li>
+                            <li>
+                                <label
+                                    ><input
+                                        name="wpm"
+                                        type="number"
+                                        value=""
+                                        step="5"
+                                    />
+                                    Speed (WPM).</label
+                                >
+                            </li>
+                            <li><input type="submit" value="Go" /></li>
+                        </ul>
+                    </form>
+                </div>
+            </div>
+        </div>
 
-<div class="wrapper">
-	<div id="form">
-		<h1>Learn Plover Exercises</h1>
-		<div class="form-section">
-			<form id="selectDrill">
-				<ul style="list-style-type: none">
-					<li><select name="drill" multiple></select></li>
-					<li><label><input name="hints" type="checkbox" value="yes" checked> Show hints?</label></li>
-					<li><label><input id="randomly" name="type" type="radio" value="randomly"> Randomly</label> for <input name="timeLimit" type="text" size="2", value="10" onfocus="selectRandomly()"> minutes.</li>
-					<li><label><input id="ordered" name="type" type="radio" value="once" checked> Once in order.</label></li>
-					<li><label><input id="shuffled" name="type" type="radio" value="shuffled"> Once in random order.</label></li>
-					<li><label><input name="wpm" type="number" value="" step="5"> Speed (WPM).</label></li>
-					<li><input type="submit" value="Go"></li>
-				</ul>
-			</form>
-		</div>
-	</div>
-</div>
+        <div id="lesson" class="wrapper" style="display: none">
+            <div id="leftside">
+                <h3 id="lesson-name" class="center"></h3>
+                <div id="drill-content">
+                    <div id="answer"></div>
+                    <div id="exercise"></div>
+                    <div id="results"></div>
+                    <div style="height: 300px">
+                        <canvas id="chartDiv" width="400" height="400"></canvas>
+                    </div>
+                </div>
+            </div>
 
-<div id="lesson" class="wrapper" style="display: none">
-	<div id="leftside">
-		<h3 id="lesson-name" class="center"></h3>
-		<div id="drill-content">
-			<div id="answer"></div>
-			<div id="exercise"></div>
-			<div id="results"></div>
-			<div style="height: 300px">
-				<canvas id="chartDiv" width="400" height="400"></canvas>
-			</div>
-		</div>
-	</div>
+            <div id="nav">
+                <p id="stroke-hint"></p>
+                <p id="strokes"></p>
+                <p id="clock" class="clock"></p>
+                <p id="live-wpm-display" class="wpm"></p>
 
-	<div id="nav">
-		<p id="stroke-hint"></p>
-		<p id="strokes"></p>
-		<p id="clock" class="clock"></p>
-		<p id="live-wpm-display" class="wpm"></p>
+                <p class="center">
+                    <a id="back" title="LeftArrow"
+                        >&larr; Back to Menu
+                        <span class="shortcutkey">(LeftArrow)</span></a
+                    >
+                </p>
+                <p class="center">
+                    <a id="again" title="Enter"
+                        >&#8634; Restart
+                        <span class="shortcutkey">(Enter 3x)</span></a
+                    >
+                </p>
+                <p class="center">
+                    <a id="end" title="Enter"
+                        >&Cross; End
+                        <span class="shortcutkey">(Tab 3x)</span></a
+                    >
+                </p>
+            </div>
 
-		<p class="center"><a id="back" title="LeftArrow">&larr; Back to Menu <span class="shortcutkey">(LeftArrow)</span></a></p>
-		<p class="center"><a id="again" title="Enter">&#8634; Restart <span class="shortcutkey">(Enter 3x)</span></a></p>
-		<p class="center"><a id="end" title="Enter">&Cross; End <span class="shortcutkey">(Tab 3x)</span></a></p>
-	</div>
+            <textarea id="input"></textarea>
+        </div>
 
-	<textarea id="input"></textarea>
-</div>
+        <script>
+            window.onload = function () {
+                if (document.location.search === "") {
+                    var form = document.getElementById("selectDrill");
+                    var drill = form.elements.drill;
+                    var order = TypeJig.WordSets.LearnPloverOrder;
+                    for (var i = 0; i < order.length; ++i) {
+                        var option = document.createElement("option");
+                        option.appendChild(document.createTextNode(order[i]));
+                        drill.appendChild(option);
+                    }
+                    drill.focus();
 
-<script>
-window.onload = function() {
-	if(document.location.search === '') {
-		var form = document.getElementById('selectDrill');
-		var drill = form.elements.drill;
-		var order = TypeJig.WordSets.LearnPloverOrder;
-		for(var i=0; i<order.length; ++i) {
-			var option = document.createElement('option');
-			option.appendChild(document.createTextNode(order[i]));
-			drill.appendChild(option);
-		}
-		drill.focus();
+                    loadFormState(form);
+                    form.addEventListener("submit", function () {
+                        saveFormState(form);
+                    });
+                } else {
+                    var fields = parseQueryString(document.location.search);
+                    TypeJig.WordSets = TypeJig.WordSets.LearnPlover;
+                    var exercise = wordDrill(fields);
+                    if (exercise) {
+                        if (fields.hints) {
+                            var strokes = document.getElementById("strokes");
+                            if (fields.floating_hints) {
+                                strokes.style.position = "fixed";
+                            }
+                            var translations = TypeJig.shortestTranslations(
+                                TypeJig.Translations.Plover
+                            );
+                            var hints = new StenoDisplay(
+                                strokes,
+                                translations,
+                                true
+                            );
+                        }
+                        fields.menu = "learn-plover";
 
-		loadFormState(form);
-		form.addEventListener("submit", function(){
-		    saveFormState(form);
-		});
-	} else {
-		var fields = parseQueryString(document.location.search);
-		TypeJig.WordSets = TypeJig.WordSets.LearnPlover;
-		var exercise = wordDrill(fields);
-		if(exercise) {
-			if(fields.hints) {
-				var strokes = document.getElementById('strokes');
-				if(fields.floating_hints) {
-					strokes.style.position = 'fixed';
-				}
-				var translations = TypeJig.shortestTranslations(TypeJig.Translations.Plover);
-				var hints = new StenoDisplay(strokes, translations, true);
-			}
-			fields.menu = 'learn-plover'
+                        displayOnly("lesson");
+                        var jig = setExercise(
+                            exercise.name,
+                            exercise,
+                            hints,
+                            fields
+                        );
+                    }
+                }
+            };
 
-			displayOnly('lesson');
-			var jig = setExercise(exercise.name, exercise, hints, fields);
-		}
-	}
-}
+            function selectRandomly() {
+                var form = document.getElementById("selectDrill");
+                form.elements.type[0].checked = true;
+            }
 
-function selectRandomly() {
-	var form = document.getElementById('selectDrill');
-	form.elements.type[0].checked = true;
-}
+            function saveFormState(form) {
+                let radioButtons =
+                    document.getElementById("selectDrill").elements["type"];
+                let drillType;
+                for (let i = 0; i < radioButtons.length; ++i) {
+                    if (radioButtons[i].checked) {
+                        drillType = radioButtons[i].value;
+                        break;
+                    }
+                }
+                save({
+                    drill: form.drill.value,
+                    hints: form.hints.checked,
+                    type: drillType,
+                    timeLimit: form.timeLimit.value,
+                });
+            }
 
-function saveFormState(form) {
-	let radioButtons = document.getElementById('selectDrill').elements['type']
-	let drillType
-	for(let i=0; i<radioButtons.length; ++i) {
-		if(radioButtons[i].checked) {
-			drillType = radioButtons[i].value
-			break
-		}
-	}
-    save({
-        drill: form.drill.value,
-        hints: form.hints.checked,
-        type: drillType,
-        timeLimit: form.timeLimit.value,
-    });
-}
+            function loadFormState(form) {
+                var loaded = load();
+                if (loaded.drill != null) {
+                    form.drill.value = loaded.drill;
+                }
+                if (loaded.hints != null) form.hints.checked = !!loaded.hints;
+                if (loaded.type != null) {
+                    let radioButtons =
+                        document.getElementById("selectDrill").elements["type"];
+                    for (let i = 0; i < radioButtons.length; ++i) {
+                        let b = radioButtons[i];
+                        b.checked = b.value === loaded.type;
+                    }
+                }
+                form.type.value = loaded.type;
+                if (loaded.timeLimit) {
+                    form.timeLimit.value = loaded.timeLimit;
+                }
+            }
 
-function loadFormState(form) {
-    var loaded = load();
-    if(loaded.drill != null) {
-        form.drill.value = loaded.drill;
-    }
-	if(loaded.hints != null) form.hints.checked = !!loaded.hints;
-	if(loaded.type != null) {
-		let radioButtons = document.getElementById('selectDrill').elements['type']
-		for(let i=0; i<radioButtons.length; ++i) {
-			let b = radioButtons[i]
-			b.checked = (b.value === loaded.type)
-		}
-	}
-    form.type.value = loaded.type;
-    if (loaded.timeLimit) {
-        form.timeLimit.value = loaded.timeLimit;
-    }
-}
+            var LOCAL_STORAGE_KEY = "learn-plover-form";
 
-var LOCAL_STORAGE_KEY = "learn-plover-form";
+            function save(obj) {
+                try {
+                    localStorage.setItem(
+                        LOCAL_STORAGE_KEY,
+                        JSON.stringify(obj)
+                    );
+                } catch (e) {
+                    console.error(e);
+                }
+            }
 
-function save(obj) {
-    try {
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(obj));
-    } catch (e) {
-        console.error(e);
-    }
-}
+            function load() {
+                try {
+                    return (
+                        JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) ||
+                        {}
+                    );
+                } catch (e) {
+                    console.error(e);
+                    return {};
+                }
+            }
 
-function load() {
-    try {
-        return JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || {};
-    } catch (e) {
-        console.error(e);
-        return {};
-    }
-}
-
-setTheme()
-</script>
-</body>
+            setTheme();
+        </script>
+    </body>
 </html>

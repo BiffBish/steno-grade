@@ -1,3 +1,74 @@
+
+
+function populatePage(options) {
+    // <div id="leftside">
+	// 	<h3 id="lesson-name" class="center"></h3>
+	// 	<div id="drill-content">
+	// 		<div id="answer"></div>
+	// 		<div id="exercise"></div>
+	// 		<div id="results"></div>
+	// 		<div style="height: 300px">
+	// 			<canvas id="chartDiv" width="400" height="400"></canvas>
+	// 		</div>
+	// 	</div>
+	// </div>
+
+	// <div id="nav">
+	// 	<p id="stroke-hint"></p>
+	// 	<p id="strokes"></p>
+	// 	<p id="clock" class="clock"></p>
+	// 	<p id="live-wpm-display" class="wpm"></p>
+	// 	<p class="center"><a id="back" title="LeftArrow">&larr; Back to Menu <span class="shortcutkey">(LeftArrow)</span></a></p>
+	// 	<p class="center"><a id="again" title="Enter">&#8634; Repeat Drill <span class="shortcutkey">(Enter 3x)</span></a></p>
+	// 	<p class="center"><a id="end" title="Enter">&Cross; End Drill <span class="shortcutkey">(Tab 3x)</span></a></p>
+	// 	<p class="center"><a id="new" title="RightArrow">&rarr; New Drill <span class="shortcutkey">(RightArrow)</span></a></p>
+	// </div>
+    //Populate the lession div with the html above
+    var lesson = document.getElementById("lesson");
+    lesson.innerHTML = `
+    <div id="leftside">
+		<h3 id="lesson-name" class="center"></h3>
+		<div id="drill-content">
+			<div id="answer"></div>
+			<div id="exercise"></div>
+			<div id="results"></div>
+			<div style="height: 300px">
+				<canvas id="chartDiv" width="400" height="400"></canvas>
+			</div>
+		</div>
+	</div>
+
+	<div id="nav">
+		<p id="stroke-hint"></p>
+		<p id="strokes"></p>
+		<p id="clock" class="clock"></p>
+		<p id="live-wpm-display" class="wpm"></p>
+		<p class="center"><a id="back" title="LeftArrow">&larr; Back to Menu <span class="shortcutkey">(LeftArrow)</span></a></p>
+		<p class="center"><a id="again" title="Enter">&#8634; Repeat Drill <span class="shortcutkey">(Enter 3x)</span></a></p>
+		<p class="center"><a id="end" title="Enter">&Cross; End Drill <span class="shortcutkey">(Tab 3x)</span></a></p>
+		<p class="center"><a id="new" title="RightArrow">&rarr; New Drill <span class="shortcutkey">(RightArrow)</span></a></p>
+        <p class="center"><a id="show-hint" title="UpArrow">Show Hint <span class="shortcutkey">(UpArrow)</span></a></p>
+		<p class="center"><a id="hide-hint" title="UpArrow">Hide Hint <span class="shortcutkey">(DownArrow)</span></a></p>
+	</div>
+    <textarea id="input"></textarea>
+    `;
+
+    //Get the leftside element and add this html below lesson-name
+    // <p style="text-align: center; padding-bottom: 3em">
+    //     <a href="raw-steno-instructions.html">How to get raw steno output</a>
+    // </p>;
+    //Select the lesson-name element inside of the leftside element using jquery
+    
+    if(options?.require_raw_steno){
+        $(".lesson-name").after(`
+            <p style="text-align: center; padding-bottom: 3em">
+                <a href="raw-steno-instructions.html">How to get raw steno output</a>
+            </p>;
+        `);
+    }
+
+}
+
 function parseQueryString(query) {
     var vars = {};
     query = query.substring(1); // remove leading '?'
@@ -62,8 +133,6 @@ function new_rng(seed_txt) {
 }
 
 function initializeHints(hints, floating_hints) {
-    // if (!hints) return null;
-
     var strokes = document.getElementById("strokes");
     if (floating_hints) {
         strokes.style.position = "fixed";
@@ -82,8 +151,8 @@ function changeName(name) {
     document.title = name + " - " + document.title.replace(/^.*? - /, "");
 }
 
-function setExercise(name, exercise, hints, options, jig) {
-    console.trace("Setting exercise", name, exercise, hints, options);
+function setExercise(name, exercise, hints = null, options, jig) {
+    console.log("Setting exersize",exercise,hints,options)
     var h = document.getElementById("lesson-name");
     h.textContent = name;
     document.title = name + " - Steno Jig";
@@ -101,7 +170,7 @@ function setExercise(name, exercise, hints, options, jig) {
     end.href = document.location.href;
 
     if (jig != null) jig.exercise = exercise;
-    else jig = new TypeJig(exercise, options);
+    else jig = new TypeJig(exercise, options, hints);
     return jig;
 }
 
@@ -141,6 +210,7 @@ function storageAvailable(type) {
 }
 
 function setTheme() {
+    console.log("Setting theme");
     if (storageAvailable("localStorage")) {
         if (localStorage.theme == null) {
             document.body.removeAttribute("data-theme");
@@ -149,6 +219,7 @@ function setTheme() {
         }
     }
 }
+
 function loadSetting(elementID, settingName) {
     const element = document.getElementById(elementID);
     if (
@@ -216,6 +287,31 @@ function loadSettings() {
     }
 }
 
+function initializeButtons(jig) {
+    let again = document.getElementById("again");
+    again.addEventListener("click", function (evt) {
+        evt.preventDefault();
+        jig.reset();
+    });
+
+    let end = document.getElementById("end");
+    end.addEventListener("click", function (evt) {
+        evt.preventDefault();
+        jig.endExercise();
+    });
+
+    let showHint = document.getElementById("show-hint");
+    showHint?.addEventListener("click", function (evt) {
+        evt.preventDefault();
+        jig.hint.show();
+    });
+
+    let hideHint = document.getElementById("hide-hint");
+    hideHint?.addEventListener("click", function (evt) {
+        evt.preventDefault();
+        jig.hint.hide();
+    });
+}
 /**
  * Update a URL parameter and return the new URL.
  * Note that if handling anchors is needed in the future,

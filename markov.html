@@ -1,47 +1,102 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<meta charset="utf-8">
-	<title>Markov-chain generated sentences</title>
-	<link href="style.css" rel="stylesheet" type="text/css">
-	<script src="type-jig.js"></script>
-	<script src="util.js"></script>
-	<script src="steno-display.js"></script>
-	<script src="plover-translations.js"></script>
-	<script src="tatoeba-sentences.js"></script>
-<script src="chart.js"></script>
-<script src="chartjs-plugin-datalabels.js"></script>	<link rel="stylesheet" type="text/css" href="font-roboto.css">
-</head>
-<body>
+    <head>
+        <meta charset="utf-8" />
+        <title>Markov-chain generated sentences</title>
+        <link href="style.css" rel="stylesheet" type="text/css" />
+        <script src="utils/type-jig.js"></script>
+        <script src="utils/util.js"></script>
+        <script src="utils/steno-display.js"></script>
+        <script src="plover-translations.js"></script>
+        <script src="tatoeba-sentences.js"></script>
+        <script src="libs/jquery-3.6.0.min.js"></script>
+        <script src="libs/chart.js"></script>
+        <script src="chartjs-plugin-datalabels.js"></script>
+        <link rel="stylesheet" type="text/css" href="font-roboto.css" />
+    </head>
+    <body>
+        <div id="lesson" class="wrapper"></div>
+    </body>
+    <script>
+        setTheme();
 
-<div id="lesson" class="wrapper">
-	<div id="leftside">
-		<h3 id="lesson-name" class="center"></h3>
-		<div id="drill-content">
-			<div id="answer"></div>
-			<div id="exercise"></div>
-			<div id="results"></div>
-			<div style="height: 300px">
-				<canvas id="chartDiv" width="400" height="400"></canvas>
-			</div>
-		</div>
-	</div>
+        function compute_ngrams(sentences, order) {
+            const ngrams = { "": [] };
+            for (let i = 0; i < sentences.length; ++i) {
+                const words = sentences[i].split(/\s+/);
+                for (let j = 0; j < words.length - order; ++j) {
+                    const Gram = words.slice(j, j + order).join(" ");
+                    if (j === 0) ngrams[""].push(Gram);
+                    const gram = Gram.toLowerCase();
+                    const next = words[j + order];
+                    if (ngrams[gram] == null) ngrams[gram] = [];
+                    ngrams[gram].push(next);
+                }
+            }
+            return ngrams;
+        }
 
-	<div id="nav">
-		<p id="stroke-hint"></p>
-		<p id="strokes"></p>
-		<p id="clock" class="clock"></p>
-		<p id="live-wpm-display" class="wpm"></p>
-		<p class="center"><a id="back" title="LeftArrow">&larr; Back to Menu <span class="shortcutkey">(LeftArrow)</span></a></p>
-		<p class="center"><a id="again" title="Enter">&#8634; Repeat Drill <span class="shortcutkey">(Enter 3x)</span></a></p>
-		<p class="center"><a id="end" title="Enter">&Cross; End Drill <span class="shortcutkey">(Tab 3x)</span></a></p>
-		<p class="center"><a id="new" title="RightArrow">&rarr; New Drill <span class="shortcutkey">(RightArrow)</span></a></p>
-	</div>
+        function generate_sentence(ngrams, rnd) {
+            const choose = (a) => a[Math.floor(rnd() * a.length)];
+            let sentence = choose(ngrams[""]).split(" ");
+            const order = sentence.length;
+            while (true) {
+                const last = sentence.slice(-order).join(" ").toLowerCase();
+                const following = ngrams[last];
+                if (following == null) break;
+                sentence.push(choose(following));
+            }
+            return sentence;
+        }
 
-	<textarea id="input"></textarea>
-</div>
+        function generateMarkovExercise(ngrams, word_count, rnd) {
+            let words = [];
+            let chars_left = word_count * 5 + 1;
+            while (chars_left > 0) {
+                const sentence = generate_sentence(ngrams, rnd);
+                chars_left -= 1 + sentence.join(" ").length;
+                words.splice(words.length, 0, ...sentence);
+            }
+            return new TypeJig.Exercise(words, 0, false, "ordered");
+        }
 
-<script src="markov.js"></script>
+        //JQuery document ready
+        $(document).ready(function () {
+            populatePage();
 
-</body>
+            var fields = parseQueryString(document.location.search);
+
+            var rng = new_rng(fields.seed);
+
+            var word_count =
+                fields.word_count == null ? 100 : parseInt(fields.word_count);
+
+            var name = "Markov-chain generated sentences";
+            const ngrams = compute_ngrams(sentences, 3);
+            // console.log(ngrams)
+            var exercise = generateMarkovExercise(ngrams, word_count, rng);
+
+            var jig = setExercise(name, exercise, null, fields);
+
+            var another = document.getElementById("new");
+            var nextSeed = prepareNextSeed(another);
+            another.addEventListener("click", function (evt) {
+                evt.preventDefault();
+                window.history.replaceState(
+                    "",
+                    "",
+                    updateURLParameter(window.location.href, "seed", nextSeed)
+                );
+                let rng = new_rng(nextSeed);
+                let exercise = generateMarkovExercise(ngrams, word_count, rng);
+                jig.exercise = exercise;
+                jig.reset();
+                nextSeed = prepareNextSeed(another);
+            });
+
+            var back = document.getElementById("back");
+            back.href = back.href.replace("markov", "form");
+            initializeButtons(jig);
+        });
+    </script>
 </html>

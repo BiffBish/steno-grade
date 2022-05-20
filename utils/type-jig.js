@@ -5,8 +5,16 @@
  * `output`, and `clock` are elements (or element ID strings).
  */
 
-function TypeJig(exercise, options) {
-    console.log("TypeJig", exercise);
+function TypeJig(exercise, options, hint = null) {
+    /**
+     *
+     */
+    this.gradingRules = {};
+    if (options?.gradingRules && typeof options?.gradingResults == "object") {
+        this.gradingRules = options.gradingResults;
+    }
+
+    console.log("TypeJig", exercise, hint);
     this.exercise = exercise;
 
     this.display = documentElement("exercise");
@@ -16,23 +24,24 @@ function TypeJig(exercise, options) {
     const liveWPM = documentElement("live-wpm-display");
     const clockElt = documentElement("clock");
 
-    this.liveWPM = new TypeJig.LiveWPM(liveWPM, this, options.live_wpm);
+    this.liveWPM = new TypeJig.LiveWPM(liveWPM, this, options?.live_wpm);
     const updateWPM = this.liveWPM.update.bind(this.liveWPM);
     this.clock = new TypeJig.Timer(
         clockElt,
         exercise.seconds * 1000,
         updateWPM
     );
+    if (hint) this.hint = hint;
+    else this.hint = initializeHints(options?.hints);
 
-    this.hint = initializeHints(options.hints);
-    if (options.hints) this.hint.show();
+    if (options?.hints) this.hint.show();
     else this.hint.hide();
 
-    if (!options.show_timer) this.clock.hide();
+    if (!options?.show_timer) this.clock.hide();
 
-    this.live_wpm = options.live_wpm;
-    this.live_cpm = options.live_cpm;
-    this.hint_on_fail = options.hints == "fail";
+    this.live_wpm = options?.live_wpm;
+    this.live_cpm = options?.live_cpm;
+    this.hint_on_fail = options?.hints == "fail";
 
     this.showing_hint_on_word = "";
 
@@ -80,7 +89,6 @@ TypeJig.prototype.reset = function () {
 
     this.showing_hint_on_word = "";
 
-
     this.persistentWordData = [];
 
     this.lastTypedWordID = -1;
@@ -101,7 +109,7 @@ TypeJig.prototype.reset = function () {
         for (let i = 0; i < spans.length; ++i) {
             spans[i].className = "notYet";
         }
-
+    console.log("105", this.hint);
     if (this.hint && this.hint.update) {
         //Get a string containing the next 10 words. if its at the end of the list get as much as you can.
 
@@ -287,6 +295,7 @@ TypeJig.prototype.onWord = function (word, id) {
 };
 
 TypeJig.prototype.gradeTypeVsResult = function (typedWords, expectedWords) {
+    var gradingRules = this.gradingRules;
     // Display the user's answer, marking it for correctness.
     var oldOutput = this.display.previousElementSibling;
     var output = document.createElement("div");
@@ -301,16 +310,12 @@ TypeJig.prototype.gradeTypeVsResult = function (typedWords, expectedWords) {
 
     var errorCount = 0;
     var correctCount = 0;
-    //If the last element in the typed Words list is blank remove it
-    // if (typedWords[typedWords.length - 1] == "") {
-    //     typedWords.pop();
-    // }
 
     for (let i = 0; i < typedWords.length; ++i) {
         if (typedIndex >= typedWords.length) break;
         var typed = typedWords[typedIndex];
         var expected = expectedWords[expectedIndex];
-        matchResult = checkMatch(typed, expected);
+        var matchResult = checkMatch(typed, expected);
         var lastTypedWord = typedIndex === typedWords.length - 1;
 
         if (matchResult) {
@@ -337,10 +342,14 @@ TypeJig.prototype.gradeTypeVsResult = function (typedWords, expectedWords) {
 
         //Check if we are on an erranious word and further on we type a correct word
         let addedWordsOffset = 0;
-        for (let offset = 1; offset < 5; offset++) {
+        for (
+            let offset = 1;
+            offset < gradingRules?.addedWordMaxJump ?? 5;
+            offset++
+        ) {
             if (typedIndex + offset >= typedWords.length) break;
             const offsetTypedWord = typedWords[typedIndex + offset];
-            offsetMatch = checkMatch(offsetTypedWord, expected);
+            let offsetMatch = checkMatch(offsetTypedWord, expected);
 
             if (offsetMatch != false) {
                 addedWordsOffset = offset;
@@ -349,10 +358,14 @@ TypeJig.prototype.gradeTypeVsResult = function (typedWords, expectedWords) {
         }
 
         let droppedWordOffset = 0;
-        for (let offset = 1; offset < 5; offset++) {
+        for (
+            let offset = 1;
+            offset < gradingRules?.droppedWordMaxJump ?? 5;
+            offset++
+        ) {
             if (expectedIndex + offset >= expectedWords.length) break;
             const offsetExpectedWord = expectedWords[expectedIndex + offset];
-            offsetMatch = checkMatch(typed, offsetExpectedWord);
+            let offsetMatch = checkMatch(typed, offsetExpectedWord);
             if (lastTypedWord && offsetMatch == null) {
                 droppedWordOffset = offset;
                 break;
@@ -371,7 +384,9 @@ TypeJig.prototype.gradeTypeVsResult = function (typedWords, expectedWords) {
                 this.persistentWordData[typedIndex] = {
                     ...this.persistentWordData[typedIndex],
                     failed: true,
-                    typed: this.persistentWordData[typedIndex]?.typed ? this.persistentWordData[typedIndex].typed : typed,
+                    typed: this.persistentWordData[typedIndex]?.typed
+                        ? this.persistentWordData[typedIndex].typed
+                        : typed,
                 };
             }
 
@@ -870,7 +885,6 @@ TypeJig.prototype.endExercise = function (seconds) {
     this.saveErrorsInLocalStorage();
 };
 
-
 TypeJig.prototype.saveErrorsInLocalStorage = function () {
     var errors = JSON.parse(localStorage.getItem("errors"));
     if (!errors) errors = [];
@@ -886,8 +900,7 @@ TypeJig.prototype.saveErrorsInLocalStorage = function () {
                 typedWord.expected,
             ];
             errors.push(error);
-        }
-        else if(persistantData?.failed){
+        } else if (persistantData?.failed) {
             errors.push([
                 this.typedWords[i - 1] ? this.typedWords[i - 1].typed : "",
                 persistantData?.typed,
@@ -897,10 +910,6 @@ TypeJig.prototype.saveErrorsInLocalStorage = function () {
     }
     localStorage.setItem("errors", JSON.stringify(errors));
 };
-
-
-
-
 
 TypeJig.prototype.showResults = function () {
     typedWords = this.input.value.replaceAll(/^\s+/g, "").split(/\s+/);
@@ -1446,9 +1455,42 @@ TypeJig.Timer.prototype.hide = function () {
 
 // -----------------------------------------------------------------------
 
+/**
+ *
+ * @param {string[] | string[][]} words The words to type
+ * @param {number} seconds The number of seconds to type all the words
+ * @param {boolean} shuffle Whether to shuffle the words
+ * @param {*} select
+ * @param {*} speed
+ */
 TypeJig.Exercise = function (words, seconds, shuffle, select, speed) {
+    this.name = "Unnamed Exercise";
+    this.enterPoints = [];
+
+    var processedWords = [];
+    words = words.flat(2);
+    for (var i = 0; i < words.length; i++) {
+        if (words[i] == "\n") {
+            processedWords.push("\n" + (words[i + 1] ?? ""));
+            i++;
+        } else {
+            processedWords.push(words[i]);
+        }
+    }
+
     this.started = false;
-    this.words = words;
+    /**
+     * @type {string[]}
+     */
+    this.words = processedWords;
+    console.log(this.words);
+    //Remove all the \n characters from words
+    this.words = this.words.map((w) => w?.replace(/\n/g, ""));
+    this.words = this.words.filter((w) => w != "");
+    /**
+     * @type {string[]}
+     */
+    this.rawWords = [...processedWords];
     this.seconds = seconds;
     this.shuffle = shuffle;
     this.select =
@@ -1488,7 +1530,7 @@ TypeJig.Exercise.prototype.getText = function () {
 TypeJig.Exercise.prototype.calculateBreakPoints = function (display) {
     this.enterPoints = [];
 
-    var words = this.words;
+    var words = this.rawWords;
     while (display.firstChild) {
         display.removeChild(display.firstChild);
     }
@@ -1501,7 +1543,7 @@ TypeJig.Exercise.prototype.calculateBreakPoints = function (display) {
         display.appendChild(span);
 
         var r = display.getBoundingClientRect();
-        if (r.bottom > y + 0.001) {
+        if (r.bottom > y + 0.001 || word.includes("\n")) {
             if (i != 0) this.enterPoints.push(i);
             y = r.bottom;
         }

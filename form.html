@@ -1,429 +1,685 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<meta charset="utf-8">
-	<title>Steno Jig</title>
-	<link href="style.css" rel="stylesheet" type="text/css">
-	<script src="type-jig.js"></script>
-	<script src="util.js"></script>
-	<script src="word-drill.js"></script>
-	<script src="number-sentences.js"></script>
-	<script src="steno-display.js"></script>
-	<script src="word-sets.js"></script>
-	<script src="plover-translations.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="chart.js"></script>
-<script src="chartjs-plugin-datalabels.js"></script>	<link rel="stylesheet" type="text/css" href="font-roboto.css">
-</head>
-<body>
-
-<div id="form" class="wrapper">
-	<h1>Choose a drill...</h1>
-
-	<div class="form-section">
-		<div class="caption"><strong>Settings</strong> that apply to all drills</div><br>
-
-		<div name="hints">
-			<label><input id="hints" type="radio" name="hints" value="1" checked>Show hints</label>
-			<label><input id="hints" type="radio" name="hints" value="fail" checked>Hint on fail</label>
-			<label><input id="hints" type="radio" name="hints" value="" checked>No hints</label>
-		</div><br>
-
-		<div name="live_wpm">
-			<label><input id="live_wpm" type="checkbox" name="live_wpm" value="1" checked>Show Live WPM</label>
-		</div><br>
-
-		<div name="show_timer">
-			<label><input id="show_timer" type="checkbox" name="show_timer" value="1" checked>Show Timer</label>
-		</div><br>
-
-		<div name="speed">
-			<label><input id="wpm" type="number" name="wpm" value="" step="5"> Speed (words per minute)
-				(or <input type="checkbox" id="cpm" value="1"> x5 chars per minute) </label>
-		</div><br>
-
-		<div name="alt">
-			<label>Alternate with: <input id="alternate" type="text" name="alternate"></label>
-		</div>
-	</div>
-
-
-	<div class="form-section">
-		<div class="caption">Custom <strong>text</strong></div>
-
-		<form class="drill-options" id="custom" action="form.html">
-
-			<textarea name="drill"></textarea><br>
-			<input type="checkbox" name="type" value="shuffled"> Shuffle words.<br>
-			Or <input type="checkbox" name="shuffleLines" value="shuffled"> shuffle lines.<br>
-			Repeat <input type="number" name="repeat" min="1" max="100" step="1" value="1"> times.<br>
-
-			<button>Start Drill &rarr;</button>
-		</form>
-	</div>
-
-	<div class="form-section">
-		<div class="caption">Custom <strong>Finger Drills</strong></div>
-
-		<form class="drill-options" action="finger-drills.html">
-
-			Repeat strokes <input type="text" name="strokes" size="18">
-			<input type="number" name="iterations" value="20" step="5"> times.<br>
-			(e.g. "EFPLT/EFPLS/EFPLTS EBGD/EBGZ/EBGDZ": strokes separated by slashes, sets separated by spaces)<br>
-			<button>Start Drill &rarr;</button>
-		</form>
-	</div>
-
-
-	<div class="form-section">
-		<div class="caption">Most used <strong>words</strong> (once, in random order)</div>
-
-		<form class="drill-options" action="form.html">
-			<input type="hidden" name="drill" value="NGSL_all_forms">
-			<input type="hidden" name="type" value="shuffled">
-
-			Drill
-			<input type="number" name="count" value="100" min="25" max="1000" step="25">
-			words starting at rank
-			<input type="number" name="first" value="0" min="0" max="8400" step="25">
-			(randomly choosing
-			<input type="number" name="choose" value="1000" min="25" max="1000" step="25">
-			each time)
-			<br>
-
-			<button>Start Drill &rarr;</button>
-		</form>
-	</div>
-
-	<div class="form-section">
-		<div class="caption"><strong>Sentences</strong> extracted from <a href="https://www.gutenberg.org/">Project Gutenberg</a></div>
-
-		<form class="drill-options" action="short-sentences.html">
-
-			<p><b class="red">NEW</b>: top "0" words gives a set of nearly 200k sentences with unrestricted vocabulary.</p>
-			Drill sentences containing only the top
-			<input id="gutnum" type="number" name="top" value="0" min="0" max="8000" step="100">
-			most used words<br>
-
-			Drill Length:
-			<input type="number" name="word_count" value="100" min="50" max="1000" step="50">
-			words <small>(plus the rest of the last sentence.)</small>
-			<br>
-
-			<script>
-			document.write('<input type="hidden" name="seed" value="' + Math.random().toString() + '">')
-			document.getElementById('gutnum').addEventListener('input', function(evt) {
-				const num = evt.target, form = num.form
-				form.action = (num.value === '0') ? 'short-sentences.html' : 'gutenberg.html'
-			})
-			</script>
-
-			<button>Start Drill &rarr;</button>
-		</form>
-	</div>
-
-	<div class="form-section">
-		<div class="caption">Randomly generated <strong>sentences</strong> using words from a <a href="https://en.wiktionary.org/wiki/Wiktionary:Frequency_lists/Contemporary_fiction">Wiktionary top 2000 list</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA 3.0</a>) and sentence data from <a href="https://tatoeba.org">Tatoeba</a> (<a href="https://creativecommons.org/licenses/by/2.0/fr/">CC-BY 2.0 fr</a>)</div>
-
-		<form class="drill-options" action="markov.html">
-
-			Drill Length:
-			<input type="number" name="word_count" value="100" min="50" max="1000" step="50">
-			words <small>(plus the rest of the last sentence.)</small>
-			<br>
-
-			<script>document.write('<input type="hidden" name="seed" value="' + Math.random().toString() + '">')</script>
-
-			<button>Start Drill &rarr;</button>
-		</form>
-	</div>
-
-	<div class="form-section">
-		<div class="caption"><strong>Quotes</strong> from <a href="https://github.com/Miodec/monkeytype/blob/master/static/quotes/english.json">Monkeytype</a>.</div>
-
-		<form class="drill-options" action="monkeytype-quote.html">
-
-			Drill length:
-			<ul>
-				<li style="list-style:none"><input type="radio" name="length" value="all" checked><label for="length">All</label></li>
-				<li style="list-style:none"><input type="radio" name="length" value="short"><label for="length">Short (&lt;100 characters)</label></li>
-				<li style="list-style:none"><input type="radio" name="length" value="medium"><label for="length">Medium (101-300 characters)</label></li>
-				<li style="list-style:none"><input type="radio" name="length" value="long"><label for="length">Long (301-600 characters)</label></li>
-				<li style="list-style:none"><input type="radio" name="length" value="thicc"><label for="length">Thicc (&gt;600 characters)</label></li>
-			</ul>
-			<button>Start Drill &rarr;</button>
-		</form>
-	</div>
-
-	<div class="form-section">
-		<div class="caption">Phonetic <strong>words</strong> that use exactly one starting <strong>consonant</strong> key, exactly one <strong>vowel</strong> key and exactly one ending <strong>consonant</strong>.</div>
-
-		<form class="drill-options" action="form.html">
-			<input type="hidden" name="drill" value="singleStrokeCVC">
-			<input type="hidden" name="type" value="randomly">
-
-			Drill Time:
-			<input type="number" name="timeLimit" value="3" min="1" max="60" size="3">
-			minutes.
-			<br>
-
-			<button>Start Drill &rarr;</button>
-		</form>
-	</div>
-
-	<div class="form-section">
-		<div class="caption"><strong>Numbers</strong> 1-99 in simple sentences</div>
-
-		<form class="drill-options" action="form.html">
-			<input type="hidden" name="drill" value="NumberSentences">
-			<input type="hidden" name="type" value="randomly">
-
-			Drill Time:
-			<input type="number" name="timeLimit" value="3" min="1" max="60">
-			minutes.
-			<br>
-
-			<button>Start Drill &rarr;</button>
-		</form>
-	</div>
-
-	<div class="form-section">
-		<div class="caption">Da Dreaded Dueling Digit Duo <strong>Finger Drills</strong></div>
-
-		<form class="drill-options" action="finger-drills.html">
-
-			Section <input type="number" name="section" value="1" min="1" max="27"><br>
-
-			Alternate <input type="number" name="iterations" value="20" step="5"> times.<br>
-
-			<button>Start Drill &rarr;</button>
-		</form>
-	</div>
-
-	<div class="form-section">
-		<div class="caption">Other drills.</div>
-		<ul>
-			<li><a href="two-key.html">Sentences which (mostly) only use two keys at once</a></li>
-			<li><a href="form.html?drill=shortAndLongA&type=shuffled&select=shuffled&hints=true">Short and Long A words</a></li>
-			<li><a href="form.html?drill=ST%20words&drill=SH%20words&drill=CH%20words&type=shuffled&hints=true">"st-", "sh-", and "ch-" words</a></li>
-			<li><a href="form.html?drill=-LD%20words&drill=-LT%20words&drill=-RT%20words&type=shuffled&hints=true">Simple "-ld", "-lt", and "-rt" words</a></li>
-			<li><a href="form.html?drill=%2bLD%20words&drill=%2bLT%20words&drill=%2bRT%20words&type=shuffled&hints=true">Extended "-ld", "-lt", and "-rt" words</a></li>
-			<li><a href="form.html?drill=-LD%20words&drill=-LT%20words&drill=-RT%20words&drill=%2bLD%20words&drill=%2bLT%20words&drill=%2bRT%20words&type=shuffled&hints=true">All "-ld", "-lt", and "-rt" words</a></li>
-			<li><a href="form.html?drill=d-/b-&type=randomly&timeLimit=3">D- and B- words</a></li>
-			<li><a href="form.html?drill=ite/ight&type=randomly&timeLimit=3">-ite/-ight words</a></li>
-			<li><a href="form.html?drill=nch&type=randomly&timeLimit=3">"nch" words</a></li>
-			<li><a href="form.html?drill=-ld/-lt&drill=-nj&type=randomly&timeLimit=5">"-nj" words mixed with "-ld/"/"-lt" ones.</a></li>
-		</ul>
-
-		<p><strong>Note</strong> on Finger Drills.  Delete (plover v3) or disable (plover v4) all dictionaries but <code>commands.json</code> (in plover v3, delete all dictionaries and save to get the default config back). In plover v4, check out the plover-dict-control plugin which allows you to define strokes to switch dictionaries.</p>
-	</div>
-</div>
-
-<div id="lesson" class="wrapper" style="display: none">
-	<div id="leftside">
-		<h3 id="lesson-name" class="center"></h3>
-		<div id="drill-content">
-			<div id="answer"></div>
-			<div id="exercise"></div>
-			<div id="results"></div>
-			<div style="height: 300px">
-				<canvas id="chartDiv" width="400" height="400"></canvas>
-			</div>
-		</div>
-	</div>
-
-	<div id="nav">
-		<p id="stroke-hint"></p>
-		<p id="strokes"></p>
-		<p id="clock" class="clock"></p>
-		<p id="live-wpm-display" class="wpm"></p>
-
-		<p class="center"><a id="back" title="LeftArrow">&larr; Back to Menu <span class="shortcutkey">(LeftArrow)</span></a></p>
-		<p class="center"><a id="again" title="Enter">&#8634; Restart <span class="shortcutkey">(Enter 3x)</span></a></p>
-		<p class="center"><a id="end" title="Enter">&Cross; End <span class="shortcutkey">(Tab 3x)</span></a></p>
-		<p class="center"><a id="show-hint" title="UpArrow">Show Hint <span class="shortcutkey">(UpArrow)</span></a></p>
-	</div>
-
-	<textarea id="input"></textarea>
-</div>
-
-<script>
-function runExercise(fields) {
-	if(fields.drill === 'NumberSentences') exercise = numberSentences(fields);
-	else exercise = wordDrill(fields);
-	if(exercise) {
-		if(fields.hints) {
-			var strokes = document.getElementById('strokes');
-			if(fields.floating_hints) {
-				strokes.style.position = 'fixed';
-			}
-			var translations = TypeJig.shortestTranslations(TypeJig.Translations.Plover);
-			var hints = new StenoDisplay(strokes, translations, true);
-		}
-		var options = fields;
-
-		options.hints = 1
-		displayOnly('lesson');
-		return setExercise(exercise.name, exercise, hints, options);
-	}
-}
-
-function getSettings(evt) {
-	const hintButtons = document.getElementsByName('hints')
-	for(var radio of hintButtons) {
-		if(radio.checked) {
-			hiddenField(this, 'hints', radio.value)
-			break
-		}
-	}
-
-	var live_wpm = document.getElementById('live_wpm')
-	if(live_wpm.checked) hiddenField(this, 'live_wpm', live_wpm.value)
-
-	var show_timer = document.getElementById('show_timer')
-	if(show_timer.checked) hiddenField(this, 'show_timer', show_timer.value)
-	var wpm = document.getElementById('wpm')
-	var cpm = document.getElementById('cpm')
-	if(cpm.checked) hiddenField(this, 'cpm', 5*wpm.value)
-	else hiddenField(this, 'wpm', wpm.value);
-
-	var alternate = document.getElementById('alternate')
-	hiddenField(this, 'alternate', alternate.value)
-}
-
-function runCustom(evt) {
-	evt.preventDefault();
-	getSettings.call(this);
-	var fields = getFormFields(this);
-	if(storageAvailable('localStorage')) {
-		localStorage.custom = fields.drill
-	}
-	if(fields.shuffleLines) {
-		// Don't shuffle words.
-		delete(fields.type);
-		// Pre-shuffle lines.
-		fields.drill = shuffle(fields.drill.trim().split(/\n+/m)).join(' ');
-	}
-	let drill =  fields.drill.trim().split(/\s+/m);
-	let n = +fields.repeat || 1;
-	TypeJig.WordSets.custom = [];
-	for(let i=0; i<n; ++i) TypeJig.WordSets.custom.push(...drill);
-	fields.drill = 'custom';
-	var jig = runExercise(fields);
-	var again = document.getElementById('again')
-	var end = document.getElementById('end');
-	again.addEventListener('click', function(evt){
-		evt.preventDefault();
-		jig.reset();
-	});
-}
-
-window.onload = function() {
-	if(document.location.search !== '') {
-		runExercise(parseQueryString(document.location.search));
-	} else {
-		// Add event listeners to get settings before submitting.
-		var forms = document.querySelectorAll('form');
-		for(var i=0; i<forms.length; ++i) {
-			var form = forms[i]
-			if(form.id === 'custom') {
-				form.addEventListener('submit', runCustom);
-			} else {
-				form.addEventListener('submit', getSettings);
-			}
-		}
-	}
-}
-
-
-//
-
-
-loadSettings()
-if(storageAvailable('localStorage') && localStorage.custom != null) {
-	let custom = document.getElementById('custom')
-	custom.elements.drill.value = localStorage.custom
-}
-
-$(document).ready(function () {
-	// Get keyboard input from entire page
-	$('body').keydown(function (e) {
-		console.log(e)
-		//prevent deafault
-		// e.preventDefault();
-
-
-		//If key is down find the div with the class "selected-form-section". If there is no div with the class "selected-form-section" then select the first div.
-		//Then set the div below it to be the div with the class "selected-form-section".
-
-		
-
-
-
-
-
-
-		var key = e.which;
-		if (key == 13) {
-			// Enter key
-			var selected = $('.selected-form-section');
-			//Find the button inside of the selected div and click it. recurse
-			console.log(selected)
-			selected.find('button').click();
-		} else if (key == 32) {
-			// Space
-			$('#show-hint').click();
-		} else if (key == 37) {
-			// Left arrow
-			$('#back').click();
-		} else if (key == 39) {
-			// Right arrow
-			$('#again').click();
-		} else if (key == 40) {
-			// Down arrow
-			var selectedDiv = $('.selected-form-section');
-			if (selectedDiv.length == 0) {
-				$('.form-section').first().addClass('selected-form-section');
-			} else {
-				selectedDiv.removeClass('selected-form-section');
-				selectedDiv.next().addClass('selected-form-section');
-			}
-			//scroll to the selected div keeping it centered. but handle fast repeated keystrokes. wait for a second before scrolling.
-			
-			//Wait for a momnet
-			setTimeout(function () {
-							$('.selected-form-section')[0].scrollIntoView({ block: "center" });
-
-			}, 10);
-				
-		} else if (key == 38) {
-			// Up arrow
-			var selectedDiv = $('.selected-form-section');
-			if (selectedDiv.length == 0) {
-				$('.form-section').last().addClass('selected-form-section');
-			} else {
-				selectedDiv.removeClass('selected-form-section');
-				selectedDiv.prev().addClass('selected-form-section');
-			}
-			//scroll to the selected div keeping it centered. but handle fast repeated keystrokes
-			setTimeout(function () {
-				$('.selected-form-section')[0].scrollIntoView({ block: "center" });
-			}, 10);
-		} 
-
-
-
-
-
-
-
-	});
-
-	// jQuery methods go here...
-
-});
-
-</script>
-
-</body>
+    <head>
+        <meta charset="utf-8" />
+        <title>Steno Jig</title>
+        <link href="style.css" rel="stylesheet" type="text/css" />
+        <script src="utils/type-jig.js"></script>
+        <script src="utils/util.js"></script>
+        <script src="word-drill.js"></script>
+        <script src="number-sentences.js"></script>
+        <script src="utils/steno-display.js"></script>
+        <script src="word-sets.js"></script>
+        <script src="plover-translations.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="libs/chart.js"></script>
+        <script src="chartjs-plugin-datalabels.js"></script>
+        <link rel="stylesheet" type="text/css" href="font-roboto.css" />
+    </head>
+    <body>
+        <div id="form" class="wrapper">
+            <h1>Choose a drill...</h1>
+
+            <div class="form-section">
+                <div class="caption">
+                    <strong>Settings</strong> that apply to all drills
+                </div>
+                <br />
+
+                <div name="hints">
+                    <label
+                        ><input
+                            id="hints"
+                            type="radio"
+                            name="hints"
+                            value="1"
+                            checked
+                        />Show hints</label
+                    >
+                    <label
+                        ><input
+                            id="hints"
+                            type="radio"
+                            name="hints"
+                            value="fail"
+                            checked
+                        />Hint on fail</label
+                    >
+                    <label
+                        ><input
+                            id="hints"
+                            type="radio"
+                            name="hints"
+                            value=""
+                            checked
+                        />No hints</label
+                    >
+                </div>
+                <br />
+
+                <div name="live_wpm">
+                    <label
+                        ><input
+                            id="live_wpm"
+                            type="checkbox"
+                            name="live_wpm"
+                            value="1"
+                            checked
+                        />Show Live WPM</label
+                    >
+                </div>
+                <br />
+
+                <div name="show_timer">
+                    <label
+                        ><input
+                            id="show_timer"
+                            type="checkbox"
+                            name="show_timer"
+                            value="1"
+                            checked
+                        />Show Timer</label
+                    >
+                </div>
+                <br />
+
+                <div name="speed">
+                    <label
+                        ><input
+                            id="wpm"
+                            type="number"
+                            name="wpm"
+                            value=""
+                            step="5"
+                        />
+                        Speed (words per minute) (or
+                        <input type="checkbox" id="cpm" value="1" /> x5 chars
+                        per minute)
+                    </label>
+                </div>
+                <br />
+
+                <div name="alt">
+                    <label
+                        >Alternate with:
+                        <input id="alternate" type="text" name="alternate"
+                    /></label>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="caption">Custom <strong>text</strong></div>
+
+                <form class="drill-options" id="custom" action="form.html">
+                    <textarea name="drill"></textarea><br />
+                    <input type="checkbox" name="type" value="shuffled" />
+                    Shuffle words.<br />
+                    Or
+                    <input
+                        type="checkbox"
+                        name="shuffleLines"
+                        value="shuffled"
+                    />
+                    shuffle lines.<br />
+                    Repeat
+                    <input
+                        type="number"
+                        name="repeat"
+                        min="1"
+                        max="100"
+                        step="1"
+                        value="1"
+                    />
+                    times.<br />
+
+                    <button>Start Drill &rarr;</button>
+                </form>
+            </div>
+
+            <div class="form-section">
+                <div class="caption">Custom <strong>Finger Drills</strong></div>
+
+                <form class="drill-options" action="finger-drills.html">
+                    Repeat strokes
+                    <input type="text" name="strokes" size="18" />
+                    <input
+                        type="number"
+                        name="iterations"
+                        value="20"
+                        step="5"
+                    />
+                    times.<br />
+                    (e.g. "EFPLT/EFPLS/EFPLTS EBGD/EBGZ/EBGDZ": strokes
+                    separated by slashes, sets separated by spaces)<br />
+                    <button>Start Drill &rarr;</button>
+                </form>
+            </div>
+
+            <div class="form-section">
+                <div class="caption">
+                    Most used <strong>words</strong> (once, in random order)
+                </div>
+
+                <form class="drill-options" action="form.html">
+                    <input type="hidden" name="drill" value="NGSL_all_forms" />
+                    <input type="hidden" name="type" value="shuffled" />
+
+                    Drill
+                    <input
+                        type="number"
+                        name="count"
+                        value="100"
+                        min="25"
+                        max="1000"
+                        step="25"
+                    />
+                    words starting at rank
+                    <input
+                        type="number"
+                        name="first"
+                        value="0"
+                        min="0"
+                        max="8400"
+                        step="25"
+                    />
+                    (randomly choosing
+                    <input
+                        type="number"
+                        name="choose"
+                        value="1000"
+                        min="25"
+                        max="1000"
+                        step="25"
+                    />
+                    each time)
+                    <br />
+
+                    <button>Start Drill &rarr;</button>
+                </form>
+            </div>
+
+            <div class="form-section">
+                <div class="caption">
+                    <strong>Sentences</strong> extracted from
+                    <a href="https://www.gutenberg.org/">Project Gutenberg</a>
+                </div>
+
+                <form class="drill-options" action="short-sentences.html">
+                    <p>
+                        <b class="red">NEW</b>: top "0" words gives a set of
+                        nearly 200k sentences with unrestricted vocabulary.
+                    </p>
+                    Drill sentences containing only the top
+                    <input
+                        id="gutnum"
+                        type="number"
+                        name="top"
+                        value="0"
+                        min="0"
+                        max="8000"
+                        step="100"
+                    />
+                    most used words<br />
+
+                    Drill Length:
+                    <input
+                        type="number"
+                        name="word_count"
+                        value="100"
+                        min="50"
+                        max="1000"
+                        step="50"
+                    />
+                    words <small>(plus the rest of the last sentence.)</small>
+                    <br />
+
+                    <script>
+                        document.write(
+                            '<input type="hidden" name="seed" value="' +
+                                Math.random().toString() +
+                                '">'
+                        );
+                        document
+                            .getElementById("gutnum")
+                            .addEventListener("input", function (evt) {
+                                const num = evt.target,
+                                    form = num.form;
+                                form.action =
+                                    num.value === "0"
+                                        ? "short-sentences.html"
+                                        : "gutenberg.html";
+                            });
+                    </script>
+
+                    <button>Start Drill &rarr;</button>
+                </form>
+            </div>
+
+            <div class="form-section">
+                <div class="caption">
+                    Randomly generated <strong>sentences</strong> using words
+                    from a
+                    <a
+                        href="https://en.wiktionary.org/wiki/Wiktionary:Frequency_lists/Contemporary_fiction"
+                        >Wiktionary top 2000 list</a
+                    >
+                    (<a href="https://creativecommons.org/licenses/by-sa/3.0/"
+                        >CC-BY-SA 3.0</a
+                    >) and sentence data from
+                    <a href="https://tatoeba.org">Tatoeba</a> (<a
+                        href="https://creativecommons.org/licenses/by/2.0/fr/"
+                        >CC-BY 2.0 fr</a
+                    >)
+                </div>
+
+                <form class="drill-options" action="markov.html">
+                    Drill Length:
+                    <input
+                        type="number"
+                        name="word_count"
+                        value="100"
+                        min="50"
+                        max="1000"
+                        step="50"
+                    />
+                    words <small>(plus the rest of the last sentence.)</small>
+                    <br />
+
+                    <script>
+                        document.write(
+                            '<input type="hidden" name="seed" value="' +
+                                Math.random().toString() +
+                                '">'
+                        );
+                    </script>
+
+                    <button>Start Drill &rarr;</button>
+                </form>
+            </div>
+
+            <div class="form-section">
+                <div class="caption">
+                    <strong>Quotes</strong> from
+                    <a
+                        href="https://github.com/Miodec/monkeytype/blob/master/static/quotes/english.json"
+                        >Monkeytype</a
+                    >.
+                </div>
+
+                <form class="drill-options" action="monkeytype-quote.html">
+                    Drill length:
+                    <ul>
+                        <li style="list-style: none">
+                            <input
+                                type="radio"
+                                name="length"
+                                value="all"
+                                checked
+                            /><label for="length">All</label>
+                        </li>
+                        <li style="list-style: none">
+                            <input
+                                type="radio"
+                                name="length"
+                                value="short"
+                            /><label for="length"
+                                >Short (&lt;100 characters)</label
+                            >
+                        </li>
+                        <li style="list-style: none">
+                            <input
+                                type="radio"
+                                name="length"
+                                value="medium"
+                            /><label for="length"
+                                >Medium (101-300 characters)</label
+                            >
+                        </li>
+                        <li style="list-style: none">
+                            <input
+                                type="radio"
+                                name="length"
+                                value="long"
+                            /><label for="length"
+                                >Long (301-600 characters)</label
+                            >
+                        </li>
+                        <li style="list-style: none">
+                            <input
+                                type="radio"
+                                name="length"
+                                value="thicc"
+                            /><label for="length"
+                                >Thicc (&gt;600 characters)</label
+                            >
+                        </li>
+                    </ul>
+                    <button>Start Drill &rarr;</button>
+                </form>
+            </div>
+
+            <div class="form-section">
+                <div class="caption">
+                    Phonetic <strong>words</strong> that use exactly one
+                    starting <strong>consonant</strong> key, exactly one
+                    <strong>vowel</strong> key and exactly one ending
+                    <strong>consonant</strong>.
+                </div>
+
+                <form class="drill-options" action="form.html">
+                    <input type="hidden" name="drill" value="singleStrokeCVC" />
+                    <input type="hidden" name="type" value="randomly" />
+
+                    Drill Time:
+                    <input
+                        type="number"
+                        name="timeLimit"
+                        value="3"
+                        min="1"
+                        max="60"
+                        size="3"
+                    />
+                    minutes.
+                    <br />
+
+                    <button>Start Drill &rarr;</button>
+                </form>
+            </div>
+
+            <div class="form-section">
+                <div class="caption">
+                    <strong>Numbers</strong> 1-99 in simple sentences
+                </div>
+
+                <form class="drill-options" action="form.html">
+                    <input type="hidden" name="drill" value="NumberSentences" />
+                    <input type="hidden" name="type" value="randomly" />
+
+                    Drill Time:
+                    <input
+                        type="number"
+                        name="timeLimit"
+                        value="3"
+                        min="1"
+                        max="60"
+                    />
+                    minutes.
+                    <br />
+
+                    <button>Start Drill &rarr;</button>
+                </form>
+            </div>
+
+            <div class="form-section">
+                <div class="caption">
+                    Da Dreaded Dueling Digit Duo <strong>Finger Drills</strong>
+                </div>
+
+                <form class="drill-options" action="finger-drills.html">
+                    Section
+                    <input
+                        type="number"
+                        name="section"
+                        value="1"
+                        min="1"
+                        max="27"
+                    /><br />
+
+                    Alternate
+                    <input
+                        type="number"
+                        name="iterations"
+                        value="20"
+                        step="5"
+                    />
+                    times.<br />
+
+                    <button>Start Drill &rarr;</button>
+                </form>
+            </div>
+
+            <div class="form-section">
+                <div class="caption">Other drills.</div>
+                <ul>
+                    <li>
+                        <a href="two-key.html"
+                            >Sentences which (mostly) only use two keys at
+                            once</a
+                        >
+                    </li>
+                    <li>
+                        <a
+                            href="form.html?drill=shortAndLongA&type=shuffled&select=shuffled&hints=true"
+                            >Short and Long A words</a
+                        >
+                    </li>
+                    <li>
+                        <a
+                            href="form.html?drill=ST%20words&drill=SH%20words&drill=CH%20words&type=shuffled&hints=true"
+                            >"st-", "sh-", and "ch-" words</a
+                        >
+                    </li>
+                    <li>
+                        <a
+                            href="form.html?drill=-LD%20words&drill=-LT%20words&drill=-RT%20words&type=shuffled&hints=true"
+                            >Simple "-ld", "-lt", and "-rt" words</a
+                        >
+                    </li>
+                    <li>
+                        <a
+                            href="form.html?drill=%2bLD%20words&drill=%2bLT%20words&drill=%2bRT%20words&type=shuffled&hints=true"
+                            >Extended "-ld", "-lt", and "-rt" words</a
+                        >
+                    </li>
+                    <li>
+                        <a
+                            href="form.html?drill=-LD%20words&drill=-LT%20words&drill=-RT%20words&drill=%2bLD%20words&drill=%2bLT%20words&drill=%2bRT%20words&type=shuffled&hints=true"
+                            >All "-ld", "-lt", and "-rt" words</a
+                        >
+                    </li>
+                    <li>
+                        <a
+                            href="form.html?drill=d-/b-&type=randomly&timeLimit=3"
+                            >D- and B- words</a
+                        >
+                    </li>
+                    <li>
+                        <a
+                            href="form.html?drill=ite/ight&type=randomly&timeLimit=3"
+                            >-ite/-ight words</a
+                        >
+                    </li>
+                    <li>
+                        <a href="form.html?drill=nch&type=randomly&timeLimit=3"
+                            >"nch" words</a
+                        >
+                    </li>
+                    <li>
+                        <a
+                            href="form.html?drill=-ld/-lt&drill=-nj&type=randomly&timeLimit=5"
+                            >"-nj" words mixed with "-ld/"/"-lt" ones.</a
+                        >
+                    </li>
+                </ul>
+
+                <p>
+                    <strong>Note</strong> on Finger Drills. Delete (plover v3)
+                    or disable (plover v4) all dictionaries but
+                    <code>commands.json</code> (in plover v3, delete all
+                    dictionaries and save to get the default config back). In
+                    plover v4, check out the plover-dict-control plugin which
+                    allows you to define strokes to switch dictionaries.
+                </p>
+            </div>
+        </div>
+
+        <div id="lesson" class="wrapper" style="display: none"></div>
+    </body>
+    <script>
+        function runExercise(fields) {
+            if (fields.drill === "NumberSentences")
+                exercise = numberSentences(fields);
+            else exercise = wordDrill(fields);
+            if (exercise) {
+                if (fields.hints) {
+                    var strokes = document.getElementById("strokes");
+                    if (fields.floating_hints) {
+                        strokes.style.position = "fixed";
+                    }
+                    var translations = TypeJig.shortestTranslations(
+                        TypeJig.Translations.Plover
+                    );
+                    var hints = new StenoDisplay(strokes, translations, true);
+                }
+                var options = fields;
+
+                options.hints = 1;
+                displayOnly("lesson");
+                return setExercise(exercise.name, exercise, hints, options);
+            }
+        }
+
+        function getSettings(evt) {
+            const hintButtons = document.getElementsByName("hints");
+            for (var radio of hintButtons) {
+                if (radio.checked) {
+                    hiddenField(this, "hints", radio.value);
+                    break;
+                }
+            }
+
+            var live_wpm = document.getElementById("live_wpm");
+            if (live_wpm.checked) hiddenField(this, "live_wpm", live_wpm.value);
+
+            var show_timer = document.getElementById("show_timer");
+            if (show_timer.checked)
+                hiddenField(this, "show_timer", show_timer.value);
+            var wpm = document.getElementById("wpm");
+            var cpm = document.getElementById("cpm");
+            if (cpm.checked) hiddenField(this, "cpm", 5 * wpm.value);
+            else hiddenField(this, "wpm", wpm.value);
+
+            var alternate = document.getElementById("alternate");
+            hiddenField(this, "alternate", alternate.value);
+        }
+
+        function runCustom(evt) {
+            evt.preventDefault();
+            getSettings.call(this);
+            var fields = getFormFields(this);
+            if (storageAvailable("localStorage")) {
+                localStorage.custom = fields.drill;
+            }
+            if (fields.shuffleLines) {
+                // Don't shuffle words.
+                delete fields.type;
+                // Pre-shuffle lines.
+                fields.drill = shuffle(fields.drill.trim().split(/\n+/m)).join(
+                    " "
+                );
+            }
+            let drill = fields.drill.trim().split(/\s+/m);
+            let n = +fields.repeat || 1;
+            TypeJig.WordSets.custom = [];
+            for (let i = 0; i < n; ++i) TypeJig.WordSets.custom.push(...drill);
+            fields.drill = "custom";
+            var jig = runExercise(fields);
+            initializeButtons(jig);
+        }
+
+        window.onload = function () {};
+
+        //
+
+        loadSettings();
+        if (storageAvailable("localStorage") && localStorage.custom != null) {
+            let custom = document.getElementById("custom");
+            custom.elements.drill.value = localStorage.custom;
+        }
+
+        $(document).ready(function () {
+            populatePage();
+
+            if (document.location.search !== "") {
+                var jig = runExercise(
+                    parseQueryString(document.location.search)
+                );
+                initializeButtons(jig);
+            } else {
+                // Add event listeners to get settings before submitting.
+                var forms = document.querySelectorAll("form");
+                for (var i = 0; i < forms.length; ++i) {
+                    var form = forms[i];
+                    if (form.id === "custom") {
+                        form.addEventListener("submit", runCustom);
+                    } else {
+                        form.addEventListener("submit", getSettings);
+                    }
+                }
+            }
+            // Get keyboard input from entire page
+            $("body").keydown(function (e) {
+                console.log(e);
+                //prevent deafault
+                // e.preventDefault();
+
+                //If key is down find the div with the class "selected-form-section". If there is no div with the class "selected-form-section" then select the first div.
+                //Then set the div below it to be the div with the class "selected-form-section".
+
+                var key = e.which;
+                if (key == 13) {
+                    // Enter key
+                    var selected = $(".selected-form-section");
+                    //Find the button inside of the selected div and click it. recurse
+                    console.log(selected);
+                    selected.find("button").click();
+                } else if (key == 32) {
+                    // Space
+                    $("#show-hint").click();
+                } else if (key == 37) {
+                    // Left arrow
+                    $("#back").click();
+                } else if (key == 39) {
+                    // Right arrow
+                    $("#again").click();
+                } else if (key == 40) {
+                    // Down arrow
+                    var selectedDiv = $(".selected-form-section");
+                    if (selectedDiv.length == 0) {
+                        $(".form-section")
+                            .first()
+                            .addClass("selected-form-section");
+                    } else {
+                        selectedDiv.removeClass("selected-form-section");
+                        selectedDiv.next().addClass("selected-form-section");
+                    }
+                    //scroll to the selected div keeping it centered. but handle fast repeated keystrokes. wait for a second before scrolling.
+
+                    //Wait for a momnet
+                    setTimeout(function () {
+                        $(".selected-form-section")[0].scrollIntoView({
+                            block: "center",
+                        });
+                    }, 10);
+                } else if (key == 38) {
+                    // Up arrow
+                    var selectedDiv = $(".selected-form-section");
+                    if (selectedDiv.length == 0) {
+                        $(".form-section")
+                            .last()
+                            .addClass("selected-form-section");
+                    } else {
+                        selectedDiv.removeClass("selected-form-section");
+                        selectedDiv.prev().addClass("selected-form-section");
+                    }
+                    //scroll to the selected div keeping it centered. but handle fast repeated keystrokes
+                    setTimeout(function () {
+                        $(".selected-form-section")[0].scrollIntoView({
+                            block: "center",
+                        });
+                    }, 10);
+                }
+            });
+        });
+    </script>
 </html>

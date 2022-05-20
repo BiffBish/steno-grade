@@ -1,0 +1,4 @@
+{
+    "javascript.implicitProjectConfig.checkJs": true,
+    "js/ts.implicitProjectConfig.checkJs": true,
+}

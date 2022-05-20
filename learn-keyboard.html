@@ -1,179 +1,282 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<meta charset="utf-8">
-	<title>Learn the Steno Keyboard</title>
-	<link href="style.css" rel="stylesheet" type="text/css">
-	<script src="type-jig.js"></script>
-	<script src="util.js"></script>
-	<script src="word-drill.js"></script>
-	<script src="steno-display.js"></script>
-	<script src="learn-keyboard.js"></script>
-<script src="chart.js"></script>
-<script src="chartjs-plugin-datalabels.js"></script>	<link rel="stylesheet" type="text/css" href="font-roboto.css">
-</head>
-<body>
+    <head>
+        <meta charset="utf-8" />
+        <title>Learn the Steno Keyboard</title>
+        <link href="style.css" rel="stylesheet" type="text/css" />
+        <script src="utils/type-jig.js"></script>
+        <script src="utils/util.js"></script>
+        <script src="word-drill.js"></script>
+        <script src="utils/steno-display.js"></script>
+        <script src="learn-keyboard.js"></script>
+        <script src="libs/chart.js"></script>
+        <script src="chartjs-plugin-datalabels.js"></script>
+        <link rel="stylesheet" type="text/css" href="font-roboto.css" />
+    </head>
+    <body>
+        <div class="wrapper">
+            <div id="form">
+                <h1>Learn the Steno Keyboard</h1>
+                <p style="text-align: center">
+                    <a href="raw-steno-instructions.html"
+                        >How to get raw steno output</a
+                    >
+                </p>
+                <div class="form-section">
+                    <form id="selectDrill">
+                        <ul style="list-style-type: none">
+                            <li><select name="drill"></select></li>
+                            <li>
+                                <label
+                                    ><input
+                                        name="hints"
+                                        type="checkbox"
+                                        value="yes"
+                                        checked
+                                    />
+                                    Show hints?</label
+                                >
+                            </li>
+                            <li>
+                                <label
+                                    ><input
+                                        name="wpm"
+                                        type="number"
+                                        value=""
+                                        step="5"
+                                    />
+                                    Speed (strokes per minute).</label
+                                >
+                            </li>
+                            <li><input type="submit" value="Go" /></li>
+                        </ul>
+                    </form>
+                </div>
+            </div>
+        </div>
 
-<div class="wrapper">
-	<div id="form">
-		<h1>Learn the Steno Keyboard</h1>
-		<p style="text-align: center"><a href="raw-steno-instructions.html">How to get raw steno output</a></p>
-		<div class="form-section">
-			<form id="selectDrill">
-				<ul style="list-style-type: none">
-					<li><select name="drill"></select></li>
-					<li><label><input name="hints" type="checkbox" value="yes" checked> Show hints?</label></li>
-					<li><label><input name="wpm" type="number" value="" step="5"> Speed (strokes per minute).</label></li>
-					<li><input type="submit" value="Go"></li>
-				</ul>
-			</form>
-		</div>
-	</div>
-</div>
+        <div id="lesson" class="wrapper" style="display: none">
+            <div id="leftside">
+                <h3 id="lesson-name" class="center"></h3>
+                <p style="text-align: center; padding-bottom: 3em">
+                    <a href="raw-steno-instructions.html"
+                        >How to get raw steno output</a
+                    >
+                </p>
+                <div id="drill-content">
+                    <div id="answer"></div>
+                    <div id="exercise"></div>
+                    <div id="results"></div>
+                    <div style="height: 300px">
+                        <canvas id="chartDiv" width="400" height="400"></canvas>
+                    </div>
+                </div>
+            </div>
 
-<div id="lesson" class="wrapper" style="display: none">
-	<div id="leftside">
-		<h3 id="lesson-name" class="center"></h3>
-		<p style="text-align: center; padding-bottom: 3em"><a href="raw-steno-instructions.html">How to get raw steno output</a></p>
-		<div id="drill-content">
-			<div id="answer"></div>
-			<div id="exercise"></div>
-			<div id="results"></div>
-			<div style="height: 300px">
-				<canvas id="chartDiv" width="400" height="400"></canvas>
-			</div>
-		</div>
-	</div>
+            <div id="nav">
+                <p id="stroke-hint"></p>
+                <p id="strokes"></p>
+                <p id="clock" class="clock"></p>
+                <p id="live-wpm-display" class="wpm"></p>
 
-	<div id="nav">
-		<p id="stroke-hint"></p>
-		<p id="strokes"></p>
-		<p id="clock" class="clock"></p>
-		<p id="live-wpm-display" class="wpm"></p>
+                <p class="center">
+                    <a id="back" title="LeftArrow"
+                        >&larr; Back to Menu
+                        <span class="shortcutkey">(LeftArrow)</span></a
+                    >
+                </p>
+                <p class="center">
+                    <a id="again" title="Enter"
+                        >&#8634; Restart
+                        <span class="shortcutkey">(Enter 3x)</span></a
+                    >
+                </p>
+                <p class="center">
+                    <a id="end" title="Enter"
+                        >&Cross; End
+                        <span class="shortcutkey">(Tab 3x)</span></a
+                    >
+                </p>
+            </div>
 
-		<p class="center"><a id="back" title="LeftArrow">&larr; Back to Menu <span class="shortcutkey">(LeftArrow)</span></a></p>
-		<p class="center"><a id="again" title="Enter">&#8634; Restart <span class="shortcutkey">(Enter 3x)</span></a></p>
-		<p class="center"><a id="end" title="Enter">&Cross; End <span class="shortcutkey">(Tab 3x)</span></a></p>
-	</div>
+            <textarea id="input"></textarea>
+        </div>
 
-	<textarea id="input"></textarea>
-</div>
+        <script>
+            window.onload = function () {
+                var leftFromPseudo = {
+                    C: "KR",
+                    D: "TK",
+                    B: "PW",
+                    L: "HR",
+                    F: "TP",
+                    M: "PH",
+                    N: "TPH",
+                    Q: "KW",
+                    Y: "KWR",
+                    J: "SKWR",
+                    V: "SR",
+                    G: "TKPW",
+                    X: "KP",
+                    Z: "STKPW",
+                };
+                var vowelFromPseudo = {
+                    AY: "AEU",
+                    OH: "OE",
+                    EE: "AOE",
+                    UU: "AOU",
+                    I: "EU",
+                    IE: "AOEU",
+                    AW: "AU",
+                    OW: "OU",
+                    OI: "OEU",
+                    EA: "AE",
+                    OA: "AO",
+                    OO: "AO",
+                };
+                var rightFromPseudo = {
+                    TH: "*T",
+                    CH: "FP",
+                    SH: "RB",
+                    RCH: "FRPB",
+                    N: "PB",
+                    NG: "PBG",
+                    NK: "PBG",
+                    M: "PL",
+                    K: "BG",
+                    SHN: "GS",
+                    KSHN: "BGS",
+                    J: "PBLG",
+                    RBGS: "RBGS",
+                };
+                var left_re =
+                    /C|L|G|Z|N|J|X|B|V|F|Y|Q|D|M|0|1|2|3|4|5|6|7|8|9|S|T|K|P|W|H|R/g;
+                var vowel_re =
+                    /AY|OA|OO|AW|EA|EE|OH|UU|OI|IE|OW|I|0|1|2|3|4|5|6|7|8|9|A|O|E|U/g;
+                var right_re =
+                    /RBGS|KSHN|SHN|RCH|CH|SH|NG|NK|TH|K|J|N|M|0|1|2|3|4|5|6|7|8|9|\*|F|R|P|B|L|G|T|S|D|Z/g;
+                var separation_re =
+                    /([^AOEUI*-]*)([AO*EUI-][AO*EUIHYW-]*|)(.*)/;
 
-<script>
-window.onload = function() {
+                function fromPseudo(stroke) {
+                    match = separation_re.exec(stroke);
+                    var b = match[1],
+                        v = match[2],
+                        e = match[3];
+                    var left = b.replace(left_re, function (m) {
+                        return leftFromPseudo[m] || m;
+                    });
+                    var vowel = v.replace(vowel_re, function (m) {
+                        return vowelFromPseudo[m] || m;
+                    });
+                    var right = e.replace(right_re, function (m) {
+                        return rightFromPseudo[m] || m;
+                    });
+                    return (left + vowel + right).replace(/-$/, "");
+                }
 
-var leftFromPseudo = {
-	'C': 'KR',
-	'D': 'TK', 'B': 'PW', 'L': 'HR',
-	'F': 'TP', 'M': 'PH', 'N': 'TPH',
-	'Q': 'KW', 'Y': 'KWR', 'J': 'SKWR', 'V': 'SR',
-	'G': 'TKPW', 'X': 'KP', 'Z': 'STKPW'
-};
-var vowelFromPseudo = {
-	'AY': 'AEU', 'OH': 'OE', 'EE': 'AOE', 'UU': 'AOU',
-	'I': 'EU', 'IE': 'AOEU',
-	'AW': 'AU', 'OW': 'OU', 'OI': 'OEU',
-	'EA': 'AE', 'OA': 'AO', 'OO': 'AO'
-};
-var rightFromPseudo = {
-	'TH': '*T', 'CH': 'FP', 'SH': 'RB', 'RCH': 'FRPB',
-	'N': 'PB', 'NG': 'PBG', 'NK': 'PBG',
-	'M': 'PL', 'K': 'BG', 'SHN': 'GS', 'KSHN': 'BGS',
-	'J': 'PBLG', 'RBGS': 'RBGS'
-};
-var left_re = /C|L|G|Z|N|J|X|B|V|F|Y|Q|D|M|0|1|2|3|4|5|6|7|8|9|S|T|K|P|W|H|R/g;
-var vowel_re = /AY|OA|OO|AW|EA|EE|OH|UU|OI|IE|OW|I|0|1|2|3|4|5|6|7|8|9|A|O|E|U/g;
-var right_re = /RBGS|KSHN|SHN|RCH|CH|SH|NG|NK|TH|K|J|N|M|0|1|2|3|4|5|6|7|8|9|\*|F|R|P|B|L|G|T|S|D|Z/g;
-var separation_re = /([^AOEUI*-]*)([AO*EUI-][AO*EUIHYW-]*|)(.*)/;
+                if (document.location.search === "") {
+                    var form = document.getElementById("selectDrill");
+                    var drill = form.elements.drill;
+                    var order = Object.keys(TypeJig.WordSets.LearnKeyboard);
+                    for (var i = 0; i < order.length; ++i) {
+                        var option = document.createElement("option");
+                        option.appendChild(document.createTextNode(order[i]));
+                        drill.appendChild(option);
+                    }
+                    drill.focus();
 
-function fromPseudo(stroke) {
-	match = separation_re.exec(stroke);
-	var b = match[1], v = match[2], e = match[3];
-	var left = b.replace(left_re, function(m) { return leftFromPseudo[m] || m; });
-	var vowel = v.replace(vowel_re, function(m) { return vowelFromPseudo[m] || m; });
-	var right = e.replace(right_re, function(m) { return rightFromPseudo[m] || m; });
-	return (left+vowel+right).replace(/-$/,'')
-}
-	if(document.location.search === '') {
-		var form = document.getElementById('selectDrill');
-		var drill = form.elements.drill;
-		var order = Object.keys(TypeJig.WordSets.LearnKeyboard);
-		for(var i=0; i<order.length; ++i) {
-			var option = document.createElement('option');
-			option.appendChild(document.createTextNode(order[i]));
-			drill.appendChild(option);
-		}
-		drill.focus();
+                    loadFormState(form);
+                    form.addEventListener("submit", function () {
+                        saveFormState(form);
+                    });
+                } else {
+                    var fields = parseQueryString(document.location.search);
+                    TypeJig.WordSets = TypeJig.WordSets.LearnKeyboard;
+                    var exercise = wordDrill(fields);
+                    if (exercise) {
+                        var hints;
+                        if (fields.hints) {
+                            var strokes = document.getElementById("strokes");
 
-		loadFormState(form);
-		form.addEventListener("submit", function(){
-		    saveFormState(form);
-		});
-	} else {
-		var fields = parseQueryString(document.location.search);
-		TypeJig.WordSets = TypeJig.WordSets.LearnKeyboard;
-		var exercise = wordDrill(fields);
-		if(exercise) {
-			if(fields.hints) {
-				var strokes = document.getElementById('strokes');
-				if(fields.floating_hints) {
-					strokes.style.position = 'fixed';
-				}
-				var translations = TypeJig.shortestTranslations(TypeJig.Translations.Plover);
-				var hints = new StenoDisplay(strokes, translations, true);
-				hints.lookupEntry = fromPseudo
-			}
-			fields.menu = 'learn-keyboard'
-			fields.actualWords = {unit: 'strokes per minute', u: 'SPM'}
+                            hints = new StenoDisplay(
+                                strokes,
+                                [{ S: "S" }],
+                                true
+                            );
+                            hints.lookup = function (word) {
+                                if (word.split(" ").length > 1) {
+                                    return "";
+                                }
+                                return word;
+                            };
+                        }
+                        fields.menu = "learn-keyboard";
+                        fields.actualWords = {
+                            unit: "strokes per minute",
+                            u: "SPM",
+                        };
 
-			displayOnly('lesson');
-			var jig = setExercise(exercise.name, exercise, hints, fields);
-			jig.match = function(a, b) {
-				return a == fromPseudo(b)
-			}
-		}
-	}
-}
+                        displayOnly("lesson");
+                        var jig = setExercise(exercise.name, exercise, hints, {
+                            ...fields,
+                            gradingRules: {
+                                droppedWordMaxJump: 0,
+                                addedWordMaxJump: 0,
+                            },
+                        });
+                        jig.match = function (a, b) {
+                            return a == fromPseudo(b);
+                        };
+                    }
+                }
+            };
 
-function saveFormState(form) {
-    save({
-        drill: form.drill.value,
-        hints: form.hints.checked,
-        timeLimit: form.timeLimit.value,
-    });
-}
+            function saveFormState(form) {
+                save({
+                    drill: form.drill.value,
+                    hints: form.hints.checked,
+                    timeLimit: form?.timeLimit?.value,
+                });
+            }
 
-function loadFormState(form) {
-    var loaded = load();
-    if (loaded.drill) {
-        form.drill.value = loaded.drill;
-    }
-    form.hints.checked = loaded.hints;
-    if (loaded.timeLimit) {
-        form.timeLimit.value = loaded.timeLimit;
-    }
-}
+            function loadFormState(form) {
+                var loaded = load();
+                if (loaded.drill) {
+                    form.drill.value = loaded.drill;
+                }
+                form.hints.checked = loaded.hints;
+                if (loaded.timeLimit) {
+                    form.timeLimit.value = loaded.timeLimit;
+                }
+            }
 
-var LOCAL_STORAGE_KEY = "learn-plover-form";
+            var LOCAL_STORAGE_KEY = "learn-plover-form";
 
-function save(obj) {
-    try {
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(obj));
-    } catch (e) {
-        console.error(e);
-    }
-}
+            function save(obj) {
+                try {
+                    localStorage.setItem(
+                        LOCAL_STORAGE_KEY,
+                        JSON.stringify(obj)
+                    );
+                } catch (e) {
+                    console.error(e);
+                }
+            }
 
-function load() {
-    try {
-        return JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || {};
-    } catch (e) {
-        console.error(e);
-        return {};
-    }
-}
+            function load() {
+                try {
+                    return (
+                        JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) ||
+                        {}
+                    );
+                } catch (e) {
+                    console.error(e);
+                    return {};
+                }
+            }
 
-setTheme()
-</script>
-</body>
+            setTheme();
+        </script>
+    </body>
 </html>
