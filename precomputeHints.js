@@ -23,10 +23,10 @@ function lookup(text) {
 
         console.log("Looking up", text, index);
 
-        var strokes = this.lookupEntry(text, dictionary);
+        var strokes = lookupEntry(text, dictionary);
         if (!strokes) {
             text = text.toLowerCase();
-            strokes = this.lookupEntry(text, dictionary);
+            strokes = lookupEntry(text, dictionary);
         }
 
         if (!strokes) {
@@ -101,6 +101,7 @@ function lookupEntry(text, dictionary) {
         strokes = this.numberStrokes(text);
     }
     if (strokes == "") {
+        return null;
     }
     if (typeof strokes == "string") {
         return [strokes];
