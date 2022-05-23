@@ -74,7 +74,7 @@ function lookup(text) {
         if (true) {
             console.log("Found", text, strokes);
             var analysisResult = Analyze(strokes, text);
-            if (analysisResult.outline.length > 0) {
+            if (analysisResult?.rules?.length > 0) {
                 return {
                     strokes: analysisResult.outline,
                     rules: analysisResult.rules,
