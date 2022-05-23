@@ -21,7 +21,7 @@ function lookup(text) {
     for (let index = 0; index < translations.length; index++) {
         const dictionary = translations[index];
 
-        // console.log("Looking up", text, index);
+        console.log("Looking up", text, index);
 
         var strokes = this.lookupEntry(text, dictionary);
         if (!strokes) {
@@ -64,7 +64,8 @@ function lookup(text) {
             }
         }
 
-        // console.log("Found", strokes);
+        console.log("Found", strokes);
+
         if (!strokes) {
             continue;
         }
@@ -93,24 +94,21 @@ function lookup(text) {
 }
 
 function lookupEntry(text, dictionary) {
-    for (let index = 0; index < translations.length; index++) {
-        const dictionary = translations[index];
-        // console.log(dictionary)
-        var strokes = dictionary[text] || "";
-        console.log("Strokes", strokes);
-        if (!strokes && /^[0-9]+$/.test(text)) {
-            strokes = this.numberStrokes(text);
-        }
-        if (strokes == "") {
-            continue;
-        }
-        if (typeof strokes == "string") {
-            return [strokes];
-        }
-        return strokes?.filter((stroke) => {
-            return !stroke.match(/[0-9]/);
-        });
+    // console.log(dictionary)
+    var strokes = dictionary[text] || "";
+    console.log("Strokes", strokes);
+    if (!strokes && /^[0-9]+$/.test(text)) {
+        strokes = this.numberStrokes(text);
     }
+    if (strokes == "") {
+    }
+    if (typeof strokes == "string") {
+        return [strokes];
+    }
+    return strokes?.filter((stroke) => {
+        return !stroke.match(/[0-9]/);
+    });
+
     return "";
 }
 
