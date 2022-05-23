@@ -11,8 +11,8 @@ var translations;
 
 var allWords = [];
 onmessage = function (e) {
-    console.log("Message received from main script. V@");
-    var workerResult = "Result: " + e.data;
+    console.log("Message received from main script. V2", e.data);
+    // var workerResult = "Result: " + e.data;
     allWords = e.data.words;
     translations = e.data.translations;
     processAllWords();
