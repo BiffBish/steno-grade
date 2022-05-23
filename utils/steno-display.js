@@ -1,3 +1,5 @@
+//Import spectra.js
+
 // Display keys for arbitrary steno stroke sequences.
 
 // To use, simply create a new StenoDisplay for your container
@@ -23,6 +25,7 @@ function StenoDisplay(container, translations, showEmpty) {
     var styles = window.getComputedStyle(container);
     var position = styles.getPropertyValue("position");
     this.placeNearText = position === "fixed";
+    this.hintComputer = new Worker("utils/precomputeHints.js");
 }
 
 StenoDisplay.prototype.update = function (text, x, y) {
@@ -36,12 +39,15 @@ StenoDisplay.prototype.update = function (text, x, y) {
         for (var i = words.length; i > 0; i--) {
             var subString = words.slice(0, i).join(" ");
 
-            var strokes = this.lookup(subString);
-            if (!strokes) {
+            var lookupResult = this.lookup(subString);
+            if (lookupResult == null) {
+                continue;
+            }
+            if (!lookupResult.strokes) {
                 // this.errorLog.innerHTML += "No strokes for: " + text + "<br>";
                 continue;
             }
-            this.set(strokes, this.showEmpty);
+            this.set(lookupResult, this.showEmpty);
 
             if (this.placeNearText) {
                 x = Math.round(x + 36);
@@ -53,15 +59,14 @@ StenoDisplay.prototype.update = function (text, x, y) {
             //Find the item with id "stroke-hint" and set its text to the text
             //that was entered
             var hint = document.getElementById("stroke-hint");
-            if(i > 1) {
-                hint.innerHTML = "There is a "+i+" word stroke available."
+            if (i > 1) {
+                hint.innerHTML = "There is a " + i + " word stroke available.";
             } else {
-                hint.innerHTML = ""
+                hint.innerHTML = "";
             }
-            return
+            return;
         }
-        this.set("",true)
-
+        this.set("", true);
     }
 };
 
@@ -121,10 +126,23 @@ StenoDisplay.prototype.lookup = function (text) {
             var bSlashes = b.split("/").length;
             return aSlashes - bSlashes;
         });
-
-        return strokes
+        if (true) {
+            console.log("Found", text, strokes);
+            var analysisResult = Analyze(strokes, text);
+            if (analysisResult.outline.length > 0) {
+                return {
+                    strokes: analysisResult.outline,
+                    rules: analysisResult.rules,
+                };
+            }
+            return {
+                strokes: strokes,
+                rules: [],
+            };
+        }
+        return { strokes: strokes, rules: null };
     }
-    return "";
+    return null;
 };
 
 StenoDisplay.prototype.lookupEntry = function (text, dictionary) {
@@ -132,13 +150,14 @@ StenoDisplay.prototype.lookupEntry = function (text, dictionary) {
         const dictionary = this.pseudoStenoFor[index];
         // console.log(dictionary)
         var strokes = dictionary[text] || "";
+        console.log("Strokes", strokes);
         if (!strokes && /^[0-9]+$/.test(text)) {
             strokes = this.numberStrokes(text);
         }
         if (strokes == "") {
             continue;
         }
-        if(typeof strokes == "string" ){
+        if (typeof strokes == "string") {
             return [strokes];
         }
         return strokes?.filter((stroke) => {
@@ -196,40 +215,61 @@ StenoDisplay.prototype.numberStrokes = function (text) {
     return strokes;
 };
 
-StenoDisplay.prototype.set = function (pseudoSteno, showEmpty) {
-    // console.log("Setting", pseudoSteno, showEmpty);
+StenoDisplay.prototype.set = function (stenoStroke, showEmpty) {
+    console.log("Setting", stenoStroke, showEmpty);
     for (i = 0; i < this.strokes.length; ++i) this.strokes[i].hide();
-
-    if (pseudoSteno !== "" || showEmpty) {
-        if (pseudoSteno.multi) {
+    if (!stenoStroke.strokes) stenoStroke.strokes = "";
+    if (stenoStroke.strokes || showEmpty) {
+        if (stenoStroke?.strokes?.multi) {
             var i0 = 0;
-            for (var i = 0; i < pseudoSteno.length; ++i) {
-                var p = pseudoSteno[i];
-                i0 = this.showAlternatives(p, "\xA0", i0);
+            for (var i = 0; i < stenoStroke.strokes.length; ++i) {
+                var pseudoKey = stenoStroke.strokes[i];
+                i0 = this.showAlternatives(pseudoKey, "\xA0", i0);
             }
         } else {
-            this.showAlternatives(pseudoSteno);
+            this.showAlternatives(stenoStroke);
         }
     }
 };
 
-StenoDisplay.prototype.showAlternatives = function (pseudoSteno, firstSep, i0) {
+StenoDisplay.prototype.showAlternatives = function (stenoStroke, firstSep, i0) {
     if (!i0) i0 = 0;
-    if (typeof pseudoSteno === "string") pseudoSteno = [pseudoSteno];
-    for (var i = 0; i < pseudoSteno.length; ++i) {
+    if (typeof stenoStroke === "string")
+        stenoStroke = { strokes: stenoStroke, rules: [] };
+    if (typeof stenoStroke.strokes === "string")
+        stenoStroke.strokes = [stenoStroke.strokes];
+    console.log(stenoStroke);
+    for (var i = 0; i < stenoStroke.strokes.length; ++i) {
         var sep = i ? " or " : firstSep;
-        i0 += this.showTranslation(pseudoSteno[i], i0, sep);
+        i0 += this.showTranslation(
+            stenoStroke.strokes[i],
+            i0,
+            sep,
+            stenoStroke.rules
+        );
     }
     return i0;
 };
 
-StenoDisplay.prototype.showTranslation = function (pseudoSteno, i0, separator) {
+StenoDisplay.prototype.showTranslation = function (
+    pseudoSteno,
+    i0,
+    separator,
+    rules
+) {
     var strokes = pseudoSteno.split("/");
-    for (i = 0; i < strokes.length; ++i) {
+    for (var i = 0; i < strokes.length; ++i) {
         if (i + i0 >= this.strokes.length) {
             this.strokes.push(new StenoDisplay.Stroke(this.container));
         }
-        this.strokes[i + i0].set(strokes[i], separator);
+        console.log(pseudoSteno, i0, separator, rules);
+        this.strokes[i + i0].set(
+            strokes[i],
+            separator,
+            rules.filter((rule) => {
+                return rule.wordNum == i;
+            })
+        );
         this.strokes[i + i0].show();
         separator = "/";
     }
@@ -254,6 +294,16 @@ StenoDisplay.Stroke = function (container) {
     this.separator.className = "big-slash";
     container.appendChild(this.separator);
     this.keys = document.createElement("table");
+
+    var spacer = document.createElement("tr");
+    spacer.style.lineHeight = "1px";
+    spacer.style.opacity = "0";
+    for (let index = 0; index < 10; index++) {
+        let newElement = document.createElement("td");
+        newElement.innerText = "W";
+        spacer.appendChild(newElement);
+    }
+
     var num = document.createElement("tr");
     var numCell = document.createElement("td");
     var numBar = document.createElement("div");
@@ -261,6 +311,7 @@ StenoDisplay.Stroke = function (container) {
     numCell.colSpan = 10;
     numCell.appendChild(numBar);
     num.appendChild(numCell);
+    this.keys.appendChild(spacer);
     this.keys.appendChild(num);
 
     var upper = document.createElement("tr");
@@ -320,6 +371,7 @@ StenoDisplay.Stroke = function (container) {
         "*": upperCells[4],
         E: vowelCells[4],
         U: vowelCells[5],
+        Blank: vowelCells[0],
     };
 };
 
@@ -337,9 +389,250 @@ StenoDisplay.Stroke.prototype.clear = function () {
     removeClassFromAllPropertiesOf(this.leftCells, "pressed");
     removeClassFromAllPropertiesOf(this.rightCells, "pressed");
     removeClassFromAllPropertiesOf(this.vowelCells, "pressed");
+
+    removeStylingFromAllPropertiesOf(this.leftCells);
+    removeStylingFromAllPropertiesOf(this.rightCells);
+    removeStylingFromAllPropertiesOf(this.vowelCells);
+
+    removeAllCustomPropertiesOf(this.leftCells);
+    removeAllCustomPropertiesOf(this.rightCells);
+    removeAllCustomPropertiesOf(this.vowelCells);
+    this.leftCells["#"].colSpan = 10;
+    this.leftCells["S"].rowSpan = 2;
+    this.vowelCells["*"].rowSpan = 2;
+
+    this.vowelCells["*"].className = "alt wide";
+    this.rightCells["D"].className = "alt";
+    this.rightCells["Z"].className = "alt";
+
+    this.vowelCells.Blank.colSpan = 2;
+    this.vowelCells.A.className = "leftVowel";
+    this.vowelCells.O.className = "leftVowel";
+    this.vowelCells.E.className = "rightVowel";
+    this.vowelCells.U.className = "rightVowel";
+    resetNameToProper(this.leftCells);
+    resetNameToProper(this.rightCells);
+    resetNameToProper(this.vowelCells);
+
+    this.vowelCells.Blank.innerText = "";
+    // this.leftCells["#"].innerText = " ";
 };
 
-StenoDisplay.Stroke.prototype.set = function (stroke, separator) {
+StenoDisplay.Stroke.prototype.applyRules = function (rules) {
+    console.log("Applying rules to stroke", rules);
+    var self = this;
+    var appliedRules = [];
+
+    rules.forEach(function (rule) {
+        if (rule.subRules.length === 0) {
+            appliedRules.push(rule);
+            return;
+        }
+        console.log("Rules flattened", rule);
+        appliedRules = appliedRules.concat(rule.subRules);
+        console.log(appliedRules);
+    });
+    console.log(appliedRules);
+
+    appliedRules.forEach((rule) => {
+        let replacedText = rule.target;
+
+        let letterMatches = [
+            "S",
+            "T",
+            "P",
+            "H",
+            "K",
+            "W",
+            "R",
+            "-F",
+            "-L",
+            "-T",
+            "-D",
+            "-B",
+            "-G",
+            "-S",
+            "-Z",
+        ];
+
+        if (letterMatches.includes(rule.outline)) {
+            let chosenLetterSet = self.leftCells;
+            if (rule.outline.includes("-")) {
+                rule.outline = rule.outline.slice(1);
+                // @ts-ignore
+                chosenLetterSet = self.rightCells;
+            }
+            chosenLetterSet[rule.outline[0]].innerText = replacedText;
+            chosenLetterSet[rule.outline[0]].className = "pressed";
+        }
+        //See if rule is part of this set
+        let verticalMatches = [
+            "TK",
+            "PW",
+            "HR",
+            "-FR",
+            "-PB",
+            "-LG",
+            "-TS",
+            "-DZ",
+        ];
+        if (verticalMatches.includes(rule.outline)) {
+            let chosenLetterSet = self.leftCells;
+            if (rule.outline.includes("-")) {
+                rule.outline = rule.outline.slice(1);
+                // @ts-ignore
+                chosenLetterSet = self.rightCells;
+            }
+            chosenLetterSet[rule.outline[0]].innerText = replacedText;
+            chosenLetterSet[rule.outline[0]].className = "pressed";
+            chosenLetterSet[rule.outline[0]].rowSpan = 2;
+            chosenLetterSet[rule.outline[1]].style.display = "none";
+        }
+        let horizontalMatches = [
+            "TP",
+            "PH",
+            "KW",
+            "WR",
+            "-FP",
+            "-PL",
+            "-LT",
+            "-RB",
+            "-BG",
+            "-GS",
+        ];
+        if (horizontalMatches.includes(rule.outline)) {
+            let chosenLetterSet = self.leftCells;
+            if (rule.outline.includes("-")) {
+                rule.outline = rule.outline.slice(1);
+                // @ts-ignore
+                chosenLetterSet = self.rightCells;
+            }
+            chosenLetterSet[rule.outline[0]].innerText = replacedText;
+            chosenLetterSet[rule.outline[0]].className = "pressed";
+            chosenLetterSet[rule.outline[0]].colSpan = 2;
+            chosenLetterSet[rule.outline[1]].style.display = "none";
+        }
+
+        switch (rule.outline) {
+            case "-F":
+                self.rightCells["F"].className = "pressed";
+                self.rightCells["F"].innerText = replacedText;
+                break;
+
+            //Vertical Matches
+            // 2 vowel matches
+            case "EU":
+                self.vowelCells["E"].innerText = replacedText;
+                self.vowelCells["E"].className = "pressed";
+                self.vowelCells["E"].colSpan = 2;
+                self.vowelCells["U"].style.display = "none";
+                break;
+
+            case "AO":
+                self.vowelCells["A"].innerText = replacedText;
+                self.vowelCells["A"].className = "pressed";
+                self.vowelCells["A"].colSpan = 2;
+                self.vowelCells["O"].style.display = "none";
+                break;
+
+            case "AOEU":
+                self.vowelCells["A"].innerText = replacedText;
+                self.vowelCells["A"].className = "pressed";
+                self.vowelCells["A"].colSpan = 2;
+                self.vowelCells["O"].style.display = "none";
+
+                self.vowelCells["E"].innerText = replacedText;
+                self.vowelCells["E"].className = "pressed";
+                self.vowelCells["E"].colSpan = 2;
+                self.vowelCells["U"].style.display = "none";
+                break;
+            // //3 Horizontal Matches
+            // "TPH"
+            // "KWR"
+            case "TPH":
+                self.leftCells["T"].innerText = replacedText;
+                self.leftCells["T"].className = "pressed";
+                self.leftCells["T"].colSpan = 3;
+                self.leftCells["P"].style.display = "none";
+                self.leftCells["H"].style.display = "none";
+                break;
+            case "KWR":
+                self.leftCells["K"].innerText = replacedText;
+                self.leftCells["K"].className = "pressed";
+                self.leftCells["K"].colSpan = 3;
+                self.leftCells["W"].style.display = "none";
+                self.leftCells["R"].style.display = "none";
+                break;
+            // "-FPL"
+            // "-PLT"
+            // "-RBG"
+            // "-BGS"
+            case "-FPL":
+                self.rightCells["T"].innerText = replacedText;
+                self.rightCells["T"].className = "pressed";
+                self.rightCells["T"].colSpan = 3;
+                self.rightCells["P"].style.display = "none";
+                self.rightCells["H"].style.display = "none";
+                break;
+            case "-KWR":
+                self.rightCells["K"].innerText = replacedText;
+                self.rightCells["K"].className = "pressed";
+                self.rightCells["K"].colSpan = 3;
+                self.rightCells["W"].style.display = "none";
+                self.rightCells["R"].style.display = "none";
+                break;
+            case "-RBG":
+                self.rightCells["R"].innerText = replacedText;
+                self.rightCells["R"].className = "pressed";
+                self.rightCells["R"].colSpan = 3;
+                self.rightCells["B"].style.display = "none";
+                self.rightCells["G"].style.display = "none";
+                break;
+            case "-BGS":
+                self.rightCells["B"].innerText = replacedText;
+                self.rightCells["B"].className = "pressed";
+                self.rightCells["B"].colSpan = 3;
+                self.rightCells["G"].style.display = "none";
+                self.rightCells["S"].style.display = "none";
+                break;
+
+            // //2x2 Matches
+            // "TKPW"
+            // "PWHR"
+            // "-FRPB"
+            // "-PBLG"
+            // "-LGTS"
+
+            // case value:
+            //     break;
+            //X
+            case "KP":
+                self.leftCells["K"].innerText = replacedText;
+                self.leftCells["K"].className = "pressed";
+                self.leftCells["P"].innerText = replacedText;
+                self.leftCells["P"].className = "pressed";
+                // self.rightCells["B"].colSpan = 1;
+                // self.rightCells["G"].style.display = "none";
+                // self.rightCells["S"].style.display = "none";
+                break;
+            case "TKPW":
+                self.leftCells["T"].innerText = replacedText;
+                self.leftCells["T"].className = "pressed";
+                self.leftCells["T"].colSpan = 2;
+                self.leftCells["T"].rowSpan = 2;
+
+                self.leftCells["K"].style.display = "none";
+                self.leftCells["P"].style.display = "none";
+                self.leftCells["W"].style.display = "none";
+
+            default:
+                break;
+        }
+    });
+};
+
+StenoDisplay.Stroke.prototype.set = function (stroke, separator, rules) {
+    console.log("Setting stroke", stroke, rules);
     this.clear();
     this.separator.firstChild.nodeValue = separator || "";
     var steno = pseudoStrokeToSteno(stroke);
@@ -355,10 +648,11 @@ StenoDisplay.Stroke.prototype.set = function (stroke, separator) {
     for (var i = 0; i < vowel.length; ++i) {
         addClass(this.vowelCells[vowel.charAt(i)], "pressed");
     }
+    this.applyRules(rules);
 };
 
 function addCells(row, contents) {
-    cells = [];
+    let cells = [];
     for (var i = 0; i < contents.length; ++i) {
         var td = document.createElement("td");
         if (contents.length) {
@@ -380,11 +674,31 @@ function removeClass(elt, className) {
     elt.className = other;
 }
 
+function removeStylingFromAllPropertiesOf(obj) {
+    for (var key in obj) {
+        obj[key].style = {};
+    }
+}
+
 function removeClassFromAllPropertiesOf(obj, className) {
     for (var key in obj) {
         if (Object.prototype.hasOwnProperty.call(obj, key)) {
             removeClass(obj[key], className);
         }
+    }
+}
+
+function removeAllCustomPropertiesOf(obj) {
+    for (var key in obj) {
+        obj[key].rowSpan = 1;
+        obj[key].colSpan = 1;
+    }
+}
+
+function resetNameToProper(obj) {
+    for (var key in obj) {
+        if (key == "#") continue;
+        obj[key].innerText = key;
     }
 }
 
@@ -443,7 +757,7 @@ var right_re =
 var separation_re = /([^AOEUI*-]*)([AO*EUI-][AO*EUIHYW-]*|)(.*)/;
 
 function pseudoStrokeToSteno(stroke) {
-    match = separation_re.exec(stroke);
+    var match = separation_re.exec(stroke);
     var b = match[1],
         v = match[2],
         e = match[3];

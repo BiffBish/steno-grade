@@ -1,4 +1,5 @@
 {
     "javascript.implicitProjectConfig.checkJs": true,
     "js/ts.implicitProjectConfig.checkJs": true,
+    "js/ts.implicitProjectConfig.strictNullChecks": true,
 }

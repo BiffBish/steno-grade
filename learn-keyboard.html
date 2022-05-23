@@ -199,11 +199,7 @@
                         if (fields.hints) {
                             var strokes = document.getElementById("strokes");
 
-                            hints = new StenoDisplay(
-                                strokes,
-                                [{ S: "S" }],
-                                true
-                            );
+                            hints = new StenoDisplay(strokes, [], true);
                             hints.lookup = function (word) {
                                 if (word.split(" ").length > 1) {
                                     return "";
