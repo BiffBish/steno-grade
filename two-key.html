@@ -53,9 +53,7 @@
         <script>
             var query = parseQueryString(document.location.search);
             var words = TypeJig.WordSets.twoKeySentences;
-            var translations = TypeJig.shortestTranslations(
-                TypeJig.Translations.Plover
-            );
+            var translations = TypeJig.shortestTranslations(PloverTranslations);
             var extra = {
                 "?": "H-F",
                 charge: "KH",

@@ -4,7 +4,7 @@ importScripts(
     "spectra/rules.js"
 );
 
-var translations = TypeJig.shortestTranslations(TypeJig.Translations.Plover);
+var translations = TypeJig.shortestTranslations(PloverTranslations);
 
 var allWords = [];
 onmessage = function (e) {

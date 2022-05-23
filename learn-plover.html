@@ -164,9 +164,10 @@
                             if (fields.floating_hints) {
                                 strokes.style.position = "fixed";
                             }
-                            var translations = TypeJig.shortestTranslations(
-                                TypeJig.Translations.Plover
-                            );
+                            var translations =
+                                TypeJig.shortestTranslations(
+                                    PloverTranslations
+                                );
                             var hints = new StenoDisplay(
                                 strokes,
                                 translations,
