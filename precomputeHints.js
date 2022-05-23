@@ -117,21 +117,22 @@ function processAllWords() {
     var results = [];
 
     for (let index = 0; index < allWords.length; index++) {
-        // for (var j = 10; j > 0; j--) {
-        var subString = allWords.slice(index, index + 1).join(" ");
-        console.log("Looking up", subString);
-        var lookupResult = this.lookup(subString);
-        if (lookupResult == null) {
-            continue;
+        for (var j = 10; j > 0; j--) {
+            var subString = allWords.slice(index, index + j).join(" ");
+            // console.log("Looking up", subString);
+            var lookupResult = this.lookup(subString);
+            if (lookupResult == null) {
+                continue;
+            }
+            if (!lookupResult.strokes) {
+                // this.errorLog.innerHTML += "No strokes for: " + text + "<br>";
+                continue;
+            }
+            postMessage({
+                text: subString,
+                lookup: lookupResult,
+            });
         }
-        if (!lookupResult.strokes) {
-            // this.errorLog.innerHTML += "No strokes for: " + text + "<br>";
-            continue;
-        }
-        postMessage({
-            text: subString,
-            lookup: lookupResult,
-        });
         // return;
         // }
         // this.set("", true);

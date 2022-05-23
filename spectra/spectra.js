@@ -292,7 +292,7 @@ function Analyze(outlines, target) {
             break;
         }
     }
-    console.log("Best Performer", bestPerformer);
+    // console.log("Best Performer", bestPerformer);
     if (bestPerformer === null) {
         return null;
     }
@@ -302,12 +302,12 @@ function Analyze(outlines, target) {
 //Lets try a recursive solution
 
 function TestRuleOutline(depth, ruleOutline, outline) {
-    console.log(
-        "---".repeat(depth) + "Testing rule outline",
-        ruleOutline,
-        "on",
-        outline
-    );
+    // console.log(
+    //     "---".repeat(depth) + "Testing rule outline",
+    //     ruleOutline,
+    //     "on",
+    //     outline
+    // );
     var firstWord = outline.split("/")[0];
 
     if (outline == "*" && !firstWord.match(/\*/)) return false;
@@ -365,12 +365,7 @@ function TestRule(
     // console.log(ruleName);
     let rule = rules[ruleName];
     let ruleSound = [rule[2]];
-    console.log(
-        "---".repeat(depth) + "Testing rule :" + ruleName,
-        target,
-        outline,
-        randomNumber
-    );
+
     if (!TestRuleOutline(depth, rule[0], outline)) return false;
     if (debug)
         console.log(

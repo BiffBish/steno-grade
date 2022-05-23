@@ -84,6 +84,10 @@ StenoDisplay.prototype.update = function (text, x, y) {
 };
 
 StenoDisplay.prototype.lookup = function (text) {
+    if (this.cachedHints[text]) {
+        return this.cachedHints[text];
+    }
+
     for (let index = 0; index < this.pseudoStenoFor.length; index++) {
         const dictionary = this.pseudoStenoFor[index];
 
