@@ -1,7 +1,8 @@
 importScripts(
     "utils/type-jig.js",
     "plover-translations.js",
-    "spectra/rules.js"
+    "spectra/rules.js",
+    "spectra/spectra.js"
 );
 
 var translations;
@@ -10,7 +11,6 @@ var allWords = [];
 onmessage = function (e) {
     console.log("Message received from main script");
     var workerResult = "Result: " + e.data;
-    console.log("Posting message back to main script");
     allWords = e.data.words;
     translations = e.data.translations;
     processAllWords();
