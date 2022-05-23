@@ -29,10 +29,12 @@ function StenoDisplay(container, translations, showEmpty) {
 }
 
 StenoDisplay.prototype.startupPrecompute = function (fullText) {
-    this.hintComputer.postMessage([{
-        fullText: fullText,
-        lookup: this.lookup.bind(this),
-    });
+    this.hintComputer.postMessage([
+        {
+            fullText: fullText,
+            lookup: this.lookup.bind(this),
+        },
+    ]);
 };
 StenoDisplay.prototype.update = function (text, x, y) {
     text = text || "";
