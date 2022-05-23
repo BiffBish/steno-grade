@@ -28,6 +28,12 @@ function StenoDisplay(container, translations, showEmpty) {
     this.hintComputer = new Worker("utils/precomputeHints.js");
 }
 
+StenoDisplay.prototype.startupPrecompute = function (fullText) {
+    this.hintComputer.postMessage({
+        fullText: fullText,
+        lookup: this.lookup.bind(this),
+    });
+};
 StenoDisplay.prototype.update = function (text, x, y) {
     text = text || "";
     if (text !== this.lastText) {

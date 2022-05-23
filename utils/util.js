@@ -1,28 +1,26 @@
-
-
 function populatePage(options) {
     // <div id="leftside">
-	// 	<h3 id="lesson-name" class="center"></h3>
-	// 	<div id="drill-content">
-	// 		<div id="answer"></div>
-	// 		<div id="exercise"></div>
-	// 		<div id="results"></div>
-	// 		<div style="height: 300px">
-	// 			<canvas id="chartDiv" width="400" height="400"></canvas>
-	// 		</div>
-	// 	</div>
-	// </div>
+    // 	<h3 id="lesson-name" class="center"></h3>
+    // 	<div id="drill-content">
+    // 		<div id="answer"></div>
+    // 		<div id="exercise"></div>
+    // 		<div id="results"></div>
+    // 		<div style="height: 300px">
+    // 			<canvas id="chartDiv" width="400" height="400"></canvas>
+    // 		</div>
+    // 	</div>
+    // </div>
 
-	// <div id="nav">
-	// 	<p id="stroke-hint"></p>
-	// 	<p id="strokes"></p>
-	// 	<p id="clock" class="clock"></p>
-	// 	<p id="live-wpm-display" class="wpm"></p>
-	// 	<p class="center"><a id="back" title="LeftArrow">&larr; Back to Menu <span class="shortcutkey">(LeftArrow)</span></a></p>
-	// 	<p class="center"><a id="again" title="Enter">&#8634; Repeat Drill <span class="shortcutkey">(Enter 3x)</span></a></p>
-	// 	<p class="center"><a id="end" title="Enter">&Cross; End Drill <span class="shortcutkey">(Tab 3x)</span></a></p>
-	// 	<p class="center"><a id="new" title="RightArrow">&rarr; New Drill <span class="shortcutkey">(RightArrow)</span></a></p>
-	// </div>
+    // <div id="nav">
+    // 	<p id="stroke-hint"></p>
+    // 	<p id="strokes"></p>
+    // 	<p id="clock" class="clock"></p>
+    // 	<p id="live-wpm-display" class="wpm"></p>
+    // 	<p class="center"><a id="back" title="LeftArrow">&larr; Back to Menu <span class="shortcutkey">(LeftArrow)</span></a></p>
+    // 	<p class="center"><a id="again" title="Enter">&#8634; Repeat Drill <span class="shortcutkey">(Enter 3x)</span></a></p>
+    // 	<p class="center"><a id="end" title="Enter">&Cross; End Drill <span class="shortcutkey">(Tab 3x)</span></a></p>
+    // 	<p class="center"><a id="new" title="RightArrow">&rarr; New Drill <span class="shortcutkey">(RightArrow)</span></a></p>
+    // </div>
     //Populate the lession div with the html above
     var lesson = document.getElementById("lesson");
     lesson.innerHTML = `
@@ -58,15 +56,14 @@ function populatePage(options) {
     //     <a href="raw-steno-instructions.html">How to get raw steno output</a>
     // </p>;
     //Select the lesson-name element inside of the leftside element using jquery
-    
-    if(options?.require_raw_steno){
+
+    if (options?.require_raw_steno) {
         $(".lesson-name").after(`
             <p style="text-align: center; padding-bottom: 3em">
                 <a href="raw-steno-instructions.html">How to get raw steno output</a>
             </p>;
         `);
     }
-
 }
 
 function parseQueryString(query) {
@@ -141,6 +138,7 @@ function initializeHints(hints, floating_hints) {
         TypeJig.Translations.Plover
     );
     console.log("Making stenoDisplay");
+
     return new StenoDisplay(strokes, translations, true);
 }
 
@@ -152,7 +150,7 @@ function changeName(name) {
 }
 
 function setExercise(name, exercise, hints = null, options, jig) {
-    console.log("Setting exersize",exercise,hints,options)
+    console.log("Setting exersize", exercise, hints, options);
     var h = document.getElementById("lesson-name");
     h.textContent = name;
     document.title = name + " - Steno Jig";
