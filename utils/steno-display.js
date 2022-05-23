@@ -563,6 +563,46 @@ StenoDisplay.Stroke.prototype.applyRules = function (rules) {
                 self.vowelCells["E"].colSpan = 2;
                 self.vowelCells["U"].style.display = "none";
                 break;
+
+            case "AEU":
+                self.vowelCells["A"].innerText = replacedText;
+                self.vowelCells["A"].className = "pressed";
+
+                self.vowelCells["E"].innerText = replacedText;
+                self.vowelCells["E"].className = "pressed";
+                self.vowelCells["E"].colSpan = 2;
+                self.vowelCells["U"].style.display = "none";
+
+                break;
+
+            case "OEU":
+                self.vowelCells["O"].innerText = replacedText;
+                self.vowelCells["O"].className = "pressed";
+
+                self.vowelCells["E"].innerText = replacedText;
+                self.vowelCells["E"].className = "pressed";
+                self.vowelCells["E"].colSpan = 2;
+                self.vowelCells["U"].style.display = "none";
+                break;
+
+            case "AOE":
+                self.vowelCells["A"].innerText = replacedText;
+                self.vowelCells["A"].className = "pressed";
+                self.vowelCells["A"].colSpan = 2;
+                self.vowelCells["O"].style.display = "none";
+
+                self.vowelCells["E"].innerText = replacedText;
+                break;
+
+            case "AOU":
+                self.vowelCells["A"].innerText = replacedText;
+                self.vowelCells["A"].className = "pressed";
+                self.vowelCells["A"].colSpan = 2;
+                self.vowelCells["O"].style.display = "none";
+
+                self.vowelCells["U"].innerText = replacedText;
+                break;
+
             // //3 Horizontal Matches
             // "TPH"
             // "KWR"
