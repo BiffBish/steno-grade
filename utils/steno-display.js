@@ -453,6 +453,9 @@ StenoDisplay.Stroke.prototype.applyRules = function (rules) {
 
     appliedRules.forEach((rule) => {
         let replacedText = rule.target;
+        // let replacedText = rule.ruleSound[0];
+
+        // if (replacedText == "") replacedText = rule.target.toLowerCase();
         var outline = rule.outline;
         let letterMatches = [
             "S",
