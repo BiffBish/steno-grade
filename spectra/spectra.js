@@ -365,7 +365,12 @@ function TestRule(
     // console.log(ruleName);
     let rule = rules[ruleName];
     let ruleSound = [rule[2]];
-
+    console.log(
+        "---".repeat(depth) + "Testing rule :" + ruleName,
+        target,
+        outline,
+        randomNumber
+    );
     if (!TestRuleOutline(depth, rule[0], outline)) return false;
     if (debug)
         console.log(
