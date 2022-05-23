@@ -118,7 +118,7 @@ function processAllWords() {
     for (let index = 0; index < allWords.length; index++) {
         for (var j = 10; j > 0; j--) {
             var subString = allWords.slice(index, index + j).join(" ");
-
+            console.log("Looking up", subString);
             var lookupResult = this.lookup(subString);
             if (lookupResult == null) {
                 continue;

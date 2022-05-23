@@ -219,7 +219,6 @@ function Analyze(outlines, target) {
             // console.log("outline", outline);
 
             // outline = "PH*ET/SEUL/*EUPB";
-            var rules = Spectra.Rules;
             var result = FindRulesThatFitRecursively(
                 {},
                 0,
