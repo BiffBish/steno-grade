@@ -216,7 +216,7 @@ function Analyze(outlines, target) {
 
     for (let index = 0; index < 5; index++) {
         outlines.forEach((outline) => {
-            console.log("outline", outline);
+            // console.log("outline", outline);
 
             // outline = "PH*ET/SEUL/*EUPB";
             var result = FindRulesThatFitRecursively(
