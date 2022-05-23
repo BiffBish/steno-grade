@@ -73,7 +73,8 @@ StenoDisplay.prototype.update = function (text, x, y) {
             //that was entered
             var hint = document.getElementById("stroke-hint");
             if (i > 1) {
-                hint.innerHTML = "There is a " + i + " word stroke available.";
+                hint.innerHTML =
+                    "There is a " + i + " word phrase brief available.";
             } else {
                 hint.innerHTML = "";
             }
