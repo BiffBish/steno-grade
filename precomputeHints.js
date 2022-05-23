@@ -120,7 +120,7 @@ function processAllWords() {
         for (var j = 10; j > 0; j--) {
             var subString = allWords.slice(index, index + j).join(" ");
             // console.log("Looking up", subString);
-            var lookupResult = this.lookup(subString);
+            var lookupResult = lookup(subString);
             if (lookupResult == null) {
                 continue;
             }

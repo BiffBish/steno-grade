@@ -364,6 +364,7 @@ function TestRule(
     var rules = SpectraRules;
     // console.log(ruleName);
     let rule = rules[ruleName];
+    if (rule == undefined) return false;
     let ruleSound = [rule[2]];
 
     if (!TestRuleOutline(depth, rule[0], outline)) return false;
