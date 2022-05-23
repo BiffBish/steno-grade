@@ -117,6 +117,7 @@ TypeJig.prototype.reset = function () {
         var rect = this.display.getBoundingClientRect();
 
         this.hint.update(word, rect.left, rect.top);
+        this.hint.startupPrecompute(this.exercise.words);
     }
 
     if (this.hint && this.hint_on_fail) this.hint.show();
