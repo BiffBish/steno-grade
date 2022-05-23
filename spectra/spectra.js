@@ -361,7 +361,7 @@ function TestRule(
     let randomNumber = Math.floor(Math.random() * 10000000);
 
     if (target == "" && outline == "") return false;
-    var rules = Spectra.Rules;
+    var rules = SpectraRules;
     // console.log(ruleName);
     let rule = rules[ruleName];
     let ruleSound = [rule[2]];
@@ -538,7 +538,7 @@ function FindRulesThatFitRecursively(
         return memorizedData[outline + "_" + target];
     }
 
-    var rules = Spectra.Rules;
+    var rules = SpectraRules;
 
     var workingRules = [];
 
@@ -619,6 +619,6 @@ function FindRulesThatFitRecursively(
 }
 
 function AnalyzeRecursive(outline, target) {
-    var rules = Spectra.Rules;
+    var rules = SpectraRules;
     // console.log("Analyzing :" + outline, target);
 }
