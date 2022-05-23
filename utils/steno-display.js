@@ -26,6 +26,13 @@ function StenoDisplay(container, translations, showEmpty) {
     var position = styles.getPropertyValue("position");
     this.placeNearText = position === "fixed";
     this.hintComputer = new Worker("precomputeHints.js");
+
+    this.hintComputer.onmessage = (event) => {
+        console.log("Hint computer message", event);
+        let result = event.data;
+        this.cachedHints[result.text] = result.lookup;
+    };
+    this.cachedHints = {};
 }
 
 StenoDisplay.prototype.startupPrecompute = function (fullText) {

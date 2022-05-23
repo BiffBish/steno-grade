@@ -1,21 +1,22 @@
 importScripts(
-    "plover-translations.js",
     "utils/type-jig.js",
+    "plover-translations.js",
     "spectra/rules.js"
 );
 
+var translations = TypeJig.shortestTranslations(TypeJig.Translations.Plover);
+
+var allWords = [];
 onmessage = function (e) {
     console.log("Message received from main script");
     var workerResult = "Result: " + e.data;
     console.log("Posting message back to main script");
-    postMessage(workerResult);
+    allWords = e.data;
+    processAllWords();
 };
-
-var translations = TypeJig.shortestTranslations(TypeJig.Translations.Plover);
-
 function lookup(text) {
-    for (let index = 0; index < this.pseudoStenoFor.length; index++) {
-        const dictionary = this.pseudoStenoFor[index];
+    for (let index = 0; index < translations.length; index++) {
+        const dictionary = translations[index];
 
         // console.log("Looking up", text, index);
 
@@ -89,8 +90,8 @@ function lookup(text) {
 }
 
 function lookupEntry(text, dictionary) {
-    for (let index = 0; index < this.pseudoStenoFor.length; index++) {
-        const dictionary = this.pseudoStenoFor[index];
+    for (let index = 0; index < translations.length; index++) {
+        const dictionary = translations[index];
         // console.log(dictionary)
         var strokes = dictionary[text] || "";
         console.log("Strokes", strokes);
@@ -108,4 +109,35 @@ function lookupEntry(text, dictionary) {
         });
     }
     return "";
+}
+
+function processAllWords() {
+    var results = [];
+
+    for (let index = 0; index < allWords.length; index++) {
+        for (var j = 10; j > 0; j--) {
+            var subString = allWords.slice(index, index + j).join(" ");
+
+            var lookupResult = this.lookup(subString);
+            if (lookupResult == null) {
+                continue;
+            }
+            if (!lookupResult.strokes) {
+                // this.errorLog.innerHTML += "No strokes for: " + text + "<br>";
+                continue;
+            }
+            postMessage({
+                text: subString,
+                lookup: lookupResult,
+            });
+            // return;
+        }
+        // this.set("", true);
+        // const word = allWords[index];
+        // const result = lookup(word);
+        // if (result) {
+        //     results.push(result);
+        // }
+    }
+    return results;
 }
