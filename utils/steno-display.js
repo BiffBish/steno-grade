@@ -25,7 +25,7 @@ function StenoDisplay(container, translations, showEmpty) {
     var styles = window.getComputedStyle(container);
     var position = styles.getPropertyValue("position");
     this.placeNearText = position === "fixed";
-    this.hintComputer = new Worker("utils/precomputeHints.js");
+    this.hintComputer = new Worker("precomputeHints.js");
 }
 
 StenoDisplay.prototype.startupPrecompute = function (fullText) {
