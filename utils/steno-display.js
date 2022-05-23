@@ -29,7 +29,7 @@ function StenoDisplay(container, translations, showEmpty) {
 }
 
 StenoDisplay.prototype.startupPrecompute = function (fullText) {
-    this.hintComputer.postMessage({
+    this.hintComputer.postMessage([{
         fullText: fullText,
         lookup: this.lookup.bind(this),
     });
