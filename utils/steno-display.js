@@ -453,7 +453,7 @@ StenoDisplay.Stroke.prototype.applyRules = function (rules) {
 
     appliedRules.forEach((rule) => {
         let replacedText = rule.target;
-
+        var outline = rule.outline;
         let letterMatches = [
             "S",
             "T",
@@ -472,15 +472,15 @@ StenoDisplay.Stroke.prototype.applyRules = function (rules) {
             "-Z",
         ];
 
-        if (letterMatches.includes(rule.outline)) {
+        if (letterMatches.includes(outline)) {
             let chosenLetterSet = self.leftCells;
-            if (rule.outline.includes("-")) {
-                rule.outline = rule.outline.slice(1);
+            if (outline.includes("-")) {
+                outline = outline.slice(1);
                 // @ts-ignore
                 chosenLetterSet = self.rightCells;
             }
-            chosenLetterSet[rule.outline[0]].innerText = replacedText;
-            chosenLetterSet[rule.outline[0]].className = "pressed";
+            chosenLetterSet[outline[0]].innerText = replacedText;
+            chosenLetterSet[outline[0]].className = "pressed";
         }
         //See if rule is part of this set
         let verticalMatches = [
@@ -493,17 +493,17 @@ StenoDisplay.Stroke.prototype.applyRules = function (rules) {
             "-TS",
             "-DZ",
         ];
-        if (verticalMatches.includes(rule.outline)) {
+        if (verticalMatches.includes(outline)) {
             let chosenLetterSet = self.leftCells;
-            if (rule.outline.includes("-")) {
-                rule.outline = rule.outline.slice(1);
+            if (outline.includes("-")) {
+                outline = outline.slice(1);
                 // @ts-ignore
                 chosenLetterSet = self.rightCells;
             }
-            chosenLetterSet[rule.outline[0]].innerText = replacedText;
-            chosenLetterSet[rule.outline[0]].className = "pressed";
-            chosenLetterSet[rule.outline[0]].rowSpan = 2;
-            chosenLetterSet[rule.outline[1]].style.display = "none";
+            chosenLetterSet[outline[0]].innerText = replacedText;
+            chosenLetterSet[outline[0]].className = "pressed";
+            chosenLetterSet[outline[0]].rowSpan = 2;
+            chosenLetterSet[outline[1]].style.display = "none";
         }
         let horizontalMatches = [
             "TP",
@@ -517,20 +517,20 @@ StenoDisplay.Stroke.prototype.applyRules = function (rules) {
             "-BG",
             "-GS",
         ];
-        if (horizontalMatches.includes(rule.outline)) {
+        if (horizontalMatches.includes(outline)) {
             let chosenLetterSet = self.leftCells;
-            if (rule.outline.includes("-")) {
-                rule.outline = rule.outline.slice(1);
+            if (outline.includes("-")) {
+                outline = outline.slice(1);
                 // @ts-ignore
                 chosenLetterSet = self.rightCells;
             }
-            chosenLetterSet[rule.outline[0]].innerText = replacedText;
-            chosenLetterSet[rule.outline[0]].className = "pressed";
-            chosenLetterSet[rule.outline[0]].colSpan = 2;
-            chosenLetterSet[rule.outline[1]].style.display = "none";
+            chosenLetterSet[outline[0]].innerText = replacedText;
+            chosenLetterSet[outline[0]].className = "pressed";
+            chosenLetterSet[outline[0]].colSpan = 2;
+            chosenLetterSet[outline[1]].style.display = "none";
         }
 
-        switch (rule.outline) {
+        switch (outline) {
             case "-F":
                 self.rightCells["F"].className = "pressed";
                 self.rightCells["F"].innerText = replacedText;
