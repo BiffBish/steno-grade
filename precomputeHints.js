@@ -4,14 +4,15 @@ importScripts(
     "spectra/rules.js"
 );
 
-var translations = TypeJig.shortestTranslations(PloverTranslations);
+var translations;
 
 var allWords = [];
 onmessage = function (e) {
     console.log("Message received from main script");
     var workerResult = "Result: " + e.data;
     console.log("Posting message back to main script");
-    allWords = e.data;
+    allWords = e.data.words;
+    translations = e.data.translations;
     processAllWords();
 };
 function lookup(text) {

@@ -36,7 +36,10 @@ function StenoDisplay(container, translations, showEmpty) {
 }
 
 StenoDisplay.prototype.startupPrecompute = function (fullText) {
-    this.hintComputer.postMessage(fullText);
+    this.hintComputer.postMessage({
+        words: fullText,
+        translations: this.pseudoStenoFor,
+    });
 };
 StenoDisplay.prototype.update = function (text, x, y) {
     text = text || "";
