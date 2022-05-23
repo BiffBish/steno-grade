@@ -1,3 +1,5 @@
+console.log("PrecomputeHints.js loaded");
+
 importScripts(
     "utils/type-jig.js",
     "plover-translations.js",
