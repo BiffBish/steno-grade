@@ -216,7 +216,7 @@ function Analyze(outlines, target) {
 
     for (let index = 0; index < 5; index++) {
         outlines.forEach((outline) => {
-            // console.log("outline", outline);
+            console.log("outline", outline);
 
             // outline = "PH*ET/SEUL/*EUPB";
             var result = FindRulesThatFitRecursively(
@@ -302,12 +302,12 @@ function Analyze(outlines, target) {
 //Lets try a recursive solution
 
 function TestRuleOutline(depth, ruleOutline, outline) {
-    // console.log(
-    //     "---".repeat(depth) + "Testing rule outline",
-    //     ruleOutline,
-    //     "on",
-    //     outline
-    // );
+    console.log(
+        "---".repeat(depth) + "Testing rule outline",
+        ruleOutline,
+        "on",
+        outline
+    );
     var firstWord = outline.split("/")[0];
 
     if (outline == "*" && !firstWord.match(/\*/)) return false;
