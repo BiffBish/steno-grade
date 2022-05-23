@@ -9,7 +9,7 @@ var translations;
 
 var allWords = [];
 onmessage = function (e) {
-    console.log("Message received from main script");
+    console.log("Message received from main script. V@");
     var workerResult = "Result: " + e.data;
     allWords = e.data.words;
     translations = e.data.translations;
