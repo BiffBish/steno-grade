@@ -223,6 +223,7 @@ var SpectraRules = {
     ],
     ".al": ["-L", "a(.l)", "", "", "drop unstressed vowel"],
     ".el": ["-L", "e(.l)", "", "", "drop unstressed vowel"],
+    ".le": ["-L", "le", "", "", "drop unstressed vowel"],
 
     ".g": ["-G", "g", "", "", "right side G"],
     ".gg": ["-G", "gg", "", "", "right side G"],
@@ -1030,7 +1031,7 @@ var SpectraRules = {
     for: ["TP-R", "(f.)o(.r)", "", "WORD", "common brief"],
     they: ["THE", "(t.)(h.)(e)y", "", "WORD", "common brief"],
     were: ["W-R", "(w.)e(.r)e", "", "WORD", "common brief"],
-
+    youre: ["UR", "you're", "", "WORD", "common brief"],
     // fingerspelling reference rules
     // "~FS": [
     //     "*",

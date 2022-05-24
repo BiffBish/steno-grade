@@ -216,6 +216,14 @@ a, a:visited {
 #strokes .leftVowel { transform: translate(+0.8em, 10%); }
 #strokes .rightVowel { transform: translate(-0.8em, 10%); }
 
+
+#strokes table tr td.asterisk-pressed {
+	color: #000;
+	background: rgb(255, 158, 119);
+}
+
+
+
 #strokes table tr td.pressed {
 	color: #000;
 	background: #fe7;

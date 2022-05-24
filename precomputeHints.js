@@ -1,7 +1,7 @@
 console.log("PrecomputeHints.js loaded");
 
 importScripts(
-    "utils/type-jig.js",
+    "type-jig.js",
     "plover-translations.js",
     "spectra/rules.js",
     "spectra/spectra.js"
@@ -30,38 +30,72 @@ function lookup(text) {
         }
 
         if (!strokes) {
-            //Get the last letter and see if its punctuation
-            var lastLetter = text.slice(-1);
-            if (lastLetter.match(/[.?,!]/)) {
-                text = text.slice(0, -1);
-                strokes = this.lookupEntry(text, dictionary);
-                if (strokes) {
-                    // console.log("Found punctuation", text, strokes, lastLetter);
-                    switch (lastLetter) {
-                        case ".":
-                            strokes = strokes.map((stroke) => {
-                                return (stroke += "/TP-PL");
-                            });
-                            break;
-                        case ",":
-                            strokes = strokes.map((stroke) => {
-                                return (stroke += "/KW-BG");
-                            });
-                            break;
-                        case "?":
-                            strokes = strokes.map((stroke) => {
-                                return (stroke += "/KW-PL");
-                            });
-                            break;
-                        case "!":
-                            strokes = strokes.map((stroke) => {
-                                return (stroke += "/TP-BG");
-                            });
-                            break;
+            //Time to process Punctuation
+
+            //Loop through the keys and values of the dictionary
+            let addStrokeBefore = "";
+            let addStrokeAfter = "";
+
+            let addSymbolBefore = "";
+            let addSymbolAfter = "";
+            for (var key in PloverPunctuation) {
+                // console.log("Checking", key, PloverPunctuation[key]);
+                let value = PloverPunctuation[key];
+                if (key.length > 1 && key.startsWith("-")) {
+                    key = key.substring(1);
+                    if (text.endsWith(key)) {
+                        addStrokeAfter = value;
+                        addSymbolAfter = key;
+
+                        text = text.substring(0, text.length - key.length);
                     }
-                    // console.log("Resulting punctuation", strokes);
+                }
+
+                if (key.length > 1 && key.endsWith("-")) {
+                    key = key.substring(0, key.length - 1);
+                    if (text.startsWith(key)) {
+                        addStrokeBefore = value;
+                        addSymbolBefore = key;
+
+                        text = text.substring(key.length);
+                    }
+                }
+
+                if (text.startsWith(key)) {
+                    addStrokeBefore = value;
+                    addSymbolBefore = key;
+
+                    text = text.substring(key.length);
+                }
+
+                if (text.endsWith(key)) {
+                    addStrokeAfter = value;
+                    addSymbolAfter = key;
+
+                    text = text.substring(0, text.length - key.length);
                 }
             }
+            // console.log("Punctuation", text, addStrokeBefore, addStrokeAfter);
+            strokes = this.lookupEntry(text, dictionary);
+            if (!strokes) {
+                continue;
+            }
+
+            if (addStrokeBefore) {
+                strokes = strokes.map((text) => addStrokeBefore + "/" + text);
+            }
+            if (addStrokeAfter) {
+                strokes = strokes.map((text) => text + "/" + addStrokeAfter);
+            }
+
+            if (addSymbolBefore) {
+                text = addSymbolBefore + text;
+            }
+            if (addSymbolAfter) {
+                text = text + addSymbolAfter;
+            }
+
+            //Get the last letter and see if its punctuation
         }
 
         // console.log("Found", strokes);

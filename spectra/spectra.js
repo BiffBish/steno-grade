@@ -156,6 +156,7 @@ function processResults(results, outline) {
                 outline: rule.outline,
                 ruleSound: rule.ruleSound,
                 description: rule.description,
+                remaningOutline: rule.remainingOutline,
                 subRules: rule.subRules,
                 skippedLetters: rule.skippedLetters,
                 wordNum: numOfWords - rule.inputOutline.split("/").length,
@@ -213,9 +214,23 @@ function Analyze(outlines, target) {
      * @type {ProcessedResult|null}
      */
     let bestPerformer = null;
+    //Reduce the outlines to the ones with the least amount of /
+
+    let smallestNumOfSlashes = Infinity;
+    outlines.forEach((outline) => {
+        if (outline.split("/").length < smallestNumOfSlashes) {
+            smallestNumOfSlashes = outline.split("/").length;
+        }
+    });
+
+    outlines = outlines.filter(
+        (outline) => outline.split("/").length == smallestNumOfSlashes
+    );
+    console.log("Analyzing :" + outlines, target);
 
     for (let index = 0; index < 5; index++) {
         outlines.forEach((outline) => {
+            // console.log("Trying :", index, outline);
             // console.log("outline", outline);
 
             // outline = "PH*ET/SEUL/*EUPB";
@@ -229,7 +244,7 @@ function Analyze(outlines, target) {
                 parameters
             );
             // console.log("result", result);
-
+            //
             if (result == null) return;
             // console.log("Result", result);
             var unpacked = UnpackRecursively(result);
@@ -280,16 +295,21 @@ function Analyze(outlines, target) {
                             ...processed,
                             outline: outline,
                         };
+                    } else if (outline.length < bestPerformer.outline.length) {
+                        bestPerformer = {
+                            ...processed,
+                            outline: outline,
+                        };
                     }
                 }
             }
         });
         if (bestPerformer == null) {
-            parameters.maxOneRuleSkip += 1;
+            parameters.maxOneRuleSkip += 3;
             parameters.maxSkippedKeys += 1;
-            parameters.maxSkippedLetters += 1;
+            parameters.maxSkippedLetters += 3;
         } else {
-            break;
+            // break;
         }
     }
     // console.log("Best Performer", bestPerformer);
@@ -354,7 +374,7 @@ function TestRule(
     currentParameters,
     acceptableParameters
 ) {
-    if (ruleName == "ex.") debug = true;
+    // if (ruleName == "ex.") debug = true;
     // if(memorizedData[ruleName]){
 
     // if (ruleName != "!c") debug = false;
@@ -441,6 +461,7 @@ function TestRule(
                 if (skippedLetters > acceptableParameters.maxOneRuleSkip) {
                     return false;
                 }
+                currentParameters ??= {};
                 currentParameters.skippedLetters ??= 0;
                 currentParameters.skippedLetters++;
                 if (
@@ -514,8 +535,13 @@ function FindRulesThatFitRecursively(
     acceptableParameters = {}
 ) {
     if (target == "") {
-        currentParameters.maxSkippedKeys ??= 0;
-        currentParameters.maxSkippedKeys += outline.length;
+        console.log(
+            "Remaning Out: ",
+            outline,
+            acceptableParameters.maxSkippedKeys
+        );
+        currentParameters.skippedKeys ??= 0;
+        currentParameters.skippedKeys += outline.length;
         // console.log(currentParameters.maxSkippedKeys);
         if (
             currentParameters.skippedKeys >
@@ -547,8 +573,8 @@ function FindRulesThatFitRecursively(
     // while(outline.length>)
     for (const ruleName in rules) {
         if (debug)
-            console.log(" --- ".repeat(depth) + "Testing rule :" + ruleName);
-        var newParameters = { ...currentParameters };
+            // console.log(" --- ".repeat(depth) + "Testing rule :" + ruleName);
+            var newParameters = { ...currentParameters };
         var result = TestRule(
             memorizedData,
             depth,

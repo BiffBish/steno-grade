@@ -28,7 +28,7 @@ function StenoDisplay(container, translations, showEmpty) {
     this.hintComputer = new Worker("precomputeHints.js");
 
     this.hintComputer.onmessage = (event) => {
-        console.log("Hint computer message", event);
+        console.log("Hint computer message", event.data);
         let result = event.data;
         this.cachedHints[result.text] = result.lookup;
     };
@@ -101,38 +101,72 @@ StenoDisplay.prototype.lookup = function (text) {
         }
 
         if (!strokes) {
-            //Get the last letter and see if its punctuation
-            var lastLetter = text.slice(-1);
-            if (lastLetter.match(/[.?,!]/)) {
-                text = text.slice(0, -1);
-                strokes = this.lookupEntry(text, dictionary);
-                if (strokes) {
-                    // console.log("Found punctuation", text, strokes, lastLetter);
-                    switch (lastLetter) {
-                        case ".":
-                            strokes = strokes.map((stroke) => {
-                                return (stroke += "/TP-PL");
-                            });
-                            break;
-                        case ",":
-                            strokes = strokes.map((stroke) => {
-                                return (stroke += "/KW-BG");
-                            });
-                            break;
-                        case "?":
-                            strokes = strokes.map((stroke) => {
-                                return (stroke += "/KW-PL");
-                            });
-                            break;
-                        case "!":
-                            strokes = strokes.map((stroke) => {
-                                return (stroke += "/TP-BG");
-                            });
-                            break;
+            //Time to process Punctuation
+
+            //Loop through the keys and values of the dictionary
+            let addStrokeBefore = "";
+            let addStrokeAfter = "";
+
+            let addSymbolBefore = "";
+            let addSymbolAfter = "";
+            for (var key in PloverPunctuation) {
+                // console.log("Checking", key, PloverPunctuation[key]);
+                let value = PloverPunctuation[key];
+                if (key.length > 1 && key.startsWith("-")) {
+                    key = key.substring(1);
+                    if (text.endsWith(key)) {
+                        addStrokeAfter = value;
+                        addSymbolAfter = key;
+
+                        text = text.substring(0, text.length - key.length);
                     }
-                    // console.log("Resulting punctuation", strokes);
+                }
+
+                if (key.length > 1 && key.endsWith("-")) {
+                    key = key.substring(0, key.length - 1);
+                    if (text.startsWith(key)) {
+                        addStrokeBefore = value;
+                        addSymbolBefore = key;
+
+                        text = text.substring(key.length);
+                    }
+                }
+
+                if (text.startsWith(key)) {
+                    addStrokeBefore = value;
+                    addSymbolBefore = key;
+
+                    text = text.substring(key.length);
+                }
+
+                if (text.endsWith(key)) {
+                    addStrokeAfter = value;
+                    addSymbolAfter = key;
+
+                    text = text.substring(0, text.length - key.length);
                 }
             }
+            // console.log("Punctuation", text, addStrokeBefore, addStrokeAfter);
+            strokes = this.lookupEntry(text, dictionary);
+            if (!strokes) {
+                continue;
+            }
+
+            if (addStrokeBefore) {
+                strokes = strokes.map((text) => addStrokeBefore + "/" + text);
+            }
+            if (addStrokeAfter) {
+                strokes = strokes.map((text) => text + "/" + addStrokeAfter);
+            }
+
+            if (addSymbolBefore) {
+                text = addSymbolBefore + text;
+            }
+            if (addSymbolAfter) {
+                text = text + addSymbolAfter;
+            }
+
+            //Get the last letter and see if its punctuation
         }
 
         // console.log("Found", strokes);
@@ -307,10 +341,10 @@ StenoDisplay.prototype.show = function () {
 // ---------------------------------------------------------------------
 
 StenoDisplay.Stroke = function (container) {
-    this.separator = document.createElement("span");
-    this.separator.appendChild(document.createTextNode("/"));
-    this.separator.className = "big-slash";
-    container.appendChild(this.separator);
+    // this.separator = document.createElement("span");
+    // this.separator.appendChild(document.createTextNode("/"));
+    // this.separator.className = "big-slash";
+    // container.appendChild(this.separator);
     this.keys = document.createElement("table");
 
     var spacer = document.createElement("tr");
@@ -438,6 +472,7 @@ StenoDisplay.Stroke.prototype.clear = function () {
 
 StenoDisplay.Stroke.prototype.applyRules = function (rules) {
     console.log("Applying rules to stroke", rules);
+
     var self = this;
     var appliedRules = [];
 
@@ -453,11 +488,22 @@ StenoDisplay.Stroke.prototype.applyRules = function (rules) {
     console.log(appliedRules);
 
     appliedRules.forEach((rule) => {
+        let className = "pressed";
+        var outline = rule.outline;
         let replacedText = rule.target;
+
+        if (replacedText == "") replacedText = rule.ruleSound[0];
+
+        console.log(outline);
+        if (outline.includes("*")) {
+            this.vowelCells["*"].className = "alt wide asterisk-pressed";
+            outline = outline.replace("*", "-");
+            className = "asterisk-pressed";
+        }
+
         // let replacedText = rule.ruleSound[0];
 
         // if (replacedText == "") replacedText = rule.target.toLowerCase();
-        var outline = rule.outline;
         let letterMatches = [
             "S",
             "T",
@@ -484,7 +530,7 @@ StenoDisplay.Stroke.prototype.applyRules = function (rules) {
                 chosenLetterSet = self.rightCells;
             }
             chosenLetterSet[outline[0]].innerText = replacedText;
-            chosenLetterSet[outline[0]].className = "pressed";
+            chosenLetterSet[outline[0]].className = className;
         }
         //See if rule is part of this set
         let verticalMatches = [
@@ -505,7 +551,7 @@ StenoDisplay.Stroke.prototype.applyRules = function (rules) {
                 chosenLetterSet = self.rightCells;
             }
             chosenLetterSet[outline[0]].innerText = replacedText;
-            chosenLetterSet[outline[0]].className = "pressed";
+            chosenLetterSet[outline[0]].className = className;
             chosenLetterSet[outline[0]].rowSpan = 2;
             chosenLetterSet[outline[1]].style.display = "none";
         }
@@ -529,14 +575,48 @@ StenoDisplay.Stroke.prototype.applyRules = function (rules) {
                 chosenLetterSet = self.rightCells;
             }
             chosenLetterSet[outline[0]].innerText = replacedText;
-            chosenLetterSet[outline[0]].className = "pressed";
+            chosenLetterSet[outline[0]].className = className;
             chosenLetterSet[outline[0]].colSpan = 2;
             chosenLetterSet[outline[1]].style.display = "none";
         }
 
+        let punctuationLeftMatches = ["TP", "KW", "KR"];
+
+        let punctuationRightMatches = ["PL", "BG", "LT", "GS"];
+
+        if (
+            punctuationLeftMatches.includes(outline.split("-")[0]) &&
+            outline.includes("-") &&
+            punctuationRightMatches.includes(outline.split("-")[1])
+        ) {
+            self.leftCells[outline.split("-")[0][0]].innerText = replacedText;
+            self.leftCells[outline.split("-")[0][0]].className = className;
+            if (outline.split("-")[0] !== "KR") {
+                self.leftCells[outline.split("-")[0][0]].colSpan = 2;
+                self.leftCells[outline.split("-")[0][1]].style.display = "none";
+            } else {
+                self.leftCells[outline.split("-")[0][1]].className = className;
+                self.leftCells[outline.split("-")[0][1]].innerText =
+                    replacedText;
+            }
+
+            self.rightCells[outline.split("-")[1][0]].innerText = replacedText;
+            self.rightCells[outline.split("-")[1][0]].className = className;
+            self.rightCells[outline.split("-")[1][0]].colSpan = 2;
+            self.rightCells[outline.split("-")[1][1]].style.display = "none";
+        }
+
+        function doubleLetter(letter) {
+            letter.innerText = replacedText;
+            letter.className = className;
+            letter.colSpan = 2;
+        }
+        function hideLetter(letter) {
+            letter.style.display = "none";
+        }
         switch (outline) {
             case "-F":
-                self.rightCells["F"].className = "pressed";
+                self.rightCells["F"].className = className;
                 self.rightCells["F"].innerText = replacedText;
                 break;
 
@@ -544,36 +624,32 @@ StenoDisplay.Stroke.prototype.applyRules = function (rules) {
             // 2 vowel matches
             case "EU":
                 self.vowelCells["E"].innerText = replacedText;
-                self.vowelCells["E"].className = "pressed";
+                self.vowelCells["E"].className = className;
                 self.vowelCells["E"].colSpan = 2;
                 self.vowelCells["U"].style.display = "none";
                 break;
 
             case "AO":
                 self.vowelCells["A"].innerText = replacedText;
-                self.vowelCells["A"].className = "pressed";
+                self.vowelCells["A"].className = className;
                 self.vowelCells["A"].colSpan = 2;
                 self.vowelCells["O"].style.display = "none";
                 break;
 
             case "AOEU":
                 self.vowelCells["A"].innerText = replacedText;
-                self.vowelCells["A"].className = "pressed";
                 self.vowelCells["A"].colSpan = 2;
                 self.vowelCells["O"].style.display = "none";
 
                 self.vowelCells["E"].innerText = replacedText;
-                self.vowelCells["E"].className = "pressed";
                 self.vowelCells["E"].colSpan = 2;
                 self.vowelCells["U"].style.display = "none";
                 break;
 
             case "AEU":
                 self.vowelCells["A"].innerText = replacedText;
-                self.vowelCells["A"].className = "pressed";
 
                 self.vowelCells["E"].innerText = replacedText;
-                self.vowelCells["E"].className = "pressed";
                 self.vowelCells["E"].colSpan = 2;
                 self.vowelCells["U"].style.display = "none";
 
@@ -581,17 +657,14 @@ StenoDisplay.Stroke.prototype.applyRules = function (rules) {
 
             case "OEU":
                 self.vowelCells["O"].innerText = replacedText;
-                self.vowelCells["O"].className = "pressed";
 
                 self.vowelCells["E"].innerText = replacedText;
-                self.vowelCells["E"].className = "pressed";
                 self.vowelCells["E"].colSpan = 2;
                 self.vowelCells["U"].style.display = "none";
                 break;
 
             case "AOE":
                 self.vowelCells["A"].innerText = replacedText;
-                self.vowelCells["A"].className = "pressed";
                 self.vowelCells["A"].colSpan = 2;
                 self.vowelCells["O"].style.display = "none";
 
@@ -600,7 +673,6 @@ StenoDisplay.Stroke.prototype.applyRules = function (rules) {
 
             case "AOU":
                 self.vowelCells["A"].innerText = replacedText;
-                self.vowelCells["A"].className = "pressed";
                 self.vowelCells["A"].colSpan = 2;
                 self.vowelCells["O"].style.display = "none";
 
@@ -612,14 +684,12 @@ StenoDisplay.Stroke.prototype.applyRules = function (rules) {
             // "KWR"
             case "TPH":
                 self.leftCells["T"].innerText = replacedText;
-                self.leftCells["T"].className = "pressed";
                 self.leftCells["T"].colSpan = 3;
                 self.leftCells["P"].style.display = "none";
                 self.leftCells["H"].style.display = "none";
                 break;
             case "KWR":
                 self.leftCells["K"].innerText = replacedText;
-                self.leftCells["K"].className = "pressed";
                 self.leftCells["K"].colSpan = 3;
                 self.leftCells["W"].style.display = "none";
                 self.leftCells["R"].style.display = "none";
@@ -630,28 +700,24 @@ StenoDisplay.Stroke.prototype.applyRules = function (rules) {
             // "-BGS"
             case "-FPL":
                 self.rightCells["T"].innerText = replacedText;
-                self.rightCells["T"].className = "pressed";
                 self.rightCells["T"].colSpan = 3;
                 self.rightCells["P"].style.display = "none";
                 self.rightCells["H"].style.display = "none";
                 break;
             case "-KWR":
                 self.rightCells["K"].innerText = replacedText;
-                self.rightCells["K"].className = "pressed";
                 self.rightCells["K"].colSpan = 3;
                 self.rightCells["W"].style.display = "none";
                 self.rightCells["R"].style.display = "none";
                 break;
             case "-RBG":
                 self.rightCells["R"].innerText = replacedText;
-                self.rightCells["R"].className = "pressed";
                 self.rightCells["R"].colSpan = 3;
                 self.rightCells["B"].style.display = "none";
                 self.rightCells["G"].style.display = "none";
                 break;
             case "-BGS":
                 self.rightCells["B"].innerText = replacedText;
-                self.rightCells["B"].className = "pressed";
                 self.rightCells["B"].colSpan = 3;
                 self.rightCells["G"].style.display = "none";
                 self.rightCells["S"].style.display = "none";
@@ -669,22 +735,35 @@ StenoDisplay.Stroke.prototype.applyRules = function (rules) {
             //X
             case "KP":
                 self.leftCells["K"].innerText = replacedText;
-                self.leftCells["K"].className = "pressed";
                 self.leftCells["P"].innerText = replacedText;
-                self.leftCells["P"].className = "pressed";
                 // self.rightCells["B"].colSpan = 1;
                 // self.rightCells["G"].style.display = "none";
                 // self.rightCells["S"].style.display = "none";
                 break;
             case "TKPW":
                 self.leftCells["T"].innerText = replacedText;
-                self.leftCells["T"].className = "pressed";
                 self.leftCells["T"].colSpan = 2;
                 self.leftCells["T"].rowSpan = 2;
 
                 self.leftCells["K"].style.display = "none";
                 self.leftCells["P"].style.display = "none";
                 self.leftCells["W"].style.display = "none";
+
+            case "AE":
+                self.vowelCells["A"].innerText = replacedText;
+                // self.vowelCells["A"].className = "leftVowel pressed";
+
+                self.vowelCells["E"].innerText = replacedText;
+
+            //L Shape
+            case "-PBG":
+                self.rightCells["P"].innerText = "n";
+                self.rightCells["P"].className = className;
+                self.rightCells["P"].rowSpan = 2;
+                self.rightCells["B"].style.display = "none";
+
+                self.rightCells["G"].innerText = "k";
+                self.rightCells["G"].className = className;
 
             default:
                 break;
@@ -695,7 +774,7 @@ StenoDisplay.Stroke.prototype.applyRules = function (rules) {
 StenoDisplay.Stroke.prototype.set = function (stroke, separator, rules) {
     console.log("Setting stroke", stroke, rules);
     this.clear();
-    this.separator.firstChild.nodeValue = separator || "";
+    // this.separator.firstChild.nodeValue = separator || "";
     var steno = pseudoStrokeToSteno(stroke);
     var left = steno[0],
         vowel = steno[1],
