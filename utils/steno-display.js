@@ -43,6 +43,7 @@ StenoDisplay.prototype.startupPrecompute = function (fullText) {
 };
 StenoDisplay.prototype.update = function (text, x, y) {
     text = text || "";
+    console.log("Updating StenoDisplay", text, x, y);
     if (text !== this.lastText) {
         this.lastText = text;
         //The input text is 10 words long. see if 10 words matches. if not try 9 words. ect
@@ -85,6 +86,9 @@ StenoDisplay.prototype.update = function (text, x, y) {
 };
 
 StenoDisplay.prototype.lookup = function (text) {
+    if (/^[0-9]+$/.test(text)) {
+        return { strokes: this.numberStrokes(text), rules: [] };
+    }
     if (this.cachedHints[text]) {
         return this.cachedHints[text];
     }
@@ -169,7 +173,6 @@ StenoDisplay.prototype.lookup = function (text) {
             //Get the last letter and see if its punctuation
         }
 
-        // console.log("Found", strokes);
         if (!strokes) {
             continue;
         }
@@ -194,6 +197,7 @@ StenoDisplay.prototype.lookup = function (text) {
         }
         return { strokes: strokes, rules: null };
     }
+
     return null;
 };
 

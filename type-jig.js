@@ -244,6 +244,7 @@ TypeJig.prototype.setWord = function (word, id) {
 };
 
 TypeJig.prototype.onWord = function (word, id) {
+    console.log("OnWord");
     this.typedWords.forEach((element) => {
         element.current = false;
     });
@@ -296,6 +297,13 @@ TypeJig.prototype.onWord = function (word, id) {
 };
 
 TypeJig.prototype.gradeTypeVsResult = function (typedWords, expectedWords) {
+    //remove any leading spaces on typedWords
+    //any blank type words if they are at the end
+    let trailingSpace = false;
+    if (typedWords[typedWords.length - 1] == "" && typedWords.length > 1) {
+        typedWords.pop();
+        trailingSpace = true;
+    }
     var gradingRules = this.gradingRules;
     // Display the user's answer, marking it for correctness.
     var oldOutput = this.display.previousElementSibling;
@@ -459,6 +467,13 @@ TypeJig.prototype.gradeTypeVsResult = function (typedWords, expectedWords) {
         ...LastWord,
         timeStamp: this.clock.getTime(),
     };
+    if (trailingSpace) {
+        wordList.push({
+            correct: null,
+            expected: "placeholder",
+            typed: "",
+        });
+    }
     return {
         words: wordList,
         correctCount: correctCount,
