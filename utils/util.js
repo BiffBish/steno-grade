@@ -151,7 +151,7 @@ function setExercise(name, exercise, hints = null, options, jig) {
     console.log("Setting exersize", exercise, hints, options);
     var h = document.getElementById("lesson-name");
     h.textContent = name;
-    document.title = name + " - Steno Jig";
+    document.title = name + " - Steno Grade";
 
     var back = document.getElementById("back");
     back.href =
