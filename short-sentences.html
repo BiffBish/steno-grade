@@ -8,61 +8,109 @@
         <script src="utils/util.js"></script>
         <script src="alea-prng.js"></script>
         <script src="utils/steno-display.js"></script>
-        <script src="plover-translations.js"></script>
         <script src="short-sentences-data.js"></script>
+        <script src="libs/jquery-3.6.0.min.js"></script>
+
         <script src="libs/chart.js"></script>
         <script src="chartjs-plugin-datalabels.js"></script>
+
+        <script src="plover-translations.js"></script>
+
+        <script src="spectra/spectra.js"></script>
+        <script src="spectra/rules.js"></script>
         <link rel="stylesheet" type="text/css" href="font-roboto.css" />
     </head>
     <body>
-        <div id="lesson" class="wrapper">
-            <div id="leftside">
-                <h3 id="lesson-name" class="center"></h3>
-                <div id="drill-content">
-                    <div id="answer"></div>
-                    <div id="exercise"></div>
-                    <div id="results"></div>
-                    <div style="height: 300px">
-                        <canvas id="chartDiv" width="400" height="400"></canvas>
-                    </div>
-                </div>
-            </div>
+        <div id="lesson" class="wrapper"></div>
 
-            <div id="nav">
-                <p id="stroke-hint"></p>
-                <p id="strokes"></p>
-                <p id="clock" class="clock"></p>
-                <p id="live-wpm-display" class="wpm"></p>
+        <script>
+            setTheme();
+            const choose = (a, rnd) => a[Math.floor(rnd() * a.length)];
 
-                <p class="center">
-                    <a id="back" title="LeftArrow"
-                        >&larr; Back to Menu
-                        <span class="shortcutkey">(LeftArrow)</span></a
-                    >
-                </p>
-                <p class="center">
-                    <a id="again" title="Enter"
-                        >&#8634; Repeat Drill
-                        <span class="shortcutkey">(Enter 3x)</span></a
-                    >
-                </p>
-                <p class="center">
-                    <a id="end" title="Enter"
-                        >&Cross; End Drill
-                        <span class="shortcutkey">(Tab 3x)</span></a
-                    >
-                </p>
-                <p class="center">
-                    <a id="new" title="RightArrow"
-                        >&rarr; New Drill
-                        <span class="shortcutkey">(RightArrow)</span></a
-                    >
-                </p>
-            </div>
+            function generateExercise(wordCount, rnd) {
+                let prevElements = [],
+                    element;
+                let words = [];
+                let charsLeft = wordCount * 5 + 1;
+                while (charsLeft > 0) {
+                    do {
+                        element = choose(shortSentences, rnd);
+                    } while (prevElements.includes(element));
+                    if (prevElements.length > 20) prevElements.shift();
+                    prevElements.push(element);
+                    const string =
+                        typeof element === "string"
+                            ? element
+                            : element.join(" ");
+                    const array = Array.isArray(element)
+                        ? element
+                        : element.split(/\s+/);
+                    charsLeft -= 1 + string.length;
+                    words.splice(words.length, 0, ...array);
+                }
+                return new TypeJig.Exercise(words, 0, false, "ordered");
+            }
 
-            <textarea id="input"></textarea>
-        </div>
+            $(document).ready(function () {
+                populatePage();
+                var fields = parseQueryString(document.location.search);
 
-        <script src="short-sentences.js"></script>
+                if (!fields.seed) {
+                    fields.seed = "" + Math.random();
+                    window.history.replaceState(
+                        "",
+                        "",
+                        updateURLParameter(
+                            window.location.href,
+                            "seed",
+                            fields.seed
+                        )
+                    );
+                }
+                var rng = PRNG(fields.seed);
+
+                var wordCount =
+                    fields.word_count == null
+                        ? 100
+                        : parseInt(fields.word_count);
+
+                var name = "Short Sentences";
+
+                var exercise = generateExercise(wordCount, rng);
+
+                var jig = setExercise(name, exercise, null, fields);
+
+                var back = document.getElementById("back");
+                var again = document.getElementById("again");
+                var end = document.getElementById("end");
+                var another = document.getElementById("new");
+                var nextSeed = prepareNextSeed(another);
+                back.href = back.href.replace("short-sentences", "form");
+                again.addEventListener("click", function (evt) {
+                    evt.preventDefault();
+                    jig.reset();
+                });
+                end.addEventListener("click", function (evt) {
+                    evt.preventDefault();
+                    jig.endExercise();
+                });
+                another.addEventListener("click", function (evt) {
+                    evt.preventDefault();
+                    window.history.replaceState(
+                        "",
+                        "",
+                        updateURLParameter(
+                            window.location.href,
+                            "seed",
+                            nextSeed
+                        )
+                    );
+                    let exercise = generateExercise(wordCount, PRNG(nextSeed));
+                    jig.exercise = exercise;
+                    jig.reset();
+                    nextSeed = prepareNextSeed(another);
+                });
+            });
+        </script>
     </body>
 </html>

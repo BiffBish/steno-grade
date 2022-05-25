@@ -203,7 +203,7 @@ function UnpackRecursively(result) {
 function Analyze(outlines, target) {
     target = target.toLowerCase();
     // outlines = ["KPAPL"];
-    console.log("Analyzing :" + outlines, target);
+    // console.log("Analyzing :" + outlines, target);
 
     let parameters = {
         maxOneRuleSkip: 0,
@@ -226,7 +226,7 @@ function Analyze(outlines, target) {
     outlines = outlines.filter(
         (outline) => outline.split("/").length == smallestNumOfSlashes
     );
-    console.log("Analyzing :" + outlines, target);
+    // console.log("Analyzing :" + outlines, target);
 
     for (let index = 0; index < 5; index++) {
         outlines.forEach((outline) => {
@@ -535,11 +535,11 @@ function FindRulesThatFitRecursively(
     acceptableParameters = {}
 ) {
     if (target == "") {
-        console.log(
-            "Remaning Out: ",
-            outline,
-            acceptableParameters.maxSkippedKeys
-        );
+        // console.log(
+        //     "Remaning Out: ",
+        //     outline,
+        //     acceptableParameters.maxSkippedKeys
+        // );
         currentParameters.skippedKeys ??= 0;
         currentParameters.skippedKeys += outline.length;
         // console.log(currentParameters.maxSkippedKeys);
@@ -548,7 +548,7 @@ function FindRulesThatFitRecursively(
                 acceptableParameters.maxSkippedKeys ??
             0
         ) {
-            console.log("Too many skipped Keys");
+            // console.log("Too many skipped Keys");
             return false;
         }
 

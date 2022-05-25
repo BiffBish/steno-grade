@@ -38,7 +38,7 @@ function populatePage(options) {
 
 	<div id="nav">
 		<p id="stroke-hint"></p>
-		<p id="strokes"></p>
+		<p class="strokes"></p>
 		<p id="clock" class="clock"></p>
 		<p id="live-wpm-display" class="wpm"></p>
 		<p class="center"><a id="back" title="LeftArrow">&larr; Back to Menu <span class="shortcutkey">(LeftArrow)</span></a></p>
@@ -130,7 +130,7 @@ function new_rng(seed_txt) {
 }
 
 function initializeHints(hints, floating_hints) {
-    var strokes = document.getElementById("strokes");
+    var strokes = document.getElementsByClassName("strokes")[0];
     if (floating_hints) {
         strokes.style.position = "fixed";
     }

@@ -602,6 +602,7 @@ TypeJig.prototype.displayTypedWords = function (typedWords) {
 
 function checkMatch(typed, expected) {
     if (typed == "") return false;
+    if (expected == "") return false;
     if (
         typed.length < expected.length &&
         typed === expected.slice(0, typed.length)
@@ -710,9 +711,12 @@ TypeJig.prototype.keyDown = function (e) {
             id = "new";
             break;
         case "ArrowUp":
+            e.preventDefault();
             id = "show-hint";
             break;
         case "ArrowDown":
+            e.preventDefault();
+
             id = "hide-hint";
             break;
     }

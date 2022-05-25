@@ -126,13 +126,58 @@ function lookup(text) {
     }
     return null;
 }
+var stenoNumKeyOrder = "#123450I6789D";
 
+function cmpStenoNumKeys(a, b) {
+    return stenoNumKeyOrder.indexOf(a) - stenoNumKeyOrder.indexOf(b);
+}
+function numberStrokes(text) {
+    var keys = {
+        1: "S",
+        2: "T",
+        3: "P",
+        4: "H",
+        5: "A",
+        0: "O",
+        6: "F",
+        7: "P",
+        8: "L",
+        9: "T",
+    };
+    var strokes = "",
+        stroke = [];
+    for (var i = 0; i < text.length; i += 2) {
+        if (strokes !== "") strokes += "/";
+        stroke = text.slice(i, i + 2).split("");
+        if (stroke.length === 1) {
+            strokes += "#" + (stroke[0] > 5 ? "-" : "") + keys[stroke[0]];
+        } else {
+            if (stroke[0] === stroke[1]) stroke[1] = "D";
+            else if (cmpStenoNumKeys(stroke[0], stroke[1]) > 0)
+                stroke.push("I");
+            stroke.sort(cmpStenoNumKeys);
+            var right;
+            right = false;
+            stroke = stroke.map(function (x) {
+                var out = keys[x] || x;
+                if ("AOEUI".indexOf(out) !== -1) right = true;
+                if ((out === "D" || +x > 5) && !right) {
+                    out = "-" + out;
+                    right = true;
+                }
+                return out;
+            });
+            strokes += "#" + stroke.join("");
+        }
+    }
+    return strokes;
+}
 function lookupEntry(text, dictionary) {
     // console.log(dictionary)
     var strokes = dictionary[text] || "";
     // console.log("Strokes", strokes);
     if (!strokes && /^[0-9]+$/.test(text)) {
-        strokes = this.numberStrokes(text);
+        strokes = numberStrokes(text);
     }
     if (strokes == "") {
         return null;

@@ -28,7 +28,7 @@ function StenoDisplay(container, translations, showEmpty) {
     this.hintComputer = new Worker("precomputeHints.js");
 
     this.hintComputer.onmessage = (event) => {
-        console.log("Hint computer message", event.data);
+        // console.log("Hint computer message", event.data);
         let result = event.data;
         this.cachedHints[result.text] = result.lookup;
     };
@@ -179,9 +179,9 @@ StenoDisplay.prototype.lookup = function (text) {
             return aSlashes - bSlashes;
         });
         if (true) {
-            console.log("Found", text, strokes);
+            // console.log("Found", text, strokes);
             var analysisResult = Analyze(strokes, text);
-            if (analysisResult.outline.length > 0) {
+            if (analysisResult?.outline?.length > 0) {
                 return {
                     strokes: analysisResult.outline,
                     rules: analysisResult.rules,
@@ -202,7 +202,7 @@ StenoDisplay.prototype.lookupEntry = function (text, dictionary) {
         const dictionary = this.pseudoStenoFor[index];
         // console.log(dictionary)
         var strokes = dictionary[text] || "";
-        console.log("Strokes", strokes);
+        // console.log("Strokes", strokes);
         if (!strokes && /^[0-9]+$/.test(text)) {
             strokes = this.numberStrokes(text);
         }
@@ -268,7 +268,7 @@ StenoDisplay.prototype.numberStrokes = function (text) {
 };
 
 StenoDisplay.prototype.set = function (stenoStroke, showEmpty) {
-    console.log("Setting", stenoStroke, showEmpty);
+    // console.log("Setting", stenoStroke, showEmpty);
     for (i = 0; i < this.strokes.length; ++i) this.strokes[i].hide();
     if (!stenoStroke.strokes) stenoStroke.strokes = "";
     if (stenoStroke.strokes || showEmpty) {
@@ -290,7 +290,7 @@ StenoDisplay.prototype.showAlternatives = function (stenoStroke, firstSep, i0) {
         stenoStroke = { strokes: stenoStroke, rules: [] };
     if (typeof stenoStroke.strokes === "string")
         stenoStroke.strokes = [stenoStroke.strokes];
-    console.log(stenoStroke);
+    // console.log(stenoStroke);
     for (var i = 0; i < stenoStroke.strokes.length; ++i) {
         var sep = i ? " or " : firstSep;
         i0 += this.showTranslation(
@@ -314,7 +314,7 @@ StenoDisplay.prototype.showTranslation = function (
         if (i + i0 >= this.strokes.length) {
             this.strokes.push(new StenoDisplay.Stroke(this.container));
         }
-        console.log(pseudoSteno, i0, separator, rules);
+        // console.log(pseudoSteno, i0, separator, rules);
         this.strokes[i + i0].set(
             strokes[i],
             separator,
@@ -442,6 +442,14 @@ StenoDisplay.Stroke.prototype.clear = function () {
     removeClassFromAllPropertiesOf(this.rightCells, "pressed");
     removeClassFromAllPropertiesOf(this.vowelCells, "pressed");
 
+    removeClassFromAllPropertiesOf(this.leftCells, "asterisk-pressed");
+    removeClassFromAllPropertiesOf(this.rightCells, "asterisk-pressed");
+    removeClassFromAllPropertiesOf(this.vowelCells, "asterisk-pressed");
+
+    removeClassFromAllPropertiesOf(this.leftCells, "number-pressed");
+    removeClassFromAllPropertiesOf(this.rightCells, "number-pressed");
+    removeClassFromAllPropertiesOf(this.vowelCells, "number-pressed");
+
     removeStylingFromAllPropertiesOf(this.leftCells);
     removeStylingFromAllPropertiesOf(this.rightCells);
     removeStylingFromAllPropertiesOf(this.vowelCells);
@@ -470,8 +478,109 @@ StenoDisplay.Stroke.prototype.clear = function () {
     // this.leftCells["#"].innerText = " ";
 };
 
+StenoDisplay.Stroke.prototype.applyNumberRules = function (stroke) {
+    console.log("APPLYING NUMBER RULES", stroke);
+
+    if (stroke.startsWith("#")) {
+        stroke = stroke.substring(1);
+        addClass(this.leftCells["#"], "number-pressed");
+    }
+
+    if (stroke.startsWith("S")) {
+        stroke = stroke.substring(1);
+        addClass(this.leftCells["S"], "number-pressed");
+        this.leftCells["S"].innerHTML = "1";
+        //
+    }
+    if (stroke.startsWith("T")) {
+        stroke = stroke.substring(1);
+        addClass(this.leftCells["T"], "number-pressed");
+        this.leftCells["T"].innerHTML = "2";
+        //
+    }
+    if (stroke.startsWith("P")) {
+        stroke = stroke.substring(1);
+        addClass(this.leftCells["P"], "number-pressed");
+        this.leftCells["P"].innerHTML = "3";
+        //
+    }
+    if (stroke.startsWith("H")) {
+        stroke = stroke.substring(1);
+        addClass(this.leftCells["H"], "number-pressed");
+        this.leftCells["H"].innerHTML = "4";
+        //
+    }
+    if (stroke.startsWith("A")) {
+        stroke = stroke.substring(1);
+        addClass(this.rightCells["A"], "number-pressed");
+        this.vowelCells["A"].innerHTML = "5";
+    }
+
+    if (stroke.startsWith("O")) {
+        stroke = stroke.substring(1);
+        addClass(this.rightCells["O"], "number-pressed");
+        this.vowelCells["O"].innerHTML = "0";
+    }
+
+    if (stroke.startsWith("I")) {
+        stroke = stroke.substring(1);
+        addClass(this.vowelCells["E"], "number-pressed");
+        this.vowelCells["E"].colSpan = 2;
+        this.vowelCells["E"].innerHTML = "⟷";
+        this.vowelCells["U"].style.display = "none";
+    }
+
+    if (stroke.startsWith("EU")) {
+        stroke = stroke.substring(2);
+        addClass(this.vowelCells["E"], "number-pressed");
+        this.vowelCells["E"].colSpan = 2;
+        this.vowelCells["E"].innerHTML = "⟷";
+        this.vowelCells["U"].style.display = "none";
+    }
+
+    if (stroke.startsWith("-")) {
+        stroke = stroke.substring(1);
+    }
+
+    if (stroke.startsWith("F")) {
+        stroke = stroke.substring(1);
+        addClass(this.rightCells["F"], "number-pressed");
+        this.rightCells["F"].innerHTML = "6";
+    }
+
+    if (stroke.startsWith("P")) {
+        stroke = stroke.substring(1);
+        addClass(this.rightCells["P"], "number-pressed");
+        this.rightCells["P"].innerHTML = "7";
+    }
+
+    if (stroke.startsWith("L")) {
+        stroke = stroke.substring(1);
+        addClass(this.rightCells["L"], "number-pressed");
+        this.rightCells["L"].innerHTML = "8";
+    }
+
+    if (stroke.startsWith("T")) {
+        stroke = stroke.substring(1);
+        addClass(this.rightCells["T"], "number-pressed");
+        this.rightCells["T"].innerHTML = "9";
+    }
+
+    if (stroke.startsWith("D")) {
+        stroke = stroke.substring(1);
+        addClass(this.rightCells["D"], "number-pressed");
+        this.rightCells["D"].innerHTML = "xx";
+    }
+
+    if (stroke.startsWith("Z")) {
+        stroke = stroke.substring(1);
+        addClass(this.rightCells["Z"], "number-pressed");
+        this.rightCells["Z"].innerHTML = "x00";
+    }
+};
+
 StenoDisplay.Stroke.prototype.applyRules = function (rules) {
-    console.log("Applying rules to stroke", rules);
+    // console.log("Applying rules to stroke", rules);
 
     var self = this;
     var appliedRules = [];
@@ -481,11 +590,11 @@ StenoDisplay.Stroke.prototype.applyRules = function (rules) {
             appliedRules.push(rule);
             return;
         }
-        console.log("Rules flattened", rule);
+        // console.log("Rules flattened", rule);
         appliedRules = appliedRules.concat(rule.subRules);
-        console.log(appliedRules);
+        // console.log(appliedRules);
     });
-    console.log(appliedRules);
+    // console.log(appliedRules);
 
     appliedRules.forEach((rule) => {
         let className = "pressed";
@@ -494,7 +603,7 @@ StenoDisplay.Stroke.prototype.applyRules = function (rules) {
 
         if (replacedText == "") replacedText = rule.ruleSound[0];
 
-        console.log(outline);
+        // console.log(outline);
         if (outline.includes("*")) {
             this.vowelCells["*"].className = "alt wide asterisk-pressed";
             outline = outline.replace("*", "-");
@@ -727,6 +836,37 @@ StenoDisplay.Stroke.prototype.applyRules = function (rules) {
             // "TKPW"
             // "PWHR"
             // "-FRPB"
+            case "-FRPB":
+                self.rightCells["F"].innerText = replacedText;
+                self.rightCells["F"].colSpan = 2;
+                self.rightCells["F"].rowSpan = 2;
+
+                self.rightCells["R"].style.display = "none";
+                self.rightCells["P"].style.display = "none";
+                self.rightCells["B"].style.display = "none";
+
+                break;
+            case "-PBLG":
+                self.rightCells["P"].innerText = replacedText;
+                self.rightCells["P"].colSpan = 2;
+                self.rightCells["P"].rowSpan = 2;
+
+                self.rightCells["B"].style.display = "none";
+                self.rightCells["L"].style.display = "none";
+                self.rightCells["G"].style.display = "none";
+
+                break;
+
+            case "-LGTS":
+                self.rightCells["P"].innerText = replacedText;
+                self.rightCells["P"].colSpan = 2;
+                self.rightCells["P"].rowSpan = 2;
+
+                self.rightCells["B"].style.display = "none";
+                self.rightCells["L"].style.display = "none";
+                self.rightCells["G"].style.display = "none";
+                break;
+
             // "-PBLG"
             // "-LGTS"
 
@@ -748,13 +888,13 @@ StenoDisplay.Stroke.prototype.applyRules = function (rules) {
                 self.leftCells["K"].style.display = "none";
                 self.leftCells["P"].style.display = "none";
                 self.leftCells["W"].style.display = "none";
-
+                break;
             case "AE":
                 self.vowelCells["A"].innerText = replacedText;
                 // self.vowelCells["A"].className = "leftVowel pressed";
 
                 self.vowelCells["E"].innerText = replacedText;
-
+                break;
             //L Shape
             case "-PBG":
                 self.rightCells["P"].innerText = "n";
@@ -788,7 +928,10 @@ StenoDisplay.Stroke.prototype.set = function (stroke, separator, rules) {
     for (var i = 0; i < vowel.length; ++i) {
         addClass(this.vowelCells[vowel.charAt(i)], "pressed");
     }
-    this.applyRules(rules);
+    //If the stroke has the number bar
+
+    if (stroke.includes("#")) this.applyNumberRules(stroke);
+    else this.applyRules(rules);
 };
 
 function addCells(row, contents) {

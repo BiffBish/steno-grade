@@ -195,14 +195,21 @@ a, a:visited {
 
 /* Setting it to `smaller` usually means about 83% (1 / 1.2),
  * but there's no standard. */
-#strokes {
+
+/* allign elements side by side */
+.word-pair{
+	display: inline-block;
+	margin: 0.2em;
+	display: flex;
+}
+.strokes {
 	font-size: 14px;
 	font-weight: bold;
 	opacity: 1;
 	text-align: center;
 }
 
-#strokes td {
+.strokes td {
 	background: #666;
 	color: #000;
 	border: thin solid black;
@@ -211,35 +218,37 @@ a, a:visited {
 	text-align: center;
 }
 
-#strokes .numberBar { min-height: 0.5em; margin: 0; padding: 0; }
-#strokes td.wide { min-width: 2em; }
-#strokes .leftVowel { transform: translate(+0.8em, 10%); }
-#strokes .rightVowel { transform: translate(-0.8em, 10%); }
+.strokes .numberBar { min-height: 0.5em; margin: 0; padding: 0; }
+.strokes td.wide { min-width: 2em; }
+.strokes .leftVowel { transform: translate(+0.8em, 10%); }
+.strokes .rightVowel { transform: translate(-0.8em, 10%); }
 
 
-#strokes table tr td.asterisk-pressed {
+.strokes table tr td.asterisk-pressed {
 	color: #000;
 	background: rgb(255, 158, 119);
 }
-
-
-
-#strokes table tr td.pressed {
+.strokes table tr td.pressed {
 	color: #000;
 	background: #fe7;
 }
 
-#strokes td.alt {
+.strokes table tr td.number-pressed {
+	color: #000;
+	background: rgb(119, 167, 255);
+}
+
+.strokes td.alt {
 	color: #555;
 	background: #888;
 }
 
-#strokes > * { vertical-align: top; }
+.strokes > * { vertical-align: top; }
 
-#strokes span.big-slash { font-size: 300%; }
+.strokes span.big-slash { font-size: 300%; }
 
 /* But don't change these ones */
 
-#strokes .hide { display: none; }
+.strokes .hide { display: none; }
 
-#strokes table { display: inline-block; empty-cells: hide; }
+.strokes table { display: inline-block; empty-cells: hide; }
