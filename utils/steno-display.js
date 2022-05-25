@@ -480,7 +480,22 @@ StenoDisplay.Stroke.prototype.clear = function () {
 
 StenoDisplay.Stroke.prototype.applyNumberRules = function (stroke) {
     console.log("APPLYING NUMBER RULES", stroke);
+    this.leftCells["S"].innerHTML = "1";
+    this.leftCells["T"].innerHTML = "2";
+    this.leftCells["P"].innerHTML = "3";
+    this.leftCells["H"].innerHTML = "4";
+    this.vowelCells["A"].innerHTML = "5";
+    this.vowelCells["O"].innerHTML = "0";
+    this.rightCells["F"].innerHTML = "6";
+    this.rightCells["P"].innerHTML = "7";
+    this.rightCells["L"].innerHTML = "8";
+    this.rightCells["T"].innerHTML = "9";
+    this.rightCells["D"].innerHTML = "xx";
+    this.rightCells["Z"].innerHTML = "x00";
 
+    this.vowelCells["E"].colSpan = 2;
+    this.vowelCells["E"].innerHTML = "⟷";
+    this.vowelCells["U"].style.display = "none";
     if (stroke.startsWith("#")) {
         stroke = stroke.substring(1);
         addClass(this.leftCells["#"], "number-pressed");
@@ -489,53 +504,41 @@ StenoDisplay.Stroke.prototype.applyNumberRules = function (stroke) {
     if (stroke.startsWith("S")) {
         stroke = stroke.substring(1);
         addClass(this.leftCells["S"], "number-pressed");
-        this.leftCells["S"].innerHTML = "1";
         //
     }
     if (stroke.startsWith("T")) {
         stroke = stroke.substring(1);
         addClass(this.leftCells["T"], "number-pressed");
-        this.leftCells["T"].innerHTML = "2";
         //
     }
     if (stroke.startsWith("P")) {
         stroke = stroke.substring(1);
         addClass(this.leftCells["P"], "number-pressed");
-        this.leftCells["P"].innerHTML = "3";
         //
     }
     if (stroke.startsWith("H")) {
         stroke = stroke.substring(1);
         addClass(this.leftCells["H"], "number-pressed");
-        this.leftCells["H"].innerHTML = "4";
         //
     }
     if (stroke.startsWith("A")) {
         stroke = stroke.substring(1);
-        addClass(this.rightCells["A"], "number-pressed");
-        this.vowelCells["A"].innerHTML = "5";
+        addClass(this.vowelCells["A"], "number-pressed");
     }
 
     if (stroke.startsWith("O")) {
         stroke = stroke.substring(1);
-        addClass(this.rightCells["O"], "number-pressed");
-        this.vowelCells["O"].innerHTML = "0";
+        addClass(this.vowelCells["O"], "number-pressed");
     }
 
     if (stroke.startsWith("I")) {
         stroke = stroke.substring(1);
         addClass(this.vowelCells["E"], "number-pressed");
-        this.vowelCells["E"].colSpan = 2;
-        this.vowelCells["E"].innerHTML = "⟷";
-        this.vowelCells["U"].style.display = "none";
     }
 
     if (stroke.startsWith("EU")) {
         stroke = stroke.substring(2);
         addClass(this.vowelCells["E"], "number-pressed");
-        this.vowelCells["E"].colSpan = 2;
-        this.vowelCells["E"].innerHTML = "⟷";
-        this.vowelCells["U"].style.display = "none";
     }
 
     if (stroke.startsWith("-")) {
@@ -545,37 +548,31 @@ StenoDisplay.Stroke.prototype.applyNumberRules = function (stroke) {
     if (stroke.startsWith("F")) {
         stroke = stroke.substring(1);
         addClass(this.rightCells["F"], "number-pressed");
-        this.rightCells["F"].innerHTML = "6";
     }
 
     if (stroke.startsWith("P")) {
         stroke = stroke.substring(1);
         addClass(this.rightCells["P"], "number-pressed");
-        this.rightCells["P"].innerHTML = "7";
     }
 
     if (stroke.startsWith("L")) {
         stroke = stroke.substring(1);
         addClass(this.rightCells["L"], "number-pressed");
-        this.rightCells["L"].innerHTML = "8";
     }
 
     if (stroke.startsWith("T")) {
         stroke = stroke.substring(1);
         addClass(this.rightCells["T"], "number-pressed");
-        this.rightCells["T"].innerHTML = "9";
     }
 
     if (stroke.startsWith("D")) {
         stroke = stroke.substring(1);
         addClass(this.rightCells["D"], "number-pressed");
-        this.rightCells["D"].innerHTML = "xx";
     }
 
     if (stroke.startsWith("Z")) {
         stroke = stroke.substring(1);
         addClass(this.rightCells["Z"], "number-pressed");
-        this.rightCells["Z"].innerHTML = "x00";
     }
 };
 
