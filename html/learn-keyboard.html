@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Learn the Steno Keyboard</title>
+
+        <link href="./../css/style.css" rel="stylesheet" type="text/css" />
+        <script type="module" src="./../js/learn-keyboard.js"></script>
+
+        <script type="module" src="./../js/word-drill.js"></script>
+        <script src="./../js/libs/chart.js"></script>
+
+        <link rel="stylesheet" type="text/css" href="font-roboto.css" />
+    </head>
+    <body>
+        <div class="wrapper">
+            <div id="form">
+                <h1>Learn the Steno Keyboard</h1>
+                <p style="text-align: center">
+                    <a href="raw-steno-instructions.html"
+                        >How to get raw steno output</a
+                    >
+                </p>
+                <div class="form-section">
+                    <form id="selectDrill">
+                        <ul style="list-style-type: none">
+                            <li><select name="drill"></select></li>
+                            <li>
+                                <label
+                                    ><input
+                                        name="hints"
+                                        type="checkbox"
+                                        value="yes"
+                                        checked
+                                    />
+                                    Show hints?</label
+                                >
+                            </li>
+                            <li>
+                                <label
+                                    ><input
+                                        name="wpm"
+                                        type="number"
+                                        value=""
+                                        step="5"
+                                    />
+                                    Speed (strokes per minute).</label
+                                >
+                            </li>
+                            <li><input type="submit" value="Go" /></li>
+                        </ul>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="lesson" class="wrapper" style="display: none">
+            <div id="leftside">
+                <h3 id="lesson-name" class="center"></h3>
+                <p style="text-align: center; padding-bottom: 3em">
+                    <a href="raw-steno-instructions.html"
+                        >How to get raw steno output</a
+                    >
+                </p>
+                <div id="drill-content">
+                    <div id="answer"></div>
+                    <div id="exercise"></div>
+                    <div id="results"></div>
+                    <div style="height: 300px">
+                        <canvas id="chartDiv" width="400" height="400"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div id="nav">
+                <p id="stroke-hint"></p>
+                <p id="strokes"></p>
+                <p id="clock" class="clock"></p>
+                <p id="live-wpm-display" class="wpm"></p>
+
+                <p class="center">
+                    <a id="back" title="LeftArrow"
+                        >&larr; Back to Menu
+                        <span class="shortcutkey">(LeftArrow)</span></a
+                    >
+                </p>
+                <p class="center">
+                    <a id="again" title="Enter"
+                        >&#8634; Restart
+                        <span class="shortcutkey">(Enter 3x)</span></a
+                    >
+                </p>
+                <p class="center">
+                    <a id="end" title="Enter"
+                        >&Cross; End
+                        <span class="shortcutkey">(Tab 3x)</span></a
+                    >
+                </p>
+            </div>
+
+            <textarea id="input"></textarea>
+        </div>
+
+        <script>
+            // console.log(wordDrill);
+        </script>
+    </body>
+</html>

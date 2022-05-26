@@ -1,0 +1,254 @@
+/* Reset Styles */
+html, body {
+	margin: 0;
+	padding: 0;
+	scroll-behavior: smooth;
+}
+
+:root {
+	--main-bg: #fff;
+	--main-fg: #000;
+	--link-text: #167EE8;
+	--form-border: #333;
+	--form-shadow: #eee;
+	--answer-text: #888;
+	--correct-text-bg: #cfc;
+	--corrected-text-bg: rgb(255, 237, 204);
+	--incorrect-text-bg: #fcc;
+}
+
+[data-theme="dark"] {
+	--main-bg: #111;
+	--main-fg: #ddb;
+	--link-text: #ea3;
+	--form-border: #888;
+	--form-shadow: #332;
+	--answer-text: #aaa;
+	--correct-text-bg: #030;
+	--corrected-text-bg: rgb(51, 39, 0);
+	--incorrect-text-bg: #300;
+}
+
+.red { color: #f55; }
+
+
+/* Main Layout and Visual Styling of Block Elements */
+body {
+	font: 15px Roboto, sans-serif;
+	background: var(--main-bg);
+	color: var(--main-fg);
+}
+
+.wrapper {
+	max-width: 44em;
+	margin: 0 auto;
+	padding: 1em;
+}
+
+.welcome-text {
+	max-width: 44em;
+	margin: 0 auto; /* Center it on screen */
+	text-align: center;
+}
+
+#nav {
+	flex: 0 0;
+	height: min-content;
+	min-width: 8em;
+	margin-left: 1.5em;
+	position: sticky;
+	top: 0;
+}
+
+
+.form-section {
+	padding: 0.8em 1em;
+	margin: 0.5em 0;
+	border: 1px solid var(--form-border);
+	border-radius: 0.2em;
+	box-shadow: 0.1em 0.2em 0.4em var(--form-shadow);
+}
+.selected-form-section {
+	border-color: red
+}
+
+/*
+	Form Controls
+ */
+
+input[type="number"] { width: 3.5em; }
+@supports  (-moz-appearance:none) { input[type="number"] { width: 5em; } }
+input[type="number"][name="timeLimit"] { width: 2.5em; }
+
+form.drill-options {
+	margin: 0.8em 0 0.1em 0;
+	box-sizing: border-box;
+}
+
+form.drill-options input,
+form.drill-options button {
+	padding: 0.1em 0.6em;
+	margin: 0.5em 0.2em;
+}
+
+form.drill-options input[type=radio]:first-child + label {
+	margin-right: 1em;
+}
+form.drill-options input[type=radio] + label {
+	cursor: pointer;
+}
+
+a, a:visited {
+	color: var(--link-text);
+}
+
+#lesson {
+	display: flex;
+	flex-direction: row;
+	font-size: 1.3em;
+}
+
+#lesson-name { margin-bottom: 3em; }
+
+#input {
+	position: fixed;
+	left: -10000px;
+}
+
+#leftside {
+	flex: 1 0;
+}
+
+#drill-content {
+	margin: 0 auto;
+	position: relative;
+}
+
+#exercise, #answer, #results {
+	margin-top: -0.8em;
+	line-height: 3;
+	
+}
+#results {
+	line-height: 1;
+	white-space: pre-wrap;
+}
+#exercise {
+	position: relative;
+	white-space: pre-wrap;
+}
+
+#answer {
+	position: absolute;
+	padding-top: 2em;
+	color: var(--answer-text);
+	white-space: pre;
+	user-select: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	width: 100%;
+	float: left;
+}
+#exercise p:not(:last-child)::after {
+	content: "¶";
+	font-weight: bold;
+}
+
+.notYet { color: var(--answer-text); }
+.correct { background: var(--correct-text-bg); }
+.corrected { background: var(--corrected-text-bg); }
+.blankWord {
+	background: var(--incorrect-text-bg);
+	border-bottom-color: var(--answer-text);
+	border-bottom-style: solid;
+	border-bottom-width: 2px;
+}
+
+.complex-word-container {
+	display: inline-block;
+	line-height :1;
+	position: relative ;
+}
+
+.incorrect { background: var(--incorrect-text-bg); text-decoration: line-through; }
+.cursor { border-right: 2px solid var(--main-fg); }
+
+
+.clock { font-size: 300%; text-align: center; }
+
+.wpm { font-size: 170%; text-align: center; }
+.center { text-align: center; }
+
+/* Navigation */
+.navigation a {
+    text-decoration: none;
+}
+.navigation a:not(:last-child) {
+    margin-right: 30px;
+}
+.shortcutkey {
+    font-size: small;
+    vertical-align: middle;
+}
+
+/* Configure these to tune the stroke display to your liking. */
+
+/* Setting it to `smaller` usually means about 83% (1 / 1.2),
+ * but there's no standard. */
+
+/* allign elements side by side */
+.word-pair{
+	display: inline-block;
+	margin: 0.2em;
+	display: flex;
+}
+.strokes {
+	font-size: 14px;
+	font-weight: bold;
+	opacity: 1;
+	text-align: center;
+}
+
+.strokes td {
+	background: #666;
+	color: #000;
+	border: thin solid black;
+	border-radius: 0.5ex;
+	padding: 0.25ex 0.33ex;
+	text-align: center;
+}
+
+.strokes .numberBar { min-height: 0.5em; margin: 0; padding: 0; }
+.strokes td.wide { min-width: 2em; }
+.strokes .leftVowel { transform: translate(+0.8em, 10%); }
+.strokes .rightVowel { transform: translate(-0.8em, 10%); }
+
+
+.strokes table tr td.asterisk-pressed {
+	color: #000;
+	background: rgb(255, 158, 119);
+}
+.strokes table tr td.pressed {
+	color: #000;
+	background: #fe7;
+}
+
+.strokes table tr td.number-pressed {
+	color: #000;
+	background: rgb(119, 167, 255);
+}
+
+.strokes td.alt {
+	color: #555;
+	background: #888;
+}
+
+.strokes > * { vertical-align: top; }
+
+.strokes span.big-slash { font-size: 300%; }
+
+/* But don't change these ones */
+
+.strokes .hide { display: none; }
+
+.strokes table { display: inline-block; empty-cells: hide; }

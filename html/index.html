@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Steno Grade</title>
+	<link href="style.css" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" type="text/css" href="font-roboto.css">
+	<script src="utils/util.js"></script>
+</head>
+<body>
+
+<div class="wrapper">
+	<h1 class="center title">Steno Grade</h1>
+
+	<p class="welcome-text">This is a forked widget of steno-jig: you can
+	<a href="learn-keyboard.html">learn the steno keyboard</a>, do <a
+	href="form.html">our lessons</a> or the <a
+	href="learn-plover.html">Learn Plover ones</a>, or fork the <a
+	href="https://github.com/BiffBish/steno-jig">GitHub repo</a>
+	and customize it to make your own. Do you have your own Plover dictionary?
+	<a href="custom-dictionary-upload.html">Upload it here</a>(Sorry for the flashbang darkmode users).</p>
+</p> 
+
+
+
+	<!-- <div class="container">
+		<h1 class="title">
+			Custom Dictionary Upload
+		</h1>
+		<h2 class="subtitle">
+			Upload a custom dictionary to be used for hints
+		</h2>
+		<form action="custom-dictionary-upload.php" method="post" enctype="multipart/form-data">
+			<div class="field">
+				<label class="label">Files (Priority top to bottom)</label>
+				<-- Allow unload of many files and have drag and drop encouraged->
+				<div class="control">
+					<input class="input" type="file" name="fileToUpload[]" id="fileToUpload1">
+				</div>
+				<div class="control">
+					<input class="input" type="file" name="fileToUpload[]" id="fileToUpload2">
+				</div>
+				<div class="control">
+					<input class="input" type="file" name="fileToUpload[]" id="fileToUpload3">
+				</div>
+				<div class="control">
+					<input class="input" type="file" name="fileToUpload[]" id="fileToUpload4">
+				</div>
+			</div>
+			<div class="field">
+				<div class="control">
+					<button class="button is-primary" id="submit" type="submit" name="submit">Save</button>
+				</div>
+			</div>
+		</form>
+	</div> -->
+</div>
+
+<script>
+	setTheme()
+	if(storageAvailable('localStorage')) {
+		let wrapper = document.querySelector('.wrapper')
+		let isDark = localStorage.theme === 'dark'
+		let checkbox = document.createElement('input')
+		checkbox.setAttribute('id', 'night-mode')
+		checkbox.setAttribute('type', 'checkbox')
+		checkbox.checked = isDark
+		checkbox.addEventListener('input', function(e) {
+			if(e.target.checked) {
+				localStorage.theme = 'dark'
+				document.body.setAttribute('data-theme', localStorage.theme)
+			} else {
+				delete localStorage.theme
+				document.body.removeAttribute('data-theme')
+			}
+		})
+		wrapper.appendChild(checkbox)
+		let label = document.createElement('label')
+		label.setAttribute('for', 'night-mode')
+		label.appendChild(document.createTextNode(' Night Mode'))
+		wrapper.appendChild(label)
+	} else {
+		document.body.appendChild(document.createTextNode('localStorage not available.'))
+	}
+
+	document.getElementById("submit").addEventListener("click", function (event) {
+			console.log("clicked");
+			event.preventDefault();
+			var filesToUpload = document.getElementById("fileToUpload1").files[0];
+			var filesToUpload2 = document.getElementById("fileToUpload2").files[0];
+			var filesToUpload3 = document.getElementById("fileToUpload3").files[0];
+			var filesToUpload4 = document.getElementById("fileToUpload4").files[0];
+
+			var texts = []
+			if (filesToUpload) texts.push(filesToUpload.text());
+			if (filesToUpload2) texts.push(filesToUpload2.text());
+			if (filesToUpload3) texts.push(filesToUpload3.text());
+			if (filesToUpload4) texts.push(filesToUpload4.text());
+
+
+			Promise.all(texts).then(function (values) {
+				console.log(values);
+				customDictionaries = values;
+				localStorage.setItem("customDictionaries", JSON.stringify(customDictionaries));
+
+				// var reader = new FileReader();
+				// reader.onload = function (e) {
+				//     var text = reader.result;
+				//     console.log(text);
+
+				//     //Get the local storage value customDictionaries. The value is a list of dictionaries.
+				//     var customDictionaries = JSON.parse(localStorage.getItem("customDictionaries"));
+				//     if (customDictionaries == null) {
+				//         customDictionaries = [];
+				//     }
+
+				//     //Add the dictionary to the list of dictionaries
+				//     customDictionaries[index] = text;
+				//     //Save the list of dictionaries to local storage
+				// };
+				// reader.readAsText(filesToUpload);
+			});
+
+
+
+		});
+</script>
+
+</body>
+</html>

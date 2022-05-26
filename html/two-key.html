@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Steno Grade</title>
+        <link href="style.css" rel="stylesheet" type="text/css" />
+        <script src="type-jig.js"></script>
+        <script src="utils/util.js"></script>
+        <script src="utils/steno-display.js"></script>
+        <script src="word-sets.js"></script>
+        <script src="plover-translations.js"></script>
+        <script src="libs/chart.js"></script>
+        <script src="chartjs-plugin-datalabels.js"></script>
+        <link rel="stylesheet" type="text/css" href="font-roboto.css" />
+    </head>
+    <body>
+        <div id="lesson" class="wrapper">
+            <div id="leftside">
+                <h3 class="center">(Mostly) Two-Key Sentences</h3>
+
+                <p class="wrapper">
+                    To capitalize the first word, hit <code>KPA</code> or
+                    <code>KPA*</code>, or tell plover to start capitalized
+                    (Configure -&gt; Output -&gt; Start Capitalized). If your
+                    keyboard has conflicts with the longer strokes (like
+                    <code>TP-PL</code> for period), you can hold one key and
+                    press the others in succesion.
+                </p>
+
+                <div id="drill-content">
+                    <div id="answer"></div>
+                    <div id="exercise"></div>
+                    <div id="results"></div>
+                    <div style="height: 300px">
+                        <canvas id="chartDiv" width="400" height="400"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div id="nav">
+                <p id="stroke-hint"></p>
+                <p id="strokes"></p>
+                <p id="clock" class="clock"></p>
+                <p id="live-wpm-display" class="wpm"></p>
+
+                <p class="center"><a id="back">&larr; Back to Menu</a></p>
+                <p class="center"><a id="again">&#8634; Restart</a></p>
+            </div>
+
+            <textarea id="input"></textarea>
+        </div>
+
+        <script>
+            var query = parseQueryString(document.location.search);
+            var words = TypeJig.WordSets.twoKeySentences;
+            var translations = TypeJig.shortestTranslations(PloverTranslations);
+            var extra = {
+                "?": "H-F",
+                charge: "KH",
+                every: "EF",
+                perfect: "P-F",
+                recall: "-RL",
+                tuberculosis: "T*B",
+                from: "PR",
+                reason: "R-P",
+                on: "OB",
+                we: "WE",
+                who: "HO",
+                kilograms: "K-G/-S",
+            };
+            for (key in extra) translations[key] = extra[key];
+            var strokes = document.getElementById("strokes");
+            var hints = new StenoDisplay(strokes, translations, true);
+            if (query.hints === "") hints = null;
+            var exercise = new TypeJig.Exercise(words);
+            var jig = new TypeJig(exercise);
+
+            var back = document.getElementById("back");
+            back.href = "form.html";
+            var again = document.getElementById("again");
+            var end = document.getElementById("end");
+            again.href = document.location.href;
+
+            setTheme();
+        </script>
+    </body>
+</html>
