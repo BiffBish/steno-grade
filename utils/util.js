@@ -253,6 +253,10 @@ function loadSettings() {
 
     loadSetting("live_wpm", "live_wpm");
     loadSetting("show_timer", "show_timer");
+
+    // Grading rules
+    loadSetting("grd_sh_corr_marks", "grd_sh_corr_marks");
+    loadSetting("grd_sh_liv_res", "grd_sh_liv_res");
     // CPM
     const cpm = document.getElementById("cpm");
     if (cpm && cpm.nodeName === "INPUT" && cpm.type === "checkbox") {

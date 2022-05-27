@@ -52,6 +52,24 @@
                             id="hints"
                             type="radio"
                             name="hints"
+                            value="fail-2"
+                            checked
+                        />Hint on failed twice</label
+                    >
+                    <label
+                        ><input
+                            id="hints"
+                            type="radio"
+                            name="hints"
+                            value="fail-3"
+                            checked
+                        />Hint on failed three times</label
+                    >
+                    <label
+                        ><input
+                            id="hints"
+                            type="radio"
+                            name="hints"
                             value=""
                             checked
                         />No hints</label
@@ -98,6 +116,32 @@
                         <input type="checkbox" id="cpm" value="1" /> x5 chars
                         per minute)
                     </label>
+                </div>
+                <br />
+                <div class="caption">
+                    <strong>Grading rules:</strong>
+                </div>
+                <br />
+
+                <div name="grading_rules">
+                    <label
+                        ><input
+                            id="grd_sh_corr_marks"
+                            type="checkbox"
+                            name="grd_sh_corr_marks"
+                            value="1"
+                            checked
+                        />Show Correction marks</label
+                    >
+                    <label
+                        ><input
+                            id="grd_sh_liv_res"
+                            type="checkbox"
+                            name="grd_sh_liv_res"
+                            value="1"
+                            checked
+                        />Show Live Results</label
+                    >
                 </div>
                 <br />
 
@@ -549,6 +593,24 @@
                     break;
                 }
             }
+
+            var grading_show_correction_marks =
+                document.getElementById("grd_sh_corr_marks");
+            if (!grading_show_correction_marks.checked)
+                hiddenField(
+                    this,
+                    "grd_sh_corr_marks",
+                    grading_show_correction_marks.checked
+                );
+
+            var grading_show_live_results =
+                document.getElementById("grd_sh_liv_res");
+            if (!grading_show_live_results.checked)
+                hiddenField(
+                    this,
+                    "grd_sh_liv_res",
+                    grading_show_live_results.checked
+                );
 
             var live_wpm = document.getElementById("live_wpm");
             if (live_wpm.checked) hiddenField(this, "live_wpm", live_wpm.value);

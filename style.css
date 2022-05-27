@@ -14,6 +14,7 @@ html, body {
 	--answer-text: #888;
 	--correct-text-bg: #cfc;
 	--corrected-text-bg: rgb(255, 237, 204);
+	--unknown-text-bg: rgb(187, 187, 187);
 	--incorrect-text-bg: #fcc;
 }
 
@@ -26,6 +27,7 @@ html, body {
 	--answer-text: #aaa;
 	--correct-text-bg: #030;
 	--corrected-text-bg: rgb(51, 39, 0);
+	--unknown-text-bg: rgb(37, 37, 37);
 	--incorrect-text-bg: #300;
 }
 
@@ -157,6 +159,7 @@ a, a:visited {
 .notYet { color: var(--answer-text); }
 .correct { background: var(--correct-text-bg); }
 .corrected { background: var(--corrected-text-bg); }
+.unknown { background: var(--unknown-text-bg); }
 .blankWord {
 	background: var(--incorrect-text-bg);
 	border-bottom-color: var(--answer-text);
