@@ -43,7 +43,7 @@
                             id="hints"
                             type="radio"
                             name="hints"
-                            value="fail"
+                            value="fail-1"
                             checked
                         />Hint on fail</label
                     >
@@ -118,12 +118,20 @@
                     </label>
                 </div>
                 <br />
+                <div name="alt">
+                    <label
+                        >Alternate with:
+                        <input id="alternate" type="text" name="alternate"
+                    /></label>
+                </div>
+                <br />
+
                 <div class="caption">
                     <strong>Grading rules:</strong>
                 </div>
                 <br />
 
-                <div name="grading_rules">
+                <div name="grading_options">
                     <label
                         ><input
                             id="grd_sh_corr_marks"
@@ -144,13 +152,12 @@
                     >
                 </div>
                 <br />
-
-                <div name="alt">
-                    <label
-                        >Alternate with:
-                        <input id="alternate" type="text" name="alternate"
-                    /></label>
-                </div>
+                <button
+                    onClick="document.getElementById('advanced_grading_rules').scrollIntoView();"
+                >
+                    Go to advanced rules
+                </button>
+                <br />
             </div>
 
             <div class="form-section">
@@ -159,14 +166,7 @@
                 <form class="drill-options" id="custom" action="form.html">
                     <textarea name="drill"></textarea><br />
                     <input type="checkbox" name="type" value="shuffled" />
-                    Shuffle words.<br />
-                    Or
-                    <input
-                        type="checkbox"
-                        name="shuffleLines"
-                        value="shuffled"
-                    />
-                    shuffle lines.<br />
+                    Shuffle lines.<br />
                     Repeat
                     <input
                         type="number"
@@ -557,6 +557,38 @@
                     allows you to define strokes to switch dictionaries.
                 </p>
             </div>
+            <div class="form-section" id="advanced_grading_rules">
+                <div class="caption">
+                    <strong>Advanced Grading Rules</strong> that apply to all
+                    drills
+                </div>
+
+                <br />
+
+                <label
+                    ><input
+                        id="grade_rules_droppedWordMaxJump"
+                        type="number"
+                        name="wpm"
+                        value="5"
+                        step="1"
+                    />
+                    Allowed Number of Dropped Words
+                </label>
+                <br />
+                <br />
+
+                <label
+                    ><input
+                        id="grade_rules_addedWordMaxJump"
+                        type="number"
+                        name="wpm"
+                        value="5"
+                        step="1"
+                    />
+                    Allowed Number of Incorrectly Added Words
+                </label>
+            </div>
         </div>
 
         <div id="lesson" class="wrapper" style="display: none"></div>
@@ -579,7 +611,7 @@
                 }
                 var options = fields;
 
-                options.hints = 1;
+                // options.hints = 1;
                 displayOnly("lesson");
                 return setExercise(exercise.name, exercise, hints, options);
             }
@@ -625,6 +657,19 @@
 
             var alternate = document.getElementById("alternate");
             hiddenField(this, "alternate", alternate.value);
+
+            var grade_rules_droppedWordMaxJump = document.getElementById(
+                "grade_rules_droppedWordMaxJump"
+            );
+            var grade_rules_addedWordMaxJump = document.getElementById(
+                "grade_rules_addedWordMaxJump"
+            );
+            hiddenField(this, "gradingRules", {
+                droppedWordMaxJump: parseInt(
+                    grade_rules_droppedWordMaxJump.value
+                ),
+                addedWordMaxJump: parseInt(grade_rules_addedWordMaxJump.value),
+            });
         }
 
         function runCustom(evt) {

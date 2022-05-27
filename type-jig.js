@@ -10,9 +10,10 @@ function TypeJig(exercise, options, hint = null) {
      *
      */
     this.gradingRules = {};
-    if (options?.gradingRules && typeof options?.gradingResults == "object") {
-        this.gradingRules = options.gradingResults;
+    if (options?.gradingRules) {
+        this.gradingRules = JSON.parse(atob(options?.gradingRules));
     }
+    console.log("Grading rules", this.gradingRules);
 
     console.log("TypeJig", exercise, hint);
     this.exercise = exercise;
@@ -41,7 +42,7 @@ function TypeJig(exercise, options, hint = null) {
 
     this.live_wpm = options?.live_wpm;
     this.live_cpm = options?.live_cpm;
-
+    console.log(options);
     this.hint_on_fail = options?.hints?.startsWith("fail");
     this.hint_on_fail_count = options?.hints?.split("-")[1] || 1;
 
@@ -358,9 +359,10 @@ TypeJig.prototype.gradeTypeVsResult = function (typedWords, expectedWords) {
 
         //Check if we are on an erranious word and further on we type a correct word
         let addedWordsOffset = 0;
+
         for (
             let offset = 1;
-            offset < gradingRules?.addedWordMaxJump ?? 5;
+            offset <= (gradingRules?.addedWordMaxJump ?? 5);
             offset++
         ) {
             if (typedIndex + offset >= typedWords.length) break;
@@ -374,11 +376,13 @@ TypeJig.prototype.gradeTypeVsResult = function (typedWords, expectedWords) {
         }
 
         let droppedWordOffset = 0;
+
         for (
             let offset = 1;
-            offset < gradingRules?.droppedWordMaxJump ?? 5;
+            offset <= (gradingRules?.droppedWordMaxJump ?? 5);
             offset++
         ) {
+            console.log("Trying to find a dropped word");
             if (expectedIndex + offset >= expectedWords.length) break;
             const offsetExpectedWord = expectedWords[expectedIndex + offset];
             let offsetMatch = checkMatch(typed, offsetExpectedWord);
@@ -525,7 +529,11 @@ TypeJig.prototype.displayTypedWords = function (typedWords, onResults = false) {
                 var addedWord = word.addedWords[j];
                 var addedWordNode = document.createElement("span");
                 addedWordNode.appendChild(document.createTextNode(addedWord));
-                addedWordNode.className = "incorrect";
+                if (this.gradingOptions.show_live_results || onResults) {
+                    addedWordNode.className = "incorrect";
+                } else {
+                    addedWordNode.className = "unknown";
+                }
                 output.appendChild(addedWordNode);
                 output.appendChild(document.createTextNode(" "));
             }
@@ -571,10 +579,14 @@ TypeJig.prototype.displayTypedWords = function (typedWords, onResults = false) {
         div.style.display = "inline-block";
         div.style.lineHeight = "1";
         div.style.position = "relative";
-
         if (ex != "" && ans == "") {
-            div.className = "blankWord";
+            if (this.gradingOptions.show_live_results || onResults) {
+                div.className = "blankWord";
+            } else {
+                div.className = "unknown";
+            }
         }
+
         var typedSpan = document.createElement("span");
         typedSpan.style.position = "absolute";
         typedSpan.style.left = "0px";

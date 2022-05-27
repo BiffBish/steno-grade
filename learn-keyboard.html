@@ -216,10 +216,12 @@
                         displayOnly("lesson");
                         var jig = setExercise(exercise.name, exercise, hints, {
                             ...fields,
-                            gradingRules: {
-                                droppedWordMaxJump: 0,
-                                addedWordMaxJump: 0,
-                            },
+                            gradingRules: btoa(
+                                JSON.stringify({
+                                    droppedWordMaxJump: 0,
+                                    addedWordMaxJump: 0,
+                                })
+                            ),
                         });
                         jig.match = function (a, b) {
                             return a == fromPseudo(b);

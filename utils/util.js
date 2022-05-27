@@ -230,6 +230,15 @@ function loadSetting(elementID, settingName) {
             localStorage[settingName] = !!element.checked;
         });
     }
+
+    if (element && element.nodeName === "INPUT" && element.type === "number") {
+        if (localStorage[settingName] != null) {
+            element.value = localStorage[settingName];
+        }
+        element.addEventListener("input", function (evt) {
+            localStorage[settingName] = element.value;
+        });
+    }
 }
 
 function loadSettings() {
@@ -257,6 +266,12 @@ function loadSettings() {
     // Grading rules
     loadSetting("grd_sh_corr_marks", "grd_sh_corr_marks");
     loadSetting("grd_sh_liv_res", "grd_sh_liv_res");
+
+    loadSetting("grade_rules_addedWordMaxJump", "grade_rules_addedWordMaxJump");
+    loadSetting(
+        "grade_rules_droppedWordMaxJump",
+        "grade_rules_droppedWordMaxJump"
+    );
     // CPM
     const cpm = document.getElementById("cpm");
     if (cpm && cpm.nodeName === "INPUT" && cpm.type === "checkbox") {
@@ -396,6 +411,9 @@ function N(target, ...args) {
 
 function hiddenField(form, name, value) {
     if (value === "") return;
+    if (typeof value === "object") {
+        value = btoa(JSON.stringify(value));
+    }
     if (form.elements[name]) form.elements[name].value = value;
     else N(form, N("input", { type: "hidden", name: name, value: value }));
 }
