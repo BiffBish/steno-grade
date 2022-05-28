@@ -336,6 +336,7 @@ TypeJig.prototype.gradeTypeVsResult = function (typedWords, expectedWords) {
         var lastTypedWord = typedIndex === typedWords.length - 1;
         this.persistentWordData[typedIndex] = {
             ...this.persistentWordData[typedIndex],
+            id: typedIndex,
             expected: expected,
             typed: typed,
         };
@@ -484,9 +485,6 @@ TypeJig.prototype.gradeTypeVsResult = function (typedWords, expectedWords) {
     this.persistentWordData[wordList.length - 1] = {
         ...LastWord,
         timeStamp: this.clock.getTime(),
-        duration:
-            this.clock.getTime() -
-                this.persistentWordData[wordList.length - 2]?.timeStamp ?? 0,
     };
     if (trailingSpace) {
         wordList.push({
@@ -1073,6 +1071,15 @@ TypeJig.prototype.endExercise = function (seconds) {
         let elt = this.lastAnswered;
         while (elt.nextSibling) elt.parentNode.removeChild(elt.nextSibling);
     }
+    this.persistentWordData = this.persistentWordData.filter((a) => a.id);
+    this.persistentWordData.sort((a, b) => a.id - b.id);
+    let prevTimestamp = 0;
+
+    this.persistentWordData.forEach((element) => {
+        element.duration = element.timeStamp - prevTimestamp;
+        prevTimestamp = element.timeStamp;
+    });
+
     this.showResults();
     this.saveDurationInLocalStorage(this.persistentWordData);
     this.saveErrorsInLocalStorage();
@@ -1085,6 +1092,7 @@ TypeJig.prototype.saveDurationInLocalStorage = function (words) {
     words.forEach((element) => {
         let duration = element.duration;
         if (duration == null || isNaN(duration)) return;
+
         let expected = element.expected.replace(/[.,;"]/, "").toLowerCase();
         console.log("Expected, ", expected, element);
         let current = durations[expected] ?? null;
@@ -1096,7 +1104,7 @@ TypeJig.prototype.saveDurationInLocalStorage = function (words) {
             resulting = current + diffrence / 10;
         }
         console.log("resulting", resulting);
-        durations[expected] = Math.round(resulting * 1000);
+        durations[expected] = Math.round(resulting * 1000) / 1000;
     });
     console.log(durations);
     localStorage.setItem("durations", JSON.stringify(durations));
@@ -1189,7 +1197,7 @@ TypeJig.prototype.showResults = function () {
 
     //get thr first child of the corrections element
 
-    var sortedPersistantWordData = this.persistentWordData.sort(function (
+    var sortedPersistantWordData = [...this.persistentWordData].sort(function (
         a,
         b
     ) {

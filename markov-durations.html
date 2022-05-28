@@ -45,28 +45,53 @@
             const choose = (a) => a[Math.floor(rnd() * a.length)];
             let sentence = choose(ngrams[""]).split(" ");
             const order = sentence.length;
+            var chooseDuration = false;
             while (true) {
                 const last = sentence.slice(-order).join(" ").toLowerCase();
                 const unmodifiedFollowing = [...(ngrams[last] ?? [])];
                 if (unmodifiedFollowing.length <= 0) break;
                 let weightedFollowing = [...unmodifiedFollowing];
                 console.log(unmodifiedFollowing);
+
+                let trackedWords = {};
+                let totalTime = 0;
+
+                let durationBias = 0.5;
                 unmodifiedFollowing.forEach((element) => {
                     if (durationData[element]) {
-                        for (
-                            let index = 0;
-                            index <
-                            durationData[element] *
-                                10 *
-                                unmodifiedFollowing.length;
-                            index++
-                        ) {
-                            weightedFollowing.push(element);
-                        }
+                        if (trackedWords[element]) return;
+                        trackedWords[element] = durationData[element];
+                        totalTime += durationData[element];
                     }
                 });
+                if (totalTime == 0) {
+                    chooseDuration = true;
+                    sentence.push(choose(unmodifiedFollowing));
+                    continue;
+                }
 
-                sentence.push(choose(weightedFollowing));
+                if (rnd() > durationBias && !chooseDuration) {
+                    sentence.push(choose(unmodifiedFollowing));
+                    continue;
+                }
+                chooseDuration = false;
+
+                let durationBiasedChoices = [];
+
+                Object.entries(trackedWords).forEach((entry) => {
+                    const [key, value] = entry;
+                    console.log(key, value, (value / totalTime) * 100);
+                    for (
+                        let index = 0;
+                        index < (value / totalTime) * 100;
+                        index++
+                    ) {
+                        durationBiasedChoices.push(key);
+                    }
+                });
+                console.log("duration Bias", durationBiasedChoices, totalTime);
+
+                sentence.push(choose(durationBiasedChoices));
             }
             return sentence;
         }
