@@ -1074,9 +1074,33 @@ TypeJig.prototype.endExercise = function (seconds) {
         while (elt.nextSibling) elt.parentNode.removeChild(elt.nextSibling);
     }
     this.showResults();
+    this.saveDurationInLocalStorage(this.persistentWordData);
     this.saveErrorsInLocalStorage();
 };
 
+TypeJig.prototype.saveDurationInLocalStorage = function (words) {
+    var durations = JSON.parse(localStorage.getItem("durations") ?? "{}");
+    if (!durations) durations = {};
+
+    words.forEach((element) => {
+        let duration = element.duration;
+        if (duration == null || isNaN(duration)) return;
+        let expected = element.expected.replace(/[.,;"]/, "").toLowerCase();
+        console.log("Expected, ", expected, element);
+        let current = durations[expected] ?? null;
+        let resulting = 0;
+        if (current == null) {
+            resulting = duration;
+        } else {
+            let diffrence = duration - current;
+            resulting = current + diffrence / 10;
+        }
+        console.log("resulting", resulting);
+        durations[expected] = Math.round(resulting * 1000);
+    });
+    console.log(durations);
+    localStorage.setItem("durations", JSON.stringify(durations));
+};
 TypeJig.prototype.saveErrorsInLocalStorage = function () {
     var errors = JSON.parse(localStorage.getItem("errors"));
     if (!errors) errors = [];

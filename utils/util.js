@@ -39,13 +39,6 @@ function populatePage(options) {
                     <th>Hesitation</th>
                     <th>Attempts</th>
                 </tr>
-                <tr>
-                    <th>World</th>
-                    <th>20ms</th>
-                    <th>3</th>
-                </tr>
-
-            
             </table>
 		</div>
 	</div>

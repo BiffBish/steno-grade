@@ -268,3 +268,7 @@ a, a:visited {
 	padding:0px;
 	border-bottom: thick solid var(--main-fg)
 }
+
+#corrections td {
+	text-align: center;
+}
