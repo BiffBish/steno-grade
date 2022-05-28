@@ -334,7 +334,11 @@ TypeJig.prototype.gradeTypeVsResult = function (typedWords, expectedWords) {
         var expected = expectedWords[expectedIndex];
         var matchResult = checkMatch(typed, expected);
         var lastTypedWord = typedIndex === typedWords.length - 1;
-
+        this.persistentWordData[typedIndex] = {
+            ...this.persistentWordData[typedIndex],
+            expected: expected,
+            typed: typed,
+        };
         if (matchResult) {
             correctCount++;
 
@@ -399,14 +403,17 @@ TypeJig.prototype.gradeTypeVsResult = function (typedWords, expectedWords) {
         //Chose the lower of the two that are not zero
 
         //If they are both zero assume it was just a misspelling
+
         if (addedWordsOffset == 0 && droppedWordOffset == 0) {
             if (typed.length > 0) {
                 this.persistentWordData[typedIndex] = {
                     ...this.persistentWordData[typedIndex],
                     failed: true,
-                    typed: this.persistentWordData[typedIndex]?.typed
-                        ? this.persistentWordData[typedIndex].typed
-                        : typed,
+                    first_typed:
+                        this.persistentWordData[typedIndex]?.first_typed ??
+                        typed,
+                    expected: expected,
+                    typed: typed,
                 };
             }
 
@@ -477,6 +484,9 @@ TypeJig.prototype.gradeTypeVsResult = function (typedWords, expectedWords) {
     this.persistentWordData[wordList.length - 1] = {
         ...LastWord,
         timeStamp: this.clock.getTime(),
+        duration:
+            this.clock.getTime() -
+                this.persistentWordData[wordList.length - 2]?.timeStamp ?? 0,
     };
     if (trailingSpace) {
         wordList.push({
@@ -686,101 +696,109 @@ TypeJig.prototype.answerChanged = function () {
     }
     let gradeResults = this.gradeTypeVsResult(typedWords, this.exercise.words);
 
-    if (this.hint_on_fail) {
-        let lastWordIndex = gradeResults.words.length - 1;
-        if (gradeResults.words[lastWordIndex].typed == "") {
-            lastWordIndex--;
-        }
+    let lastWordIndex = gradeResults.words.length - 1;
 
-        let onLastWord = (this.erroredWordIndex ?? 0) == lastWordIndex;
-        let beforeTheErrorWord =
-            (this.erroredWordIndex ?? 0) - 1 == lastWordIndex;
+    let numOfFailsThisWord =
+        this.persistentWordData[lastWordIndex]?.failed_count ?? 0;
 
-        let superBeforeTheErrorWord =
-            (this.erroredWordIndex ?? 0) - 1 > lastWordIndex;
-        let pastErrorWord = lastWordIndex > (this.erroredWordIndex ?? 0);
+    // this.failedThisWord = false;
 
-        let currentWordisError =
-            gradeResults.words[lastWordIndex]?.correct == false;
+    let currentWordisError =
+        gradeResults.words[lastWordIndex]?.correct == false;
 
-        if (
-            this.lastWordIndex != lastWordIndex &&
-            (this.numOfLastWordErrors ?? 0) > 0
-        ) {
-            this.waitingForError = true;
-            if ((this.numOfLastWordErrors ?? 0) > 0) {
-                if (
-                    beforeTheErrorWord &&
-                    (this.numOfLastWordErrors ?? 0) >= this.hint_on_fail_count
-                ) {
-                    this.hint.show();
-                }
-            }
-        }
-        if (pastErrorWord || superBeforeTheErrorWord) {
-            console.log("Resetting error");
-            this.waitingForError = false;
-            this.numOfLastWordErrors = 0;
-            this.erroredWordIndex = null;
-            this.hint.hide();
-        }
-        if (this.waitingForError) {
-            if (currentWordisError) {
-                this.waitingForError = false;
-                this.numOfLastWordErrors ??= 0;
-                this.numOfLastWordErrors += 1;
-                this.hint.hide();
-            }
-            if (
-                gradeResults.words[this.erroredWordIndex ?? 0]?.correct == true
-            ) {
-                this.waitingForError = false;
-                this.numOfLastWordErrors = 0;
-                this.erroredWordIndex = null;
-                this.hint.hide();
-            }
-        } else {
-            if (
-                (this.numOfLastWordErrors ?? 0) == 0 &&
-                !this.waitingForError &&
-                currentWordisError
-            ) {
-                this.waitingForError = false;
-                this.erroredWordIndex = lastWordIndex;
-                this.numOfLastWordErrors = 1;
-            }
-        }
-
-        this.lastWordIndex = lastWordIndex;
-        // if (
-        //     this.lastWordFailed &&
-        //     lastWordIndex + 1 > (this.lastWordIndex ?? 0) &&
-        //     gradeResults.words[lastWordIndex].correct == false &&
-        //     (this.numOfLastWordErrors ?? 0) > 0
-        // ) {
-        //     // this.numOfLastWordErrors ??= 0;
-        //     // this.numOfLastWordErrors++;
-        //     console.log("ERRRRORRROROROR");
-        // }
-        // if (
-        //     this.lastWordFailed &&
-        //     lastWordIndex + 1 > (this.lastWordIndex ?? 0) &&
-        //     gradeResults.words[lastWordIndex].correct == true
-        // ) {
-        //     this.hint.hide();
-        //     this.lastWordFailed = false;
-        //     this.lastWordIndex = lastWordIndex;
-        //     this.numOfLastWordErrors = 0;
-        // }
-        // if (
-        //     this.lastWordFailed &&
-        //     gradeResults.words[lastWordIndex].correct == false
-        // ) {
-        //     this.lastWordFailed = true;
-        //     this.lastWordIndex = lastWordIndex;
-        //     this.numOfLastWordErrors = 1;
-        // }
+    if (currentWordisError && this.failedThisWord == false) {
+        this.failedThisWord = true;
+        numOfFailsThisWord++;
+        this.persistentWordData[lastWordIndex] = {
+            ...this.persistentWordData[lastWordIndex],
+            failed_count: numOfFailsThisWord,
+        };
+        console.log(
+            "Adding error to index:",
+            lastWordIndex,
+            "count:",
+            numOfFailsThisWord
+        );
     }
+
+    if (
+        this.lastWordIndex != lastWordIndex ||
+        gradeResults.words[lastWordIndex].typed == ""
+    ) {
+        this.lastWordIndex = lastWordIndex;
+        this.failedThisWord = false;
+    }
+
+    if (
+        numOfFailsThisWord > 3 &&
+        gradeResults.words[lastWordIndex]?.correct == null
+    ) {
+        this.hint.show();
+    } else {
+        this.hint.hide();
+    }
+    // if (this.hint_on_fail) {
+    //     if (gradeResults.words[lastWordIndex].typed == "") {
+    //         lastWordIndex--;
+    //     }
+
+    //     let onLastWord = (this.erroredWordIndex ?? 0) == lastWordIndex;
+    //     let beforeTheErrorWord =
+    //         (this.erroredWordIndex ?? 0) - 1 == lastWordIndex;
+
+    //     let superBeforeTheErrorWord =
+    //         (this.erroredWordIndex ?? 0) - 1 > lastWordIndex;
+    //     let pastErrorWord = lastWordIndex > (this.erroredWordIndex ?? 0);
+
+    //     if (
+    //         this.lastWordIndex != lastWordIndex &&
+    //         (this.numOfLastWordErrors ?? 0) > 0
+    //     ) {
+    //         this.waitingForError = true;
+    //         if ((this.numOfLastWordErrors ?? 0) > 0) {
+    //             if (
+    //                 beforeTheErrorWord &&
+    //                 (this.numOfLastWordErrors ?? 0) >= this.hint_on_fail_count
+    //             ) {
+    //                 this.hint.show();
+    //             }
+    //         }
+    //     }
+    //     if (pastErrorWord || superBeforeTheErrorWord) {
+    //         console.log("Resetting error");
+    //         this.waitingForError = false;
+    //         this.numOfLastWordErrors = 0;
+    //         this.erroredWordIndex = null;
+    //         this.hint.hide();
+    //     }
+    //     if (this.waitingForError) {
+    //         if (currentWordisError) {
+    //             this.waitingForError = false;
+    //             this.numOfLastWordErrors ??= 0;
+    //             this.numOfLastWordErrors += 1;
+    //             this.hint.hide();
+    //         }
+    //         if (
+    //             gradeResults.words[this.erroredWordIndex ?? 0]?.correct == true
+    //         ) {
+    //             this.waitingForError = false;
+    //             this.numOfLastWordErrors = 0;
+    //             this.erroredWordIndex = null;
+    //             this.hint.hide();
+    //         }
+    //     } else {
+    //         if (
+    //             (this.numOfLastWordErrors ?? 0) == 0 &&
+    //             !this.waitingForError &&
+    //             currentWordisError
+    //         ) {
+    //             this.waitingForError = false;
+    //             this.erroredWordIndex = lastWordIndex;
+    //             this.numOfLastWordErrors = 1;
+    //         }
+    //     }
+    // }
+
     this.typedWords = gradeResults.words;
 
     if (
@@ -1070,14 +1088,14 @@ TypeJig.prototype.saveErrorsInLocalStorage = function () {
         if (typedWord.correct == false) {
             var error = [
                 this.typedWords[i - 1] ? this.typedWords[i - 1].typed : "",
-                typedWord.typed,
+                typedWord.first_typed,
                 typedWord.expected,
             ];
             errors.push(error);
         } else if (persistantData?.failed) {
             errors.push([
                 this.typedWords[i - 1] ? this.typedWords[i - 1].typed : "",
-                persistantData?.typed,
+                persistantData?.first_typed,
                 typedWord.expected,
             ]);
         }
@@ -1139,6 +1157,42 @@ TypeJig.prototype.showResults = function () {
 
     this.resultsDisplay.scrollIntoView(true);
     this.displayTypedWords(this.typedWords, true);
+
+    console.log(this.persistentWordData);
+
+    var correctionsElement =
+        document.getElementById("corrections")?.children[0];
+
+    //get thr first child of the corrections element
+
+    var sortedPersistantWordData = this.persistentWordData.sort(function (
+        a,
+        b
+    ) {
+        return (b.duration ?? 0) - (a.duration ?? 0);
+    });
+
+    //filter out all the bad values
+    sortedPersistantWordData = sortedPersistantWordData.filter(function (
+        wordData
+    ) {
+        if (isNaN(wordData.duration)) return false;
+        if (wordData.expected == undefined) return false;
+        return true;
+    });
+    sortedPersistantWordData.forEach((element) => {
+        var newRow = document.createElement("tr");
+        var newCell = document.createElement("td");
+        newCell.innerHTML = element.expected;
+        newRow.appendChild(newCell);
+        newCell = document.createElement("td");
+        newCell.innerHTML = ((element.duration ?? 0) * 1000).toFixed(0) + "ms";
+        newRow.appendChild(newCell);
+        newCell = document.createElement("td");
+        newCell.innerHTML = element.failed_count ?? 0;
+        newRow.appendChild(newCell);
+        correctionsElement?.appendChild(newRow);
+    });
 };
 
 TypeJig.prototype.addCursor = function (output) {

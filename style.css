@@ -255,3 +255,16 @@ a, a:visited {
 .strokes .hide { display: none; }
 
 .strokes table { display: inline-block; empty-cells: hide; }
+
+
+#corrections {
+	/* display: inline-block; */
+	/* margin: 0.5em 0; */
+	width: 100%;
+	border-spacing: 0px 10px;
+}
+
+#corrections tr:first-child th { 
+	padding:0px;
+	border-bottom: thick solid var(--main-fg)
+}
