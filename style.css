@@ -193,7 +193,10 @@ a, a:visited {
     font-size: small;
     vertical-align: middle;
 }
-
+.caption {
+	font-size: x-large;
+	vertical-align: middle;
+}
 /* Configure these to tune the stroke display to your liking. */
 
 /* Setting it to `smaller` usually means about 83% (1 / 1.2),

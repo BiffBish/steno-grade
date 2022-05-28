@@ -46,11 +46,6 @@ function TypeJig(exercise, options, hint = null) {
     this.hint_on_fail = options?.hints?.startsWith("fail");
     this.hint_on_fail_count = options?.hints?.split("-")[1] || 1;
 
-    this.gradingOptions = {
-        show_corrections: options?.grd_sh_corr_marks != "false",
-        show_live_results: options?.grd_sh_liv_res != "false",
-    };
-
     this.showing_hint_on_word = "";
 
     this.typedWords = [];
@@ -59,6 +54,7 @@ function TypeJig(exercise, options, hint = null) {
 
     this.lastTypedWordID = -1;
 
+    this.options = options;
     if (options) {
         if (options.wpm !== "" && Math.floor(+options.wpm) == options.wpm) {
             this.speed = { type: "wpm", value: options.wpm };
@@ -312,7 +308,7 @@ TypeJig.prototype.gradeTypeVsResult = function (typedWords, expectedWords) {
         typedWords.pop();
         trailingSpace = true;
     }
-    var gradingRules = this.gradingRules;
+    var options = this.options;
     // Display the user's answer, marking it for correctness.
     var oldOutput = this.display.previousElementSibling;
     var output = document.createElement("div");
@@ -367,7 +363,7 @@ TypeJig.prototype.gradeTypeVsResult = function (typedWords, expectedWords) {
 
         for (
             let offset = 1;
-            offset <= (gradingRules?.addedWordMaxJump ?? 5);
+            offset <= (options?.grade_rules_addedWordMaxJump ?? 5);
             offset++
         ) {
             if (typedIndex + offset >= typedWords.length) break;
@@ -384,7 +380,7 @@ TypeJig.prototype.gradeTypeVsResult = function (typedWords, expectedWords) {
 
         for (
             let offset = 1;
-            offset <= (gradingRules?.droppedWordMaxJump ?? 5);
+            offset <= (options?.grade_rules_droppedWordMaxJump ?? 5);
             offset++
         ) {
             console.log("Trying to find a dropped word");
@@ -531,13 +527,12 @@ TypeJig.prototype.displayTypedWords = function (typedWords, onResults = false) {
         }
 
         //If the match has any erronius words, display them
-
         if (word.addedWords) {
             for (let j = 0; j < word.addedWords.length; j++) {
                 var addedWord = word.addedWords[j];
                 var addedWordNode = document.createElement("span");
                 addedWordNode.appendChild(document.createTextNode(addedWord));
-                if (this.gradingOptions.show_live_results || onResults) {
+                if (this.options.show_live_grading || onResults) {
                     addedWordNode.className = "incorrect";
                 } else {
                     addedWordNode.className = "unknown";
@@ -554,15 +549,12 @@ TypeJig.prototype.displayTypedWords = function (typedWords, onResults = false) {
             typedSpan.appendChild(document.createTextNode(ans));
 
             let className = "";
-            console.log(this.gradingOptions.show_corrections);
-            if (this.gradingOptions.show_live_results || onResults) {
+            console.log(this.options.show_corrections);
+            if (this.options.show_live_grading || onResults) {
                 if (match == true) {
                     className = "correct";
                 }
-                if (
-                    persistentData?.failed &&
-                    this.gradingOptions.show_corrections
-                ) {
+                if (persistentData?.failed && this.options.show_corrections) {
                     className = "corrected";
                 }
 
@@ -588,7 +580,7 @@ TypeJig.prototype.displayTypedWords = function (typedWords, onResults = false) {
         div.style.lineHeight = "1";
         div.style.position = "relative";
         if (ex != "" && ans == "") {
-            if (this.gradingOptions.show_live_results || onResults) {
+            if (this.options.show_live_grading || onResults) {
                 div.className = "blankWord";
             } else {
                 div.className = "unknown";
@@ -614,14 +606,11 @@ TypeJig.prototype.displayTypedWords = function (typedWords, onResults = false) {
         }
 
         var className = "incorrect";
-        if (this.gradingOptions.show_live_results || onResults) {
+        if (this.options.show_live_grading || onResults) {
             if (match == true) {
                 className = "correct";
             }
-            if (
-                persistentData?.failed &&
-                this.gradingOptions.show_corrections
-            ) {
+            if (persistentData?.failed && this.options.show_corrections) {
                 className = "corrected";
             }
         } else {

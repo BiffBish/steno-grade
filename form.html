@@ -34,7 +34,7 @@
                             id="hints"
                             type="radio"
                             name="hints"
-                            value="1"
+                            value="true"
                             checked
                         />Show hints</label
                     >
@@ -70,7 +70,7 @@
                             id="hints"
                             type="radio"
                             name="hints"
-                            value=""
+                            value="false"
                             checked
                         />No hints</label
                     >
@@ -134,21 +134,21 @@
                 <div name="grading_options">
                     <label
                         ><input
-                            id="grd_sh_corr_marks"
+                            id="show_corrections"
                             type="checkbox"
-                            name="grd_sh_corr_marks"
+                            name="show_corrections"
                             value="1"
                             checked
                         />Show Correction marks</label
                     >
                     <label
                         ><input
-                            id="grd_sh_liv_res"
+                            id="show_live_grading"
                             type="checkbox"
-                            name="grd_sh_liv_res"
+                            name="show_live_grading"
                             value="1"
                             checked
-                        />Show Live Results</label
+                        />Show Live Grading Results</label
                     >
                 </div>
                 <br />
@@ -246,8 +246,7 @@
 
             <div class="form-section">
                 <div class="caption">
-                    <strong>Sentences</strong> extracted from
-                    <a href="https://www.gutenberg.org/">Project Gutenberg</a>
+                    Randomly <strong>Chosen</strong> Sentences
                 </div>
 
                 <form class="drill-options" action="short-sentences.html">
@@ -299,23 +298,16 @@
 
                     <button>Start Drill &rarr;</button>
                 </form>
+
+                <footer>
+                    extracted from
+                    <a href="https://www.gutenberg.org/">Project Gutenberg</a>
+                </footer>
             </div>
 
             <div class="form-section">
                 <div class="caption">
-                    Randomly generated <strong>sentences</strong> using words
-                    from a
-                    <a
-                        href="https://en.wiktionary.org/wiki/Wiktionary:Frequency_lists/Contemporary_fiction"
-                        >Wiktionary top 2000 list</a
-                    >
-                    (<a href="https://creativecommons.org/licenses/by-sa/3.0/"
-                        >CC-BY-SA 3.0</a
-                    >) and sentence data from
-                    <a href="https://tatoeba.org">Tatoeba</a> (<a
-                        href="https://creativecommons.org/licenses/by/2.0/fr/"
-                        >CC-BY 2.0 fr</a
-                    >)
+                    Randomly <strong>Generated</strong> Sentences
                 </div>
 
                 <form class="drill-options" action="markov.html">
@@ -617,64 +609,8 @@
             }
         }
 
-        function getSettings(evt) {
-            const hintButtons = document.getElementsByName("hints");
-            for (var radio of hintButtons) {
-                if (radio.checked) {
-                    hiddenField(this, "hints", radio.value);
-                    break;
-                }
-            }
-
-            var grading_show_correction_marks =
-                document.getElementById("grd_sh_corr_marks");
-            if (!grading_show_correction_marks.checked)
-                hiddenField(
-                    this,
-                    "grd_sh_corr_marks",
-                    grading_show_correction_marks.checked
-                );
-
-            var grading_show_live_results =
-                document.getElementById("grd_sh_liv_res");
-            if (!grading_show_live_results.checked)
-                hiddenField(
-                    this,
-                    "grd_sh_liv_res",
-                    grading_show_live_results.checked
-                );
-
-            var live_wpm = document.getElementById("live_wpm");
-            if (live_wpm.checked) hiddenField(this, "live_wpm", live_wpm.value);
-
-            var show_timer = document.getElementById("show_timer");
-            if (show_timer.checked)
-                hiddenField(this, "show_timer", show_timer.value);
-            var wpm = document.getElementById("wpm");
-            var cpm = document.getElementById("cpm");
-            if (cpm.checked) hiddenField(this, "cpm", 5 * wpm.value);
-            else hiddenField(this, "wpm", wpm.value);
-
-            var alternate = document.getElementById("alternate");
-            hiddenField(this, "alternate", alternate.value);
-
-            var grade_rules_droppedWordMaxJump = document.getElementById(
-                "grade_rules_droppedWordMaxJump"
-            );
-            var grade_rules_addedWordMaxJump = document.getElementById(
-                "grade_rules_addedWordMaxJump"
-            );
-            hiddenField(this, "gradingRules", {
-                droppedWordMaxJump: parseInt(
-                    grade_rules_droppedWordMaxJump.value
-                ),
-                addedWordMaxJump: parseInt(grade_rules_addedWordMaxJump.value),
-            });
-        }
-
         function runCustom(evt) {
             evt.preventDefault();
-            getSettings.call(this);
             var fields = getFormFields(this);
             if (storageAvailable("localStorage")) {
                 localStorage.custom = fields.drill;
@@ -721,8 +657,6 @@
                     var form = forms[i];
                     if (form.id === "custom") {
                         form.addEventListener("submit", runCustom);
-                    } else {
-                        form.addEventListener("submit", getSettings);
                     }
                 }
             }

@@ -155,7 +155,6 @@ function changeName(name) {
 }
 
 function setExercise(name, exercise, hints = null, options, jig) {
-    console.log("Setting exersize", exercise, hints, options);
     var h = document.getElementById("lesson-name");
     h.textContent = name;
     document.title = name + " - Steno Grade";
@@ -171,6 +170,16 @@ function setExercise(name, exercise, hints = null, options, jig) {
 
     var end = document.getElementById("end");
     end.href = document.location.href;
+
+    //Add the settings from local storage to the options
+    var settings = localStorage.getItem("settings") ?? "{}";
+    if (settings) {
+        options = {
+            ...options,
+            ...(JSON.parse(settings) ?? {}),
+        };
+    }
+    console.log("Setting exersize", exercise, hints, options);
 
     if (jig != null) jig.exercise = exercise;
     else jig = new TypeJig(exercise, options, hints);
@@ -223,28 +232,75 @@ function setTheme() {
     }
 }
 
-function loadSetting(elementID, settingName) {
-    const element = document.getElementById(elementID);
-    if (
-        element &&
-        element.nodeName === "INPUT" &&
-        element.type === "checkbox"
-    ) {
-        if (localStorage[settingName] != null) {
-            element.checked = JSON.parse(localStorage[settingName]);
-        }
-        element.addEventListener("input", function (evt) {
-            localStorage[settingName] = !!element.checked;
-        });
+function loadLocalSetting(name) {
+    if (storageAvailable("localStorage")) {
+        return JSON.parse(localStorage.settings ?? "{}")[name] ?? null;
     }
+    return null;
+}
 
-    if (element && element.nodeName === "INPUT" && element.type === "number") {
-        if (localStorage[settingName] != null) {
-            element.value = localStorage[settingName];
-        }
-        element.addEventListener("input", function (evt) {
-            localStorage[settingName] = element.value;
-        });
+function setLocalSetting(name, value) {
+    if (storageAvailable("localStorage")) {
+        console.log("Setting local setting", name, value);
+        console.log(localStorage.settings);
+        var settings = JSON.parse(localStorage.settings ?? "{}");
+        settings[name] = value;
+        localStorage.settings = JSON.stringify(settings);
+    }
+}
+/**
+ *
+ * @param {string} settingName
+ * @param {any} defaultValue
+ * @returns
+ */
+function loadSetting(settingName, defaultValue = null) {
+    localStorage.settings ??= "{}";
+    const element = document.getElementById(settingName);
+    console.log("Loading setting", settingName, element);
+    var value = loadLocalSetting(settingName);
+    if (value == null) setLocalSetting(settingName, defaultValue);
+    value ??= defaultValue;
+
+    if (!element) return;
+    if (!(element.nodeName === "INPUT")) return;
+
+    switch (element.type) {
+        case "checkbox":
+            if (value != null) {
+                element.checked = value;
+            }
+            element.addEventListener("input", function (evt) {
+                setLocalSetting(settingName, !!evt.target.checked);
+            });
+            break;
+        case "number":
+            if (value != null) {
+                element.value = value;
+            }
+            element.addEventListener("input", function (evt) {
+                setLocalSetting(settingName, evt.target.value);
+            });
+            break;
+
+        case "radio":
+            const hints = document.getElementsByName(settingName);
+            console.log(hints);
+            for (const hint of hints) {
+                console.log(hint, hint.value);
+                hint.addEventListener("click", function (evt) {
+                    console.log(evt);
+                    setLocalSetting(settingName, evt.target.value);
+                });
+                if (hint.value === value) hint.checked = true;
+            }
+            break;
+        case "text":
+            if (value != null) element.value = value;
+            element.addEventListener("input", function (evt) {
+                setLocalSetting(settingName, evt.target.value);
+            });
+            break;
     }
 }
 
@@ -257,56 +313,16 @@ function loadSettings() {
     } else {
         document.body.setAttribute("data-theme", localStorage.theme);
     }
-
-    // Hints
-    const hints = document.getElementsByName("hints");
-    for (const hint of hints) {
-        hint.addEventListener("click", function (e) {
-            localStorage.hints = e.target.value;
-        });
-        if (localStorage.hints === hint.value) hint.checked = true;
-    }
-
-    loadSetting("live_wpm", "live_wpm");
-    loadSetting("show_timer", "show_timer");
-
-    // Grading rules
-    loadSetting("grd_sh_corr_marks", "grd_sh_corr_marks");
-    loadSetting("grd_sh_liv_res", "grd_sh_liv_res");
-
-    loadSetting("grade_rules_addedWordMaxJump", "grade_rules_addedWordMaxJump");
-    loadSetting(
-        "grade_rules_droppedWordMaxJump",
-        "grade_rules_droppedWordMaxJump"
-    );
-    // CPM
-    const cpm = document.getElementById("cpm");
-    if (cpm && cpm.nodeName === "INPUT" && cpm.type === "checkbox") {
-        if (localStorage.cpm != null) {
-            cpm.checked = JSON.parse(localStorage.cpm);
-        }
-        cpm.addEventListener("input", function (evt) {
-            localStorage.cpm = !!cpm.checked;
-        });
-    }
-
-    // WPM
-    const wpm = document.getElementById("wpm");
-    if (wpm && wpm.nodeName === "INPUT" && wpm.type === "number") {
-        if (localStorage.wpm != null) wpm.value = localStorage.wpm;
-        wpm.addEventListener("input", function (evt) {
-            localStorage.wpm = wpm.value;
-        });
-    }
-
-    // ALTERNATE
-    const alt = document.getElementById("alternate");
-    if (alt && alt.nodeName === "INPUT" && alt.type === "text") {
-        if (localStorage.alternate != null) alt.value = localStorage.alternate;
-        alt.addEventListener("input", function (evt) {
-            localStorage.alternate = alt.value;
-        });
-    }
+    loadSetting("hints", "fail-1");
+    loadSetting("live_wpm", true);
+    loadSetting("show_timer", true);
+    loadSetting("show_corrections", false);
+    loadSetting("show_live_grading", true);
+    loadSetting("grade_rules_addedWordMaxJump", 5);
+    loadSetting("grade_rules_droppedWordMaxJump", 5);
+    loadSetting("cpm");
+    loadSetting("wpm");
+    loadSetting("alternate");
 }
 
 function initializeButtons(jig) {
