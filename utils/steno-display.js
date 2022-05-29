@@ -43,7 +43,7 @@ StenoDisplay.prototype.startupPrecompute = function (fullText) {
 };
 StenoDisplay.prototype.update = function (text, x, y) {
     text = text || "";
-    console.log("Updating StenoDisplay", text, x, y);
+    // console.log("Updating StenoDisplay", text, x, y);
     if (text !== this.lastText) {
         this.lastText = text;
         //The input text is 10 words long. see if 10 words matches. if not try 9 words. ect
@@ -333,12 +333,12 @@ StenoDisplay.prototype.showTranslation = function (
 };
 
 StenoDisplay.prototype.hide = function () {
-    console.log("Hiding StenoDisplay");
-    console.trace();
+    // console.log("Hiding StenoDisplay");
+    // console.trace();
     this.container.style.display = "none";
 };
 StenoDisplay.prototype.show = function () {
-    console.trace("Showing StenoDisplay");
+    // console.trace("Showing StenoDisplay");
     this.container.style.display = "block";
 };
 
@@ -913,7 +913,7 @@ StenoDisplay.Stroke.prototype.applyRules = function (rules) {
 };
 
 StenoDisplay.Stroke.prototype.set = function (stroke, separator, rules) {
-    console.log("Setting stroke", stroke, rules);
+    // console.log("Setting stroke", stroke, rules);
     this.clear();
     // this.separator.firstChild.nodeValue = separator || "";
     var steno = pseudoStrokeToSteno(stroke);

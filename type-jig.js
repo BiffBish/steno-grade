@@ -477,10 +477,12 @@ TypeJig.prototype.gradeTypeVsResult = function (typedWords, expectedWords) {
 
     //Timestamp the last word
     var LastWord = this.persistentWordData[wordList.length - 1];
-
+    console.log(LastWord, "LastWord");
     this.persistentWordData[wordList.length - 1] = {
         ...LastWord,
-        timeStamp: this.clock.getTime(),
+        timeStamp:
+            this.persistentWordData[wordList.length - 1]?.timeStamp ??
+            this.clock.getTime(),
     };
     if (trailingSpace) {
         wordList.push({
@@ -549,7 +551,7 @@ TypeJig.prototype.displayTypedWords = function (typedWords, onResults = false) {
             typedSpan.appendChild(document.createTextNode(ans));
 
             let className = "";
-            console.log(this.options.show_corrections);
+            // console.log(this.options.show_corrections);
             if (this.options.show_live_grading || onResults) {
                 if (match == true) {
                     className = "correct";
