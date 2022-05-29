@@ -477,12 +477,20 @@ TypeJig.prototype.gradeTypeVsResult = function (typedWords, expectedWords) {
 
     //Timestamp the last word
     var LastWord = this.persistentWordData[wordList.length - 1];
+    var LastTypedWord = wordList[wordList.length - 1];
     console.log(LastWord, "LastWord");
+    //if the last typed word is correct, add the timestamp
+    if (LastTypedWord.correct == true) {
+        this.persistentWordData[wordList.length - 1] = {
+            ...LastWord,
+            correctTimeStamp:
+                this.persistentWordData[wordList.length - 1]
+                    ?.correctTimeStamp ?? this.clock.getTime(),
+        };
+    }
     this.persistentWordData[wordList.length - 1] = {
         ...LastWord,
-        timeStamp:
-            this.persistentWordData[wordList.length - 1]?.timeStamp ??
-            this.clock.getTime(),
+        lastKnownTimeStamp: this.clock.getTime(),
     };
     if (trailingSpace) {
         wordList.push({
@@ -1066,11 +1074,32 @@ TypeJig.prototype.endExercise = function (seconds) {
     this.persistentWordData.sort((a, b) => a.id - b.id);
     let prevTimestamp = 0;
 
-    this.persistentWordData.forEach((element) => {
-        element.duration = element.timeStamp - prevTimestamp;
-        prevTimestamp = element.timeStamp;
-    });
+    for (let index = 1; index < this.persistentWordData.length; index++) {
+        const prevElement = this.persistentWordData[index - 1];
+        const element = this.persistentWordData[index];
+        const nextElement = this.persistentWordData[index + 1];
 
+        if (!nextElement) continue;
+        if (!prevElement) continue;
+        if (element.correctTimeStamp) {
+            element.duration =
+                element.correctTimeStamp -
+                (prevElement.correctTimeStamp ??
+                    prevElement.lastKnownTimeStamp);
+            continue;
+        }
+        if (element.lastKnownTimeStamp) {
+            element.duration =
+                element.lastKnownTimeStamp -
+                (prevElement.correctTimeStamp ??
+                    prevElement.lastKnownTimeStamp);
+
+            continue;
+        }
+
+        element.duration = 0;
+    }
+    console.log(this.persistentWordData);
     this.showResults();
     this.saveDurationInLocalStorage(this.persistentWordData);
     this.saveErrorsInLocalStorage();
