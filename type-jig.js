@@ -100,6 +100,9 @@ TypeJig.prototype.reset = function () {
     this.display.style.width = "100%";
     this.exercise.calculateBreakPoints(this.display);
 
+    document.getElementById("corrections").style.display = "none";
+    document.getElementById("chartDiv").style.display = "none";
+
     this.liveWPM.reset();
     this.display.style.width = "200%";
     this.typedWords = [];
@@ -1232,6 +1235,13 @@ TypeJig.prototype.showResults = function (persistantData) {
 
     var correctionsElement =
         document.getElementById("corrections")?.children[0];
+    console.log(correctionsElement);
+
+    document.getElementById("corrections").style.display = "table";
+    //delete all but the first children
+    while (correctionsElement?.children?.length > 1) {
+        correctionsElement?.removeChild(correctionsElement?.children[1]);
+    }
 
     //get thr first child of the corrections element
 
@@ -1651,7 +1661,7 @@ TypeJig.prototype.renderChart = function () {
             },
         },
     };
-
+    document.getElementById("chartDiv").style.display = "block";
     this.wpmChart = new Chart(
         document.getElementById("chartDiv").getContext("2d"),
         config

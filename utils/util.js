@@ -33,7 +33,7 @@ function populatePage(options) {
 			<div style="height: 300px">
 				<canvas id="chartDiv" width="400" height="400"></canvas>
 			</div>
-            <table id="corrections">
+            <table id="corrections" style="display:none">
                 <tr>
                     <th>Expected</th>
                     <th>Hesitation</th>
