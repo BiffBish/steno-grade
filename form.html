@@ -337,6 +337,57 @@
 
             <div class="form-section">
                 <div class="caption">
+                    <b class="red">NEW</b> AI Generated Challenging Sentences
+                </div>
+
+                <form class="drill-options" action="markov-durations.html">
+                    <p>
+                        Using tracked word durations a built in AI generates
+                        sentences that will challenge you. Giving you words that
+                        you struggle with
+                    </p>
+
+                    Drill Length:
+                    <input
+                        type="number"
+                        name="word_count"
+                        value="100"
+                        min="50"
+                        max="1000"
+                        step="50"
+                    />
+                    words <small>(plus the rest of the last sentence.)</small>
+                    <br />
+
+                    Difficulty:
+                    <input
+                        type="number"
+                        name="duration_bias"
+                        value="40"
+                        min="0"
+                        max="100"
+                        step="10"
+                    />
+                    %
+                    <small
+                        >(how likely it will give you words you struggle
+                        with)</small
+                    >
+                    <br />
+
+                    <script>
+                        document.write(
+                            '<input type="hidden" name="seed" value="' +
+                                Math.random().toString() +
+                                '">'
+                        );
+                    </script>
+
+                    <button>Start Drill &rarr;</button>
+                </form>
+            </div>
+            <div class="form-section">
+                <div class="caption">
                     <strong>Quotes</strong> from
                     <a
                         href="https://github.com/Miodec/monkeytype/blob/master/static/quotes/english.json"
