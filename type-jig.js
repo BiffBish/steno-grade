@@ -479,17 +479,29 @@ TypeJig.prototype.gradeTypeVsResult = function (typedWords, expectedWords) {
     var LastWord = this.persistentWordData[wordList.length - 1];
     var LastTypedWord = wordList[wordList.length - 1];
     console.log(LastWord, "LastWord");
+    console.log(LastTypedWord, "LastWord");
+    console.log([...this.persistentWordData], "input data");
+
     //if the last typed word is correct, add the timestamp
     if (LastTypedWord.correct == true) {
+        let nowTime = this.clock.getTime();
+        let savedTime = LastWord.correctTimeStamp;
+        console.log(nowTime, savedTime, wordList.length - 1);
         this.persistentWordData[wordList.length - 1] = {
-            ...LastWord,
+            ...this.persistentWordData[wordList.length - 1],
             correctTimeStamp:
                 this.persistentWordData[wordList.length - 1]
-                    ?.correctTimeStamp ?? this.clock.getTime(),
+                    ?.correctTimeStamp ?? nowTime,
         };
+        console.log(
+            "setting value for ",
+            wordList.length - 1,
+            this.persistentWordData[wordList.length - 1]
+        );
     }
+    console.log([...this.persistentWordData], "persistentWordData");
     this.persistentWordData[wordList.length - 1] = {
-        ...LastWord,
+        ...this.persistentWordData[wordList.length - 1],
         lastKnownTimeStamp: this.clock.getTime(),
     };
     if (trailingSpace) {
@@ -1070,14 +1082,21 @@ TypeJig.prototype.endExercise = function (seconds) {
         let elt = this.lastAnswered;
         while (elt.nextSibling) elt.parentNode.removeChild(elt.nextSibling);
     }
-    this.persistentWordData = this.persistentWordData.filter((a) => a.id);
-    this.persistentWordData.sort((a, b) => a.id - b.id);
+    let persistantData = [...this.persistentWordData];
+    console.log("Before filtering", [...persistantData]);
+
+    persistantData = persistantData.filter((a) => a.id != undefined);
+    console.log("Before sort", [...persistantData]);
+
+    persistantData.sort((a, b) => a.id - b.id);
+    console.log("After", [...persistantData]);
+
     let prevTimestamp = 0;
 
-    for (let index = 1; index < this.persistentWordData.length; index++) {
-        const prevElement = this.persistentWordData[index - 1];
-        const element = this.persistentWordData[index];
-        const nextElement = this.persistentWordData[index + 1];
+    for (let index = 1; index < persistantData.length; index++) {
+        const prevElement = persistantData[index - 1];
+        const element = persistantData[index];
+        const nextElement = persistantData[index + 1];
 
         if (!nextElement) continue;
         if (!prevElement) continue;
@@ -1099,8 +1118,7 @@ TypeJig.prototype.endExercise = function (seconds) {
 
         element.duration = 0;
     }
-    console.log(this.persistentWordData);
-    this.showResults();
+    this.showResults(persistantData);
     this.saveDurationInLocalStorage(this.persistentWordData);
     this.saveErrorsInLocalStorage();
 };
@@ -1155,7 +1173,7 @@ TypeJig.prototype.saveErrorsInLocalStorage = function () {
     localStorage.setItem("errors", JSON.stringify(errors));
 };
 
-TypeJig.prototype.showResults = function () {
+TypeJig.prototype.showResults = function (persistantData) {
     typedWords = this.input.value.replaceAll(/^\s+/g, "").split(/\s+/);
     var seconds = this.clock.getTime(true);
     var gradingResults = this.gradeTypeVsResult(
@@ -1210,17 +1228,14 @@ TypeJig.prototype.showResults = function () {
     this.resultsDisplay.scrollIntoView(true);
     this.displayTypedWords(this.typedWords, true);
 
-    console.log(this.persistentWordData);
+    console.log(persistantData);
 
     var correctionsElement =
         document.getElementById("corrections")?.children[0];
 
     //get thr first child of the corrections element
 
-    var sortedPersistantWordData = [...this.persistentWordData].sort(function (
-        a,
-        b
-    ) {
+    var sortedPersistantWordData = [...persistantData].sort(function (a, b) {
         return (b.duration ?? 0) - (a.duration ?? 0);
     });
 
