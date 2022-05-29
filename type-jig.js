@@ -1458,14 +1458,14 @@ TypeJig.LiveWPM.prototype.update = function (seconds) {
             return;
         }
         distance =
-            persistantData[persistantData.length - 1].timeStamp -
-            persistantData[persistantData.length - 11].timeStamp;
+            persistantData[persistantData.length - 1].lastKnownTimeStamp -
+            persistantData[persistantData.length - 11].lastKnownTimeStamp;
 
         if (this.showLiveWPM)
             this.elt.innerHTML =
                 "~" + Math.floor((10 / distance) * 60) + " " + unit;
     } else {
-        distance = persistantData[persistantData.length - 1].timeStamp;
+        distance = persistantData[persistantData.length - 1].lastKnownTimeStamp;
 
         if (this.showLiveWPM)
             this.elt.innerHTML =
@@ -1517,10 +1517,10 @@ TypeJig.prototype.renderChart = function () {
         });
     }
 
-    combinedData.sort((a, b) => a.timeStamp - b.timeStamp);
+    combinedData.sort((a, b) => a.lastKnownTimeStamp - b.lastKnownTimeStamp);
 
     for (let i = 0; i < combinedData.length; i++) {
-        var pastValue = combinedData[i].timeStamp ?? 0;
+        var pastValue = combinedData[i].lastKnownTimeStamp ?? 0;
 
         var currentValues = 0;
 
@@ -1533,9 +1533,9 @@ TypeJig.prototype.renderChart = function () {
             pastValue = combinedData[j];
         }
 
-        distance = combinedData[i].timeStamp - pastValue;
+        distance = combinedData[i].lastKnownTimeStamp - pastValue;
         averageDatasetData.push({
-            x: combinedData[i].timeStamp,
+            x: combinedData[i].lastKnownTimeStamp,
             y: (currentValues / distance) * 60,
             ...combinedData[i],
         });
@@ -1551,14 +1551,17 @@ TypeJig.prototype.renderChart = function () {
     for (let i = 0; i < combinedData.length; i++) {
         if (i < 10) {
             totalDataDataset.push({
-                x: combinedData[i].timeStamp,
-                y: (i / combinedData[i].timeStamp) * 60 * (i / (i + 1)),
+                x: combinedData[i].lastKnownTimeStamp,
+                y:
+                    (i / combinedData[i].lastKnownTimeStamp) *
+                    60 *
+                    (i / (i + 1)),
                 ...combinedData[i],
             });
         } else {
             totalDataDataset.push({
-                x: combinedData[i].timeStamp,
-                y: (i / combinedData[i].timeStamp) * 60,
+                x: combinedData[i].lastKnownTimeStamp,
+                y: (i / combinedData[i].lastKnownTimeStamp) * 60,
                 ...combinedData[i],
             });
         }
