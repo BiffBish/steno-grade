@@ -46,6 +46,7 @@ function TypeJig(exercise, options, hint = null) {
     this.hint_on_fail = options?.hints?.startsWith("fail");
     this.hint_on_fail_count = parseInt(options?.hints?.split("-")[1] || 1);
 
+    this.multi_word_hints = options?.multi_word_hints;
     this.showing_hint_on_word = "";
 
     this.typedWords = [];
@@ -842,22 +843,27 @@ TypeJig.prototype.answerChanged = function () {
                 .slice(
                     this.typedWords.length - 1,
                     Math.min(
-                        this.typedWords.length + 10,
+                        this.typedWords.length +
+                            (this.multi_word_hints ? 10 : 0),
                         this.exercise.words.length
                     )
                 )
                 .join(" ");
+            console.log("nextWords", nextWords);
+
             this.hint.update(nextWords, r.left, r.top);
         } else {
             var nextWords = this.exercise.words
                 .slice(
                     this.typedWords.length,
                     Math.min(
-                        this.typedWords.length + 10,
+                        this.typedWords.length +
+                            (this.multi_word_hints ? 10 : 1),
                         this.exercise.words.length
                     )
                 )
                 .join(" ");
+            console.log("nextWords", nextWords);
             this.hint.update(nextWords, r.left, r.top);
         }
     }

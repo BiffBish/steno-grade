@@ -35,10 +35,11 @@ function StenoDisplay(container, translations, showEmpty) {
     this.cachedHints = {};
 }
 
-StenoDisplay.prototype.startupPrecompute = function (fullText) {
+StenoDisplay.prototype.startupPrecompute = function (fullText, options) {
     this.hintComputer.postMessage({
         words: fullText,
         translations: this.pseudoStenoFor,
+        options: options,
     });
 };
 StenoDisplay.prototype.update = function (text, x, y) {

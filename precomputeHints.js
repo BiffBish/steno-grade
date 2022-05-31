@@ -10,11 +10,14 @@ importScripts(
 var translations;
 
 var allWords = [];
+var options;
 onmessage = function (e) {
     console.log("Message received from main script. V2", e.data);
     // var workerResult = "Result: " + e.data;
     allWords = e.data.words;
     translations = e.data.translations;
+    options = e.data.options;
+
     processAllWords();
 };
 function lookup(text) {

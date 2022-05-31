@@ -323,6 +323,7 @@ function loadSettings() {
     loadSetting("cpm");
     loadSetting("wpm");
     loadSetting("alternate");
+    loadSetting("multi_word_hints", false);
 }
 
 function initializeButtons(jig) {
