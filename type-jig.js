@@ -35,7 +35,7 @@ function TypeJig(exercise, options, hint = null) {
     if (hint) this.hint = hint;
     else this.hint = initializeHints(options?.hints);
 
-    if (options?.hints == "1") this.hint.show();
+    if (options?.hints == "true") this.hint.show();
     else this.hint.hide();
 
     if (!options?.show_timer) this.clock.hide();
@@ -44,7 +44,7 @@ function TypeJig(exercise, options, hint = null) {
     this.live_cpm = options?.live_cpm;
     console.log(options);
     this.hint_on_fail = options?.hints?.startsWith("fail");
-    this.hint_on_fail_count = options?.hints?.split("-")[1] || 1;
+    this.hint_on_fail_count = parseInt(options?.hints?.split("-")[1] || 1);
 
     this.showing_hint_on_word = "";
 
@@ -740,15 +740,17 @@ TypeJig.prototype.answerChanged = function () {
         this.lastWordIndex = lastWordIndex;
         this.failedThisWord = false;
     }
-
-    if (
-        numOfFailsThisWord > 3 &&
-        gradeResults.words[lastWordIndex]?.correct == null
-    ) {
-        this.hint.show();
-    } else {
-        this.hint.hide();
+    if (this.options.hint_on_fail) {
+        if (
+            numOfFailsThisWord > this.options.hint_on_fail_count &&
+            gradeResults.words[lastWordIndex]?.correct == null
+        ) {
+            this.hint.show();
+        } else {
+            this.hint.hide();
+        }
     }
+
     // if (this.hint_on_fail) {
     //     if (gradeResults.words[lastWordIndex].typed == "") {
     //         lastWordIndex--;
