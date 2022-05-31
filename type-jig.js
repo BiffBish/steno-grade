@@ -713,6 +713,9 @@ TypeJig.prototype.answerChanged = function () {
     let numOfFailsThisWord =
         this.persistentWordData[lastWordIndex]?.failed_count ?? 0;
 
+    let numOfFailsNextWord =
+        this.persistentWordData[lastWordIndex + 1]?.failed_count ?? 0;
+
     // this.failedThisWord = false;
 
     let currentWordisError =
@@ -742,8 +745,9 @@ TypeJig.prototype.answerChanged = function () {
     }
     if (this.hint_on_fail) {
         if (
-            numOfFailsThisWord > this.hint_on_fail_count &&
-            gradeResults.words[lastWordIndex]?.correct == null
+            (numOfFailsThisWord >= this.hint_on_fail_count &&
+                gradeResults.words[lastWordIndex]?.correct == null) ||
+            numOfFailsNextWord >= this.hint_on_fail_count
         ) {
             this.hint.show();
         } else {
