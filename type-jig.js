@@ -740,9 +740,9 @@ TypeJig.prototype.answerChanged = function () {
         this.lastWordIndex = lastWordIndex;
         this.failedThisWord = false;
     }
-    if (this.options.hint_on_fail) {
+    if (this.hint_on_fail) {
         if (
-            numOfFailsThisWord > this.options.hint_on_fail_count &&
+            numOfFailsThisWord > this.hint_on_fail_count &&
             gradeResults.words[lastWordIndex]?.correct == null
         ) {
             this.hint.show();
