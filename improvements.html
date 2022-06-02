@@ -20,52 +20,21 @@
         <div class="wrapper">
             <div id="form">
                 <h1>Improve your mistakes</h1>
-                <!-- <p style="text-align: center">
-                    <a href="raw-steno-instructions.html"
-                        >How to get raw steno output</a
-                    >
-                </p> -->
-                <div class="form-section" style="width: 900px">
-                    Most messed up words
-                    <ul id="most-messed-up-words" style="list-style-type: none">
-                        Bad -> back
-                    </ul>
-
-                    <!-- <form id="selectDrill">
-                        <ul style="list-style-type: none">
-                            <li><select name="drill"></select></li>
-                            <li>
-                                <label
-                                    ><input
-                                        name="hints"
-                                        type="checkbox"
-                                        value="yes"
-                                        checked
-                                    />
-                                    Show hints?</label
-                                >
-                            </li>
-                            <li>
-                                <label
-                                    ><input
-                                        name="wpm"
-                                        type="number"
-                                        value=""
-                         var strokes = document.getElementById("strokes");
-    if (floating_hints) {
-        strokes.style.position = "fixed";
-    }
-    var translations = TypeJig.shortestTranslations(PloverTranslations);
-    console.log("Making stenoDisplay");
-
-    return new StenoDisplay(strokes, translations, true);                step="5"
-                                    />
-                                    Speed (strokes per minute).</label
-                                >
-                            </li>
-                            <li><input type="submit" value="Go" /></li>
-                        </ul>
-                    </form> -->
+                <div style="display: flex">
+                    <div class="form-section" style="width: 900px">
+                        Most messed up words
+                        <ul
+                            id="most-messed-up-words"
+                            style="list-style-type: none"
+                        ></ul>
+                    </div>
+                    <div class="form-section" style="width: 900px">
+                        Words you pause the most on
+                        <ul
+                            id="most-durations-words"
+                            style="list-style-type: none"
+                        ></ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -239,6 +208,37 @@
         let top20 = sortedCountedErrors.slice(0, 20);
         top20.forEach((mistake) => {
             makeImprovementPair(mistake);
+        });
+
+        let durations = JSON.parse(localStorage.getItem("durations"));
+
+        let listedDurations = Object.entries(durations);
+
+        let sortedDurations = listedDurations.sort((a, b) => {
+            return b[1] - a[1];
+        });
+        var list = $("#most-durations-words");
+
+        sortedDurations.forEach((duration) => {
+            let descriptionList = document.createElement("ul");
+            descriptionList.style.width = "200px";
+
+            let description = document.createElement("div");
+
+            let overallUpdate = document.createElement("h2");
+            overallUpdate.innerHTML = duration[0];
+            description.append(overallUpdate);
+
+            let updateItem = document.createElement("li");
+            updateItem.innerHTML = "Duration: " + duration[1] * 1000 + "ms";
+            descriptionList.append(updateItem);
+            description.append(descriptionList);
+
+            let wordPair = document.createElement("div");
+            wordPair.classList.add("word-pair");
+            wordPair.appendChild(description);
+
+            list.append(wordPair);
         });
 
         //get the ul with the ID of "most-messed-up-words"
