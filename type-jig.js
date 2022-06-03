@@ -489,7 +489,7 @@ TypeJig.prototype.gradeTypeVsResult = function (typedWords, expectedWords) {
     //if the last typed word is correct, add the timestamp
     if (LastTypedWord.correct == true) {
         let nowTime = this.clock.getTime();
-        let savedTime = LastWord.correctTimeStamp;
+        let savedTime = LastWord?.correctTimeStamp;
         console.log(nowTime, savedTime, wordList.length - 1);
         this.persistentWordData[wordList.length - 1] = {
             ...this.persistentWordData[wordList.length - 1],
@@ -1100,7 +1100,7 @@ TypeJig.prototype.endExercise = function (seconds) {
     let persistantData = [...this.persistentWordData];
     console.log("Before filtering", [...persistantData]);
 
-    persistantData = persistantData.filter((a) => a.id != undefined);
+    persistantData = persistantData.filter((a) => a?.id != undefined);
     console.log("Before sort", [...persistantData]);
 
     persistantData.sort((a, b) => a.id - b.id);
