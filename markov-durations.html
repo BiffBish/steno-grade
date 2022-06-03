@@ -42,6 +42,30 @@
             const durationData = JSON.parse(
                 localStorage.getItem("durations") ?? "{}"
             );
+            const durationDataItems = Object.entries(durationData);
+            //Remove all punctuation from the duration data
+            const punctuation = /[.,\/#!$%\^&\*;:{}=\-_`~()]/g;
+            const durationDataItemsNoPunctuation = durationDataItems.map(
+                ([key, value]) => [key.replace(punctuation, ""), value]
+            );
+
+            //turn the duration data into a dictionary averaging any duplicates
+            const durationDataDict = {};
+            durationDataItemsNoPunctuation.forEach(([key, value]) => {
+                if (durationDataDict[key] == null) {
+                    durationDataDict[key] = [value];
+                } else {
+                    durationDataDict[key].push(value);
+                }
+            });
+
+            //turn the duration data dictionary into a dictionary with the average
+            const durationDataDictAvg = {};
+            Object.entries(durationDataDict).forEach(([key, value]) => {
+                durationDataDictAvg[key] =
+                    value.reduce((a, b) => a + b) / value.length;
+            });
+
             const choose = (a) => a[Math.floor(rnd() * a.length)];
             let sentence = choose(ngrams[""]).split(" ");
             const order = sentence.length;
@@ -57,10 +81,10 @@
                 let totalTime = 0;
 
                 unmodifiedFollowing.forEach((element) => {
-                    if (durationData[element]) {
+                    if (durationDataDictAvg[element]) {
                         if (trackedWords[element]) return;
-                        trackedWords[element] = durationData[element];
-                        totalTime += durationData[element];
+                        trackedWords[element] = durationDataDictAvg[element];
+                        totalTime += durationDataDictAvg[element];
                     }
                 });
                 if (totalTime == 0) {
