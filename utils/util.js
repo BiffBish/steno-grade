@@ -227,7 +227,7 @@ function setTheme() {
         //get both settings and custom settings. merging them
         var settings = localStorage.getItem("settings") ?? "{}";
         var customSettings = localStorage.getItem("custom_settings") ?? "{}";
-        var mergedSettings = {
+        var mS = {
             ...(JSON.parse(settings) ?? {}),
             ...(JSON.parse(customSettings) ?? {}),
         };
@@ -237,17 +237,24 @@ function setTheme() {
         } else {
             document.body.setAttribute("data-theme", localStorage.theme);
         }
-        console.log("Setting theme", mergedSettings);
+        console.log("Setting theme", mS);
         //Get the settings from local storage
-        if (mergedSettings) {
+        if (mS) {
             //Add a varable to the root element to set boredr thickness
             var root = document.documentElement;
-            root.style.setProperty(
-                "--form-border-thickness",
-                mergedSettings.theme_form_border_thickness ?? "1px"
+            var body = document.body;
+            setCustomThemeSetting("main-bg", mS.theme_background_color, true);
+            setCustomThemeSetting(
+                "form-border-thickness",
+                mS.theme_form_border_thickness ?? "1px"
             );
         }
     }
+}
+function setCustomThemeSetting(setting, value, dontApplyIfFalse = false) {
+    if (dontApplyIfFalse && !value) return;
+    var body = document.body;
+    body.style.setProperty("--" + setting, value);
 }
 
 function loadLocalSetting(name) {
