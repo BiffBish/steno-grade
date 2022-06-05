@@ -67,7 +67,11 @@ body {
 	top: 0;
 }
 
-
+.custom-settings-input {
+	position: sticky;
+	top: 20px;
+	background: var(--main-bg);
+}
 .form-section, .clickable-form-section  {
 	padding: 0.8em 1em;
 	margin: 0.5em 0;
@@ -91,6 +95,7 @@ a .clickable-form-section {
 	text-decoration: none;
 	color: inherit !important;
 };
+
 
 /*
 	Form Controls
