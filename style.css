@@ -6,6 +6,7 @@ html, body {
 }
 
 :root {
+
 	--main-bg: #fff;
 	--main-fg: #000;
 	--link-text: #167EE8;
@@ -16,6 +17,10 @@ html, body {
 	--corrected-text-bg: rgb(255, 237, 204);
 	--unknown-text-bg: rgb(187, 187, 187);
 	--incorrect-text-bg: #fcc;
+
+
+
+	--form-border-thickness: 1px;
 }
 
 [data-theme="dark"] {
@@ -63,16 +68,29 @@ body {
 }
 
 
-.form-section {
+.form-section, .clickable-form-section  {
 	padding: 0.8em 1em;
 	margin: 0.5em 0;
-	border: 1px solid var(--form-border);
+	border: var(--form-border-thickness) solid var(--form-border);
 	border-radius: 0.2em;
 	box-shadow: 0.1em 0.2em 0.4em var(--form-shadow);
 }
 .selected-form-section {
 	border-color: red
 }
+a .clickable-form-section {
+	text-decoration: none
+}
+/* On hover */
+.clickable-form-section:hover {
+	border-color: var(--link-text);
+	cursor: pointer;
+	color: var(--link-text);
+}
+.no-link-formatting {
+	text-decoration: none;
+	color: inherit !important;
+};
 
 /*
 	Form Controls

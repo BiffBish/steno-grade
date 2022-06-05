@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 	<meta charset="utf-8">
 	<title>Steno Grade</title>
@@ -7,21 +8,68 @@
 	<link rel="stylesheet" type="text/css" href="font-roboto.css">
 	<script src="utils/util.js"></script>
 </head>
+
 <body>
 
-<div class="wrapper">
 	<h1 class="center title">Steno Grade</h1>
+	<!-- <p class="welcome-text">This is a forked widget of steno-jig: you can
+		<a href="learn-keyboard.html">learn the steno keyboard</a>, do <a href="form.html">our lessons</a> or the <a
+			href="learn-plover.html">Learn Plover ones</a>, or fork the <a
+			href="https://github.com/BiffBish/steno-jig">GitHub repo</a>
+		and customize it to make your own. Do you have your own Plover dictionary?
+		<a href="custom-dictionary-upload.html">Upload it here</a>(Sorry for the flashbang darkmode users).
+	</p> -->
 
-	<p class="welcome-text">This is a forked widget of steno-jig: you can
-	<a href="learn-keyboard.html">learn the steno keyboard</a>, do <a
-	href="form.html">our lessons</a> or the <a
-	href="learn-plover.html">Learn Plover ones</a>, or fork the <a
-	href="https://github.com/BiffBish/steno-jig">GitHub repo</a>
-	and customize it to make your own. Do you have your own Plover dictionary?
-	<a href="custom-dictionary-upload.html">Upload it here</a>(Sorry for the flashbang darkmode users).</p>
-</p> 
+	<div id="form" class="wrapper">
+		<h1>Welcome!</h1>
+		<a href="learn-keyboard.html" class="button no-link-formatting ">
+			<div class="clickable-form-section">
+				<div class="caption">
+					<strong>Learn</strong> the steno keyboard
+				</div>
+				Learn how to use the steno keyboard. 
+			</div>
+		</a>
+		<a href="form.html" class="button no-link-formatting ">
+			<div class="clickable-form-section">
+				<div class="caption">
+					<strong>Drill</strong> our lessons
+				</div>
+				Improve your overall WPM and accuracy by drilling these custom made exercises.
+			</div>
+		</a>
+		<a href="learn-plover.html" class="button no-link-formatting ">
+			<div class="clickable-form-section">
+				<div class="caption">
+					Try out <strong>Learn Plover</strong> lessons
+				</div>
+				Try out these exercises from Learn Plover
+			</div>
+		</a>
+		<br />
+		<a href="learn-plover.html" class="button no-link-formatting ">
+			<div class="clickable-form-section">
+				<div class="caption">
+					Upload a custom <strong>Dictionary</strong>
+				</div>
+				Do you have a custom made dictionary that differs from plovers default? Upload it here to improve the dynamic hint system
+			</div>
+		</a>
+		<!-- <div class="form-section">
+			<div class="caption">Custom <strong>text</strong></div>
 
+			<form class="drill-options" id="custom" action="form.html">
+				<textarea name="drill"></textarea><br />
+				<input type="checkbox" name="type" value="shuffled" />
+				Shuffle lines.<br />
+				Repeat
+				<input type="number" name="repeat" min="1" max="100" step="1" value="1" />
+				times.<br />
 
+				<button>Start Drill &rarr;</button>
+			</form>
+		</div> -->
+	</div>
 
 	<!-- <div class="container">
 		<h1 class="title">
@@ -54,36 +102,36 @@
 			</div>
 		</form>
 	</div> -->
-</div>
+	</div>
 
-<script>
-	setTheme()
-	if(storageAvailable('localStorage')) {
-		let wrapper = document.querySelector('.wrapper')
-		let isDark = localStorage.theme === 'dark'
-		let checkbox = document.createElement('input')
-		checkbox.setAttribute('id', 'night-mode')
-		checkbox.setAttribute('type', 'checkbox')
-		checkbox.checked = isDark
-		checkbox.addEventListener('input', function(e) {
-			if(e.target.checked) {
-				localStorage.theme = 'dark'
-				document.body.setAttribute('data-theme', localStorage.theme)
-			} else {
-				delete localStorage.theme
-				document.body.removeAttribute('data-theme')
-			}
-		})
-		wrapper.appendChild(checkbox)
-		let label = document.createElement('label')
-		label.setAttribute('for', 'night-mode')
-		label.appendChild(document.createTextNode(' Night Mode'))
-		wrapper.appendChild(label)
-	} else {
-		document.body.appendChild(document.createTextNode('localStorage not available.'))
-	}
+	<script>
+		setTheme()
+		if (storageAvailable('localStorage')) {
+			let wrapper = document.querySelector('.wrapper')
+			let isDark = localStorage.theme === 'dark'
+			let checkbox = document.createElement('input')
+			checkbox.setAttribute('id', 'night-mode')
+			checkbox.setAttribute('type', 'checkbox')
+			checkbox.checked = isDark
+			checkbox.addEventListener('input', function (e) {
+				if (e.target.checked) {
+					localStorage.theme = 'dark'
+					document.body.setAttribute('data-theme', localStorage.theme)
+				} else {
+					delete localStorage.theme
+					document.body.removeAttribute('data-theme')
+				}
+			})
+			wrapper.appendChild(checkbox)
+			let label = document.createElement('label')
+			label.setAttribute('for', 'night-mode')
+			label.appendChild(document.createTextNode(' Night Mode'))
+			wrapper.appendChild(label)
+		} else {
+			document.body.appendChild(document.createTextNode('localStorage not available.'))
+		}
 
-	document.getElementById("submit").addEventListener("click", function (event) {
+		document.getElementById("submit").addEventListener("click", function (event) {
 			console.log("clicked");
 			event.preventDefault();
 			var filesToUpload = document.getElementById("fileToUpload1").files[0];
@@ -124,7 +172,8 @@
 
 
 		});
-</script>
+	</script>
 
 </body>
+
 </html>

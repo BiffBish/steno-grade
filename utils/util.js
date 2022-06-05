@@ -224,10 +224,28 @@ function storageAvailable(type) {
 function setTheme() {
     console.log("Setting theme");
     if (storageAvailable("localStorage")) {
+        //get both settings and custom settings. merging them
+        var settings = localStorage.getItem("settings") ?? "{}";
+        var customSettings = localStorage.getItem("custom_settings") ?? "{}";
+        var mergedSettings = {
+            ...(JSON.parse(settings) ?? {}),
+            ...(JSON.parse(customSettings) ?? {}),
+        };
+
         if (localStorage.theme == null) {
             document.body.removeAttribute("data-theme");
         } else {
             document.body.setAttribute("data-theme", localStorage.theme);
+        }
+        console.log("Setting theme", mergedSettings);
+        //Get the settings from local storage
+        if (mergedSettings) {
+            //Add a varable to the root element to set boredr thickness
+            var root = document.documentElement;
+            root.style.setProperty(
+                "--form-border-thickness",
+                mergedSettings.theme_form_border_thickness ?? "1px"
+            );
         }
     }
 }
