@@ -173,10 +173,15 @@ function setExercise(name, exercise, hints = null, options, jig) {
 
     //Add the settings from local storage to the options
     var settings = localStorage.getItem("settings") ?? "{}";
+    var custom_settings = JSON.parse(
+        localStorage.getItem("custom_settings") ?? "{}"
+    );
+
     if (settings) {
         options = {
             ...options,
             ...(JSON.parse(settings) ?? {}),
+            ...custom_settings,
         };
     }
     console.log("Setting exersize", exercise, hints, options);
