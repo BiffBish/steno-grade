@@ -1138,8 +1138,46 @@ TypeJig.prototype.endExercise = function (seconds) {
     this.saveErrorsInLocalStorage();
 };
 
+TypeJig.prototype.getAggregateStats = function () {
+    var stats = {};
+    for (var i = 0; i < localStorage.length; i++) {
+        var key = localStorage.key(i);
+        if (key.startsWith("stats-")) {
+            var date = key.slice(6);
+            var statsByDate = JSON.parse(localStorage.getItem(key));
+            for (var key in statsByDate) {
+                if (key in stats) stats[key] += statsByDate[key];
+                else stats[key] = statsByDate[key];
+            }
+        }
+    }
+    return stats;
+};
+
+TypeJig.prototype.getTodaysStats = function () {
+    // yyyy-mm-dd
+    var todayDate = new Date().toISOString().slice(0, 10);
+    var statsByToday = JSON.parse(
+        localStorage.getItem("stats-" + todayDate) ?? "{}"
+    );
+    return statsByToday;
+};
+
+TypeJig.prototype.saveStatsToToday = function (newPartialStats) {
+    // yyyy-mm-dd
+    var todayDate = new Date().toISOString().slice(0, 10);
+
+    var stats = this.getTodaysStats();
+
+    var newStats = {
+        ...stats,
+        ...newPartialStats,
+    };
+    localStorage.setItem("stats-" + todayDate, JSON.stringify(newStats));
+};
+
 TypeJig.prototype.saveDurationInLocalStorage = function (words) {
-    var durations = JSON.parse(localStorage.getItem("durations") ?? "{}");
+    var durations = this.getTodaysStats()?.durations ?? {};
     if (!durations) durations = {};
 
     words.forEach((element) => {
@@ -1160,10 +1198,16 @@ TypeJig.prototype.saveDurationInLocalStorage = function (words) {
         durations[expected] = Math.round(resulting * 1000) / 1000;
     });
     console.log(durations);
-    localStorage.setItem("durations", JSON.stringify(durations));
+
+    this.saveStatsToToday({ durations: durations });
 };
 TypeJig.prototype.saveErrorsInLocalStorage = function () {
-    var errors = JSON.parse(localStorage.getItem("errors"));
+    var todayDate = new Date().toISOString().slice(0, 10);
+    var statsByToday = JSON.parse(
+        localStorage.getItem("stats-" + todayDate) ?? "{}"
+    );
+
+    var errors = statsByToday?.errors ?? [];
     if (!errors) errors = [];
 
     //Get each occurance of an error in the TypedWords and save the word before and after
@@ -1185,7 +1229,7 @@ TypeJig.prototype.saveErrorsInLocalStorage = function () {
             ]);
         }
     }
-    localStorage.setItem("errors", JSON.stringify(errors));
+    this.saveStatsToToday({ errors: errors });
 };
 
 TypeJig.prototype.showResults = function (persistantData) {

@@ -10,6 +10,29 @@
 // It needs a bunch of help from styles: see the `#stroke` entries
 // in `style.css`.
 
+
+
+const workerCode = `
+  self.onmessage = function(event) {
+    const eventType = event.data.eventType;
+    if (eventType === "load") {
+        const scriptUrls = event.data.scriptUrls;
+        // const absoluteUrl = new URL(scriptUrl, self.location).href;
+        console.log("Loading script", scriptUrls);
+        importScripts(...scriptUrls);
+    }
+    if (eventType === "compute") {
+        const data = event.data.data;
+        const result = compute(data);
+        self.postMessage(result);
+    }
+  };
+`;
+
+const workerUrl = URL.createObjectURL(
+    new Blob([workerCode], { type: "text/javascript" })
+);
+
 function StenoDisplay(container, translations, showEmpty) {
     console.log("Creating StenoDisplay", container, translations, showEmpty);
     if (typeof container === "string") {
@@ -25,21 +48,50 @@ function StenoDisplay(container, translations, showEmpty) {
     var styles = window.getComputedStyle(container);
     var position = styles.getPropertyValue("position");
     this.placeNearText = position === "fixed";
-    this.hintComputer = new Worker("precomputeHints.js");
+    this.hintComputer = new Worker(workerUrl);
 
     this.hintComputer.onmessage = (event) => {
         // console.log("Hint computer message", event.data);
         let result = event.data;
         this.cachedHints[result.text] = result.lookup;
     };
+
+    urls = [
+        "type-jig.js",
+        "plover-translations.js",
+        "spectra/rules.js",
+        "spectra/spectra.js",
+        "precomputeHints.js",
+    ];
+
+    this.hintComputer.postMessage({
+        // new URL("precomputeHints.js", document.baseURI).href,
+        scriptUrls: urls.map((url) => new URL(url, document.baseURI).href),
+        eventType: "load",
+    });
+
     this.cachedHints = {};
 }
 
 StenoDisplay.prototype.startupPrecompute = function (fullText, options) {
-    this.hintComputer.postMessage({
+    // if (this.hintComputer) {
+    //     this.hintComputer.terminate();
+    // }
+
+    // importScripts(
+    //     "type-jig.js",
+    //     "plover-translations.js",
+    //     "spectra/rules.js",
+    //     "spectra/spectra.js"
+    // );
+    const data = {
         words: fullText,
         translations: this.pseudoStenoFor,
         options: options,
+    };
+    this.hintComputer.postMessage({
+        data: data,
+        eventType: "compute",
     });
 };
 StenoDisplay.prototype.update = function (text, x, y) {

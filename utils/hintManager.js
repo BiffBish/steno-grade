@@ -15,8 +15,8 @@ function HintManager() {
 }
 
 HintManager.prototype.lookup = function (text) {
-    for (let index = 0; index < this.pseudoStenoFor.length; index++) {
-        const dictionary = this.pseudoStenoFor[index];
+    for (const element of this.pseudoStenoFor) {
+        const dictionary = element;
 
         // console.log("Looking up", text, index);
 

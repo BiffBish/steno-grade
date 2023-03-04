@@ -4,32 +4,35 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Custom Dictionary Upload</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css">
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css"> -->
     <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <script src="utils/util.js"></script>
+    <link href="style.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
-<section class="section">
-    <div class="container">
-        <h1 class="title">
+
+    <div class="wrapper">
+        <div id="form">
+        <h1>
             Custom Dictionary Upload
         </h1>
         <h2 class="subtitle">
             Upload a custom dictionary file and give it a name.
         </h2>
         <form action="custom-dictionary-upload.php" method="post" enctype="multipart/form-data">
-            <div class="field">
-                <label class="label">Files (Priority top to bottom)</label>
+            <div class="form-section">
+                <label class="label" >Files (Priority top to bottom)</label>
                 <!-- Allow unload of many files and have drag and drop encouraged-->
-                <div class="control">
+                <div class="control" style = "margin-bottom: 1em; margin-top: 1em">
                     <input class="input" type="file" name="fileToUpload[]" id="fileToUpload1" >
                 </div>
-                <div class="control">
+                <div class="control" style = "margin-bottom: 1em">
                     <input class="input" type="file" name="fileToUpload[]" id="fileToUpload2">
                 </div>
-                <div class="control">
+                <div class="control" style = "margin-bottom: 1em">
                     <input class="input" type="file" name="fileToUpload[]" id="fileToUpload3">
                 </div>
-                <div class="control">
+                <div class="control" style = "margin-bottom: 1em">
                     <input class="input" type="file" name="fileToUpload[]" id="fileToUpload4">
                 </div>
             </div>
@@ -42,7 +45,7 @@
     </div>
 </body>
 <script>
-
+    setTheme();
     //When the user clicks Save the dictionary is saved to local storage
     document.getElementById("submit").addEventListener("click", function (event) {
         console.log("clicked");

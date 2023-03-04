@@ -210,7 +210,7 @@
             makeImprovementPair(mistake);
         });
 
-        let durations = JSON.parse(localStorage.getItem("durations"));
+        let durations = TypeJig.getAggregateStats().durations;
 
         let listedDurations = Object.entries(durations);
 

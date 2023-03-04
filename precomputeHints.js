@@ -1,30 +1,37 @@
 console.log("PrecomputeHints.js loaded");
 
-importScripts(
-    "type-jig.js",
-    "plover-translations.js",
-    "spectra/rules.js",
-    "spectra/spectra.js"
-);
+// importScripts(
+//     "type-jig.js",
+//     "plover-translations.js",
+//     "spectra/rules.js",
+//     "spectra/spectra.js"
+// );
 
 var translations;
 
 var allWords = [];
 var options;
-onmessage = function (e) {
-    console.log("Message received from main script. V2", e.data);
-    // var workerResult = "Result: " + e.data;
-    allWords = e.data.words;
-    translations = e.data.translations;
-    options = e.data.options;
+// onmessage = function (e) {
+//     console.log("Message received from main script. V2", e.data);
+//     allWords = e.data.words;
+//     translations = e.data.translations;
+//     options = e.data.options;
+
+//     processAllWords();
+// };
+
+function compute(data) {
+    console.log("Message received from main script. V2", data);
+    allWords = data.words;
+    translations = data.translations;
+    options = data.options;
 
     processAllWords();
-};
-function lookup(text) {
-    for (let index = 0; index < translations.length; index++) {
-        const dictionary = translations[index];
+}
 
-        // console.log("Looking up", text, index);
+function lookup(text) {
+    for (const element of translations) {
+        const dictionary = element;
 
         var strokes = lookupEntry(text, dictionary);
         if (!strokes) {
