@@ -4,8 +4,10 @@
 <head>
 	<meta charset="utf-8">
 	<title>Steno Grade</title>
-	<link href="style.css" rel="stylesheet" type="text/css">
+	<link href="style.less" rel="stylesheet/less" type="text/css" />
 	<link rel="stylesheet" type="text/css" href="font-roboto.css">
+	<script src="libs/less.js"></script>
+	<script src="libs/jquery-3.6.0.min.js"></script>
 	<script src="utils/util.js"></script>
 </head>
 
@@ -80,6 +82,9 @@
 	<script>
 		setTheme()
 		if (storageAvailable('localStorage')) {
+
+
+
 			let wrapper = document.querySelector('.wrapper')
 			let isDark = localStorage.theme === 'dark'
 			let checkbox = document.createElement('input')
@@ -89,62 +94,81 @@
 			checkbox.addEventListener('input', function (e) {
 				if (e.target.checked) {
 					localStorage.theme = 'dark'
-					document.body.setAttribute('data-theme', localStorage.theme)
 				} else {
-					delete localStorage.theme
-					document.body.removeAttribute('data-theme')
+					localStorage.theme = 'light'
 				}
+				setTheme()
 			})
 			wrapper.appendChild(checkbox)
 			let label = document.createElement('label')
 			label.setAttribute('for', 'night-mode')
 			label.appendChild(document.createTextNode(' Night Mode'))
 			wrapper.appendChild(label)
+
+
+			N($('.wrapper'), [
+				N('input', {
+					id: 'night-mode',
+					type: 'checkbox',
+					checked: localStorage.theme === 'dark',
+					oninput: function (e) {
+						if (e.target.checked) {
+							localStorage.theme = 'dark'
+						} else {
+							localStorage.theme = 'light'
+						}
+						setTheme()
+					}
+				}),
+				N('label', {
+					for: 'night-mode'
+				}, " Night Mode")
+			])
 		} else {
 			document.body.appendChild(document.createTextNode('localStorage not available.'))
 		}
 
-		document.getElementById("submit").addEventListener("click", function (event) {
-			console.log("clicked");
-			event.preventDefault();
-			var filesToUpload = document.getElementById("fileToUpload1").files[0];
-			var filesToUpload2 = document.getElementById("fileToUpload2").files[0];
-			var filesToUpload3 = document.getElementById("fileToUpload3").files[0];
-			var filesToUpload4 = document.getElementById("fileToUpload4").files[0];
+		// document.getElementById("submit").addEventListener("click", function (event) {
+		// 	console.log("clicked");
+		// 	event.preventDefault();
+		// 	var filesToUpload = document.getElementById("fileToUpload1").files[0];
+		// 	var filesToUpload2 = document.getElementById("fileToUpload2").files[0];
+		// 	var filesToUpload3 = document.getElementById("fileToUpload3").files[0];
+		// 	var filesToUpload4 = document.getElementById("fileToUpload4").files[0];
 
-			var texts = []
-			if (filesToUpload) texts.push(filesToUpload.text());
-			if (filesToUpload2) texts.push(filesToUpload2.text());
-			if (filesToUpload3) texts.push(filesToUpload3.text());
-			if (filesToUpload4) texts.push(filesToUpload4.text());
-
-
-			Promise.all(texts).then(function (values) {
-				console.log(values);
-				customDictionaries = values;
-				localStorage.setItem("customDictionaries", JSON.stringify(customDictionaries));
-
-				// var reader = new FileReader();
-				// reader.onload = function (e) {
-				//     var text = reader.result;
-				//     console.log(text);
-
-				//     //Get the local storage value customDictionaries. The value is a list of dictionaries.
-				//     var customDictionaries = JSON.parse(localStorage.getItem("customDictionaries"));
-				//     if (customDictionaries == null) {
-				//         customDictionaries = [];
-				//     }
-
-				//     //Add the dictionary to the list of dictionaries
-				//     customDictionaries[index] = text;
-				//     //Save the list of dictionaries to local storage
-				// };
-				// reader.readAsText(filesToUpload);
-			});
+		// 	var texts = []
+		// 	if (filesToUpload) texts.push(filesToUpload.text());
+		// 	if (filesToUpload2) texts.push(filesToUpload2.text());
+		// 	if (filesToUpload3) texts.push(filesToUpload3.text());
+		// 	if (filesToUpload4) texts.push(filesToUpload4.text());
 
 
+		// 	Promise.all(texts).then(function (values) {
+		// 		console.log(values);
+		// 		customDictionaries = values;
+		// 		localStorage.setItem("customDictionaries", JSON.stringify(customDictionaries));
 
-		});
+		// 		// var reader = new FileReader();
+		// 		// reader.onload = function (e) {
+		// 		//     var text = reader.result;
+		// 		//     console.log(text);
+
+		// 		//     //Get the local storage value customDictionaries. The value is a list of dictionaries.
+		// 		//     var customDictionaries = JSON.parse(localStorage.getItem("customDictionaries"));
+		// 		//     if (customDictionaries == null) {
+		// 		//         customDictionaries = [];
+		// 		//     }
+
+		// 		//     //Add the dictionary to the list of dictionaries
+		// 		//     customDictionaries[index] = text;
+		// 		//     //Save the list of dictionaries to local storage
+		// 		// };
+		// 		// reader.readAsText(filesToUpload);
+		// 	});
+
+
+
+		// });
 	</script>
 
 </body>

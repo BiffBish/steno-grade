@@ -5,6 +5,14 @@ html, body {
 	scroll-behavior: smooth;
 }
 
+* {
+	box-sizing: border-box;
+	&:before, &:after {
+		box-sizing: border-box;
+	}
+	text-decoration: none;
+}
+
 :root {
 
 	--main-bg: #fff;
@@ -21,6 +29,9 @@ html, body {
 
 
 	--form-border-thickness: 1px;
+
+
+	--form-gap: 0.5em;
 }
 
 [data-theme="dark"] {
@@ -47,7 +58,7 @@ body {
 }
 
 .wrapper {
-	max-width: 44em;
+	max-width: 50em;
 	margin: 0 auto;
 	padding: 1em;
 }
@@ -72,25 +83,80 @@ body {
 	top: 20px;
 	background: var(--main-bg);
 }
-.form-section, .clickable-form-section  {
-	padding: 0.8em 1em;
-	margin: 0.5em 0;
+
+
+
+.form-border {
 	border: var(--form-border-thickness) solid var(--form-border);
 	border-radius: 0.2em;
 	box-shadow: 0.1em 0.2em 0.4em var(--form-shadow);
 }
-.selected-form-section {
+
+.form-section {
+	.form-border();
+	padding: 0.8em 1em;
+	margin: var(--form-gap) 0;
+
+		position: relative;
+
+	.form-section__submit-button {
+		.form-border();
+		position: absolute;
+		top: 0em;
+		left: calc(100% + var(--form-gap));
+
+		height: 100%;
+		width: 5em;
+		.center();
+
+		//Act like a form button
+		&::after {
+			
+			content: "\2192";
+			font-size: 4em;
+			font-weight: bold;
+			color: var(--main-fg);
+		}
+
+
+		&:hover {
+			border-color: var(--link-text);
+			cursor: pointer;
+			color: var(--link-text);
+		}
+		background: none;
+	}
+
+	&:has(.form-section__submit-button:hover) {
+		border-color: var(--link-text);
+		cursor: pointer;
+		color: var(--link-text);
+	}
+}
+
+.clickable-form-section {
+	.form-section();
+	color: var(--main-fg);
+	&:hover {
+		border-color: var(--link-text);
+		cursor: pointer;
+		color: var(--link-text);
+	}
+
+	h1, h2, h3, h4, h5, h6 {
+		margin: 0;
+	}
+}
+a .clickable-form-section * {
+	text-decoration: none;
+}
+
+.form-section--selected {
 	border-color: red
 }
-a .clickable-form-section {
-	text-decoration: none
-}
+
 /* On hover */
-.clickable-form-section:hover {
-	border-color: var(--link-text);
-	cursor: pointer;
-	color: var(--link-text);
-}
+
 .no-link-formatting {
 	text-decoration: none;
 	color: inherit !important;
@@ -110,9 +176,8 @@ form.drill-options {
 	box-sizing: border-box;
 }
 
-form.drill-options input,
-form.drill-options button {
-	padding: 0.1em 0.6em;
+form.drill-options input{
+	// padding: 0.1em 1em;
 	margin: 0.5em 0.2em;
 }
 
@@ -203,7 +268,17 @@ a, a:visited {
 .clock { font-size: 300%; text-align: center; }
 
 .wpm { font-size: 170%; text-align: center; }
-.center { text-align: center; }
+.center { 
+	text-align: center; 
+	/* Vertical centering */
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.half-scale {
+	transform: scale(0.5);
+}
 
 /* Navigation */
 .navigation a {
@@ -212,10 +287,18 @@ a, a:visited {
 .navigation a:not(:last-child) {
     margin-right: 30px;
 }
-.shortcutkey {
+
+
+
+.shortcut-key {
     font-size: small;
     vertical-align: middle;
 }
+
+
+
+
+
 .caption {
 	font-size: x-large;
 	vertical-align: middle;
@@ -297,4 +380,31 @@ a, a:visited {
 
 #corrections td {
 	text-align: center;
+}
+
+
+.row {
+	display: flex;
+	flex-direction: row;
+}
+
+.flex {
+	flex: 1 0;
+}
+
+.button-radio-row {
+	display: flex;
+	flex-direction: row;
+	gap: 0.5em;
+	 
+	/* Affect children elements */
+}
+
+
+
+.button-radio-row > * {
+	flex: 1 0;
+
+	/* Align children elements in the center */
+	align-self: stretch;
 }

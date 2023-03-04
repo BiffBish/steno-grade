@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8" />
         <title>Steno Grade</title>
-        <link href="style.css" rel="stylesheet" type="text/css" />
+        <link href="style.less" rel="stylesheet/less" type="text/css" />
         <script src="type-jig.js"></script>
         <script src="utils/util.js"></script>
         <script src="word-drill.js"></script>
@@ -12,6 +12,8 @@
         <script src="word-sets.js"></script>
         <script src="plover-translations.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+        <script src="libs/less.js" ></script>
         <script src="libs/chart.js"></script>
         <script src="chartjs-plugin-datalabels.js"></script>
         <script src="spectra/spectra.js"></script>
@@ -21,6 +23,13 @@
     <body>
         <div id="form" class="wrapper">
             <h1>Choose a drill...</h1>
+
+            <a href="index.html"> 
+                <div class="clickable-form-section center" id="word-drill">
+                    <h2>Go back</h2>
+                </div>
+            </a>
+
 
             <div class="form-section">
                 <div class="caption">
@@ -188,9 +197,9 @@
                         value="1"
                     />
                     times.<br />
-
-                    <button>Start Drill &rarr;</button>
+                    <button class="form-section__submit-button"></button>
                 </form>
+
             </div>
 
             <div class="form-section">
@@ -208,7 +217,7 @@
                     times.<br />
                     (e.g. "EFPLT/EFPLS/EFPLTS EBGD/EBGZ/EBGDZ": strokes
                     separated by slashes, sets separated by spaces)<br />
-                    <button>Start Drill &rarr;</button>
+                    <button class="form-section__submit-button" ></button>
                 </form>
             </div>
 
@@ -247,11 +256,11 @@
                         min="25"
                         max="1000"
                         step="25"
+                        style=" width: 4em;"
                     />
                     each time)
                     <br />
-
-                    <button>Start Drill &rarr;</button>
+                    <button class="form-section__submit-button"></button>
                 </form>
             </div>
 
@@ -306,10 +315,8 @@
                                         : "gutenberg.html";
                             });
                     </script>
-
-                    <button>Start Drill &rarr;</button>
+                <button class="form-section__submit-button"></button>
                 </form>
-
                 <footer>
                     extracted from
                     <a href="https://www.gutenberg.org/">Project Gutenberg</a>
@@ -342,7 +349,7 @@
                         );
                     </script>
 
-                    <button>Start Drill &rarr;</button>
+                    <button class="form-section__submit-button"></button>
                 </form>
             </div>
 
@@ -393,8 +400,7 @@
                                 '">'
                         );
                     </script>
-
-                    <button>Start Drill &rarr;</button>
+                    <button class="form-section__submit-button"></button>
                 </form>
             </div>
             <div class="form-section">
@@ -454,7 +460,7 @@
                             >
                         </li>
                     </ul>
-                    <button>Start Drill &rarr;</button>
+                    <button class="form-section__submit-button"></button>
                 </form>
             </div>
 
@@ -482,7 +488,7 @@
                     minutes.
                     <br />
 
-                    <button>Start Drill &rarr;</button>
+                    <button class="form-section__submit-button"></button>
                 </form>
             </div>
 
@@ -506,8 +512,9 @@
                     minutes.
                     <br />
 
-                    <button>Start Drill &rarr;</button>
+                    <button class="form-section__submit-button"></button>
                 </form>
+
             </div>
 
             <div class="form-section">
@@ -534,7 +541,7 @@
                     />
                     times.<br />
 
-                    <button>Start Drill &rarr;</button>
+                    <button class="form-section__submit-button"></button>
                 </form>
             </div>
 
@@ -695,10 +702,6 @@
             initializeButtons(jig);
         }
 
-        window.onload = function () {};
-
-        //
-
         loadSettings();
         if (storageAvailable("localStorage") && localStorage.custom != null) {
             let custom = document.getElementById("custom");
@@ -715,9 +718,8 @@
                 initializeButtons(jig);
             } else {
                 // Add event listeners to get settings before submitting.
-                var forms = document.querySelectorAll("form");
-                for (var i = 0; i < forms.length; ++i) {
-                    var form = forms[i];
+                // var forms = document.querySelectorAll("form");
+                for (const form of $("form")) {
                     if (form.id === "custom") {
                         form.addEventListener("submit", runCustom);
                     }
@@ -737,63 +739,58 @@
             $("body").keydown(function (e) {
                 // console.log(e);
                 //prevent deafault
-                // e.preventDefault();
+                //If key is down find the div with the class "form-section--selected". If there is no div with the class "form-section--selected" then select the first div.
+                //Then set the div below it to be the div with the class "form-section--selected".
+                var keyString = e.key;
+                switch (keyString) {
+                    case "Enter":
+                        // Enter key
+                        var selected = $(".form-section--selected");
+                        //Find the button inside of the selected div and click it. recurse
+                        console.log(selected);
+                        selected.find("button").click();
+                        break;
+                    case " ":
+                        // Space
+                        $("#show-hint").click();
+                        break;
+                    case "ArrowLeft":
+                        // Left arrow
+                        $("#back").click();
+                        break;
+                    case "ArrowRight":
+                        // Right arrow
+                        $("#again").click();
+                        break;
+                   case "ArrowDown":
+                        e.preventDefault();
 
-                //If key is down find the div with the class "selected-form-section". If there is no div with the class "selected-form-section" then select the first div.
-                //Then set the div below it to be the div with the class "selected-form-section".
-
-                var key = e.which;
-                if (key == 13) {
-                    // Enter key
-                    var selected = $(".selected-form-section");
-                    //Find the button inside of the selected div and click it. recurse
-                    console.log(selected);
-                    selected.find("button").click();
-                } else if (key == 32) {
-                    // Space
-                    $("#show-hint").click();
-                } else if (key == 37) {
-                    // Left arrow
-                    $("#back").click();
-                } else if (key == 39) {
-                    // Right arrow
-                    $("#again").click();
-                } else if (key == 40) {
-                    // Down arrow
-                    var selectedDiv = $(".selected-form-section");
-                    if (selectedDiv.length == 0) {
-                        $(".form-section")
-                            .first()
-                            .addClass("selected-form-section");
-                    } else {
-                        selectedDiv.removeClass("selected-form-section");
-                        selectedDiv.next().addClass("selected-form-section");
-                    }
-                    //scroll to the selected div keeping it centered. but handle fast repeated keystrokes. wait for a second before scrolling.
-
-                    //Wait for a momnet
-                    setTimeout(function () {
-                        $(".selected-form-section")[0].scrollIntoView({
-                            block: "center",
-                        });
-                    }, 10);
-                } else if (key == 38) {
-                    // Up arrow
-                    var selectedDiv = $(".selected-form-section");
-                    if (selectedDiv.length == 0) {
-                        $(".form-section")
-                            .last()
-                            .addClass("selected-form-section");
-                    } else {
-                        selectedDiv.removeClass("selected-form-section");
-                        selectedDiv.prev().addClass("selected-form-section");
-                    }
-                    //scroll to the selected div keeping it centered. but handle fast repeated keystrokes
-                    setTimeout(function () {
-                        $(".selected-form-section")[0].scrollIntoView({
-                            block: "center",
-                        });
-                    }, 10);
+                        // Down arrow
+                        var selectedDiv = $(".form-section--selected");
+                        var targetDiv = selectedDiv.length == 0
+                            ? $(".form-section").first()
+                            : selectedDiv.next();
+                        if (targetDiv.length > 0) {
+                            selectedDiv.removeClass("form-section--selected");
+                            targetDiv.addClass("form-section--selected");
+                            targetDiv[0].scrollIntoView({ block: "center" });
+                        }
+                        break;
+                    case "ArrowUp":
+                        e.preventDefault();
+                        // Up arrow
+                        var selectedDiv = $(".form-section--selected");
+                        var targetDiv = selectedDiv.length == 0
+                            ? $(".form-section").first()
+                            : selectedDiv.prev();
+                        if (targetDiv.length > 0) {
+                            selectedDiv.removeClass("form-section--selected");
+                            targetDiv.addClass("form-section--selected");
+                            targetDiv[0].scrollIntoView({ block: "center" });
+                        }
+                        break;
+                    default:
+                        break;
                 }
             });
         });

@@ -16,47 +16,129 @@ function populatePage(options) {
     // 	<p id="strokes"></p>
     // 	<p id="clock" class="clock"></p>
     // 	<p id="live-wpm-display" class="wpm"></p>
-    // 	<p class="center"><a id="back" title="LeftArrow">&larr; Back to Menu <span class="shortcutkey">(LeftArrow)</span></a></p>
-    // 	<p class="center"><a id="again" title="Enter">&#8634; Repeat Drill <span class="shortcutkey">(Enter 3x)</span></a></p>
-    // 	<p class="center"><a id="end" title="Enter">&Cross; End Drill <span class="shortcutkey">(Tab 3x)</span></a></p>
-    // 	<p class="center"><a id="new" title="RightArrow">&rarr; New Drill <span class="shortcutkey">(RightArrow)</span></a></p>
+    // 	<p class="center"><a id="back" title="LeftArrow">&larr; Back to Menu <span class="shortcut-key">(LeftArrow)</span></a></p>
+    // 	<p class="center"><a id="again" title="Enter">&#8634; Repeat Drill <span class="shortcut-key">(Enter 3x)</span></a></p>
+    // 	<p class="center"><a id="end" title="Enter">&Cross; End Drill <span class="shortcut-key">(Tab 3x)</span></a></p>
+    // 	<p class="center"><a id="new" title="RightArrow">&rarr; New Drill <span class="shortcut-key">(RightArrow)</span></a></p>
     // </div>
     //Populate the lession div with the html above
-    var lesson = document.getElementById("lesson");
-    lesson.innerHTML = `
-    <div id="leftside">
-		<h3 id="lesson-name" class="center"></h3>
-		<div id="drill-content">
-			<div id="answer"></div>
-			<div id="exercise"></div>
-			<div id="results"></div>
-			<div style="height: 300px">
-				<canvas id="chartDiv" width="400" height="400"></canvas>
-			</div>
-            <table id="corrections" style="display:none">
-                <tr>
-                    <th>Expected</th>
-                    <th>Hesitation</th>
-                    <th>Attempts</th>
-                </tr>
-            </table>
-		</div>
-	</div>
+    // var lesson = document.getElementById("lesson");
+    // lesson.innerHTML = `
+    // <div id="leftside">
+    // 	<h3 id="lesson-name" class="center"></h3>
+    // 	<div id="drill-content">
+    // 		<div id="answer"></div>
+    // 		<div id="exercise"></div>
+    // 		<div id="results"></div>
+    // 		<div style="height: 300px">
+    // 			<canvas id="chartDiv" width="400" height="400"></canvas>
+    // 		</div>
+    //         <table id="corrections" style="display:none">
+    //             <tr>
+    //                 <th>Expected</th>
+    //                 <th>Hesitation</th>
+    //                 <th>Attempts</th>
+    //             </tr>
+    //         </table>
+    // 	</div>
+    // </div>
 
-	<div id="nav">
-		<p id="stroke-hint"></p>
-		<p class="strokes"></p>
-		<p id="clock" class="clock"></p>
-		<p id="live-wpm-display" class="wpm"></p>
-		<p class="center"><a id="back" title="LeftArrow">&larr; Back to Menu <span class="shortcutkey">(LeftArrow)</span></a></p>
-		<p class="center"><a id="again" title="Enter">&#8634; Repeat Drill <span class="shortcutkey">(Enter 3x)</span></a></p>
-		<p class="center"><a id="end" title="Enter">&Cross; End Drill <span class="shortcutkey">(Tab 3x)</span></a></p>
-		<p class="center"><a id="new" title="RightArrow">&rarr; New Drill <span class="shortcutkey">(RightArrow)</span></a></p>
-        <p class="center"><a id="show-hint" title="UpArrow">Show Hint <span class="shortcutkey">(UpArrow)</span></a></p>
-		<p class="center"><a id="hide-hint" title="UpArrow">Hide Hint <span class="shortcutkey">(DownArrow)</span></a></p>
-	</div>
-    <textarea id="input"></textarea>
-    `;
+    // <div id="nav">
+    // 	<p id="stroke-hint"></p>
+    // 	<p class="strokes"></p>
+    // 	<p id="clock" class="clock"></p>
+    // 	<p id="live-wpm-display" class="wpm"></p>
+    // 	<p class="center"><a id="back" title="LeftArrow">&larr; Back to Menu <span class="shortcut-key">(LeftArrow)</span></a></p>
+    // 	<p class="center"><a id="again" title="Enter">&#8634; Repeat Drill <span class="shortcut-key">(Enter 3x)</span></a></p>
+    // 	<p class="center"><a id="end" title="Enter">&Cross; End Drill <span class="shortcut-key">(Tab 3x)</span></a></p>
+    // 	<p class="center"><a id="new" title="RightArrow">&rarr; New Drill <span class="shortcut-key">(RightArrow)</span></a></p>
+    //     <p class="center"><a id="show-hint" title="UpArrow">Show Hint <span class="shortcut-key">(UpArrow)</span></a></p>
+    // 	<p class="center"><a id="hide-hint" title="UpArrow">Hide Hint <span class="shortcut-key">(DownArrow)</span></a></p>
+    // </div>
+    // <textarea id="input"></textarea>
+    // `;
+
+    let leftSide = N("div", { id: "leftside" }, [
+        N("h3", { id: "lesson-name", class: "center" }),
+        N("div", { id: "drill-content" }, [
+            N("div", { id: "answer" }),
+            N("div", { id: "exercise" }),
+            N("div", { id: "results" }),
+            N("div", { style: "height: 300px" }, [
+                N("canvas", { id: "chartDiv", width: "400", height: "400" }),
+            ]),
+            N("table", { id: "corrections", style: "display:none" }, [
+                N("tr", {}, [
+                    N("th", {}, "Expected"),
+                    N("th", {}, "Hesitation"),
+                    N("th", {}, "Attempts"),
+                ]),
+            ]),
+        ]),
+    ]);
+
+    let rightButtons = [
+        {
+            id: "back",
+            title: "LeftArrow",
+            text: "&larr; Back to Menu ",
+            shortcut: "(LeftArrow)",
+        },
+        {
+            id: "again",
+            title: "Enter",
+            text: "&#8634; Repeat Drill ",
+            shortcut: "(Enter 3x)",
+        },
+        {
+            id: "end",
+            title: "Enter",
+            text: "&Cross; End Drill ",
+            shortcut: "(Tab 3x)",
+        },
+        {
+            id: "new",
+            title: "RightArrow",
+            text: "&rarr; New Drill ",
+
+            shortcut: "(RightArrow)",
+        },
+        {
+            id: "show-hint",
+            title: "UpArrow",
+            text: "Show Hint ",
+            shortcut: "(UpArrow)",
+        },
+        {
+            id: "hide-hint",
+            title: "Down Arrow",
+            text: "Hide Hint ",
+            shortcut: "(DownArrow)",
+        },
+    ];
+
+    let nav = N("div", { id: "nav" }, [
+        N("p", { id: "stroke-hint" }),
+        N("p", { class: "strokes" }),
+        N("p", { id: "clock", class: "clock" }),
+        N("p", { id: "live-wpm-display", class: "wpm" }),
+        ...rightButtons.map((button) => {
+            return N("p", { class: "center" }, [
+                N("a", { id: button.id, title: button.title }, button.text),
+                N("span", { class: "shortcut-key" }, button.shortcut),
+            ]);
+        }),
+    ]);
+
+    let textarea = N("textarea", { id: "input" });
+
+    let lesson = $("#lesson").get(0);
+
+    console.log(lesson);
+
+    N(lesson, [leftSide, nav, textarea]);
+
+    // document.body.appendChild(lesson);
 
     //Get the leftside element and add this html below lesson-name
     // <p style="text-align: center; padding-bottom: 3em">
@@ -232,26 +314,31 @@ function setTheme() {
         //get both settings and custom settings. merging them
         var settings = localStorage.getItem("settings") ?? "{}";
         var customSettings = localStorage.getItem("custom_settings") ?? "{}";
-        var mS = {
+        var mergedSettings = {
             ...(JSON.parse(settings) ?? {}),
             ...(JSON.parse(customSettings) ?? {}),
         };
+        localStorage.theme ??= "dark";
 
         if (localStorage.theme == null) {
             document.body.removeAttribute("data-theme");
         } else {
             document.body.setAttribute("data-theme", localStorage.theme);
         }
-        console.log("Setting theme", mS);
+        console.log("Setting theme", mergedSettings);
         //Get the settings from local storage
-        if (mS) {
+        if (mergedSettings) {
             //Add a varable to the root element to set boredr thickness
             var root = document.documentElement;
             var body = document.body;
-            setCustomThemeSetting("main-bg", mS.theme_background_color, true);
+            setCustomThemeSetting(
+                "main-bg",
+                mergedSettings.theme_background_color,
+                true
+            );
             setCustomThemeSetting(
                 "form-border-thickness",
-                mS.theme_form_border_thickness ?? "1px"
+                mergedSettings.theme_form_border_thickness ?? "1px"
             );
         }
     }
@@ -437,14 +524,24 @@ function displayOnly(show) {
 
 function N(target, ...args) {
     const el =
-        typeof target === "string" ? document.createElement(target) : target;
+        typeof target === "string"
+            ? document.createElement(target)
+            : //Handle if the target is a JQuery object
+            target instanceof jQuery
+            ? target[0]
+            : target;
     for (const arg of args) {
         if (arg instanceof Element || arg instanceof Text) {
             el.appendChild(arg);
         } else if (Array.isArray(arg)) {
             N(el, ...arg);
         } else if (typeof arg === "string") {
-            el.appendChild(document.createTextNode(arg));
+            // Add a text node and allow for HTML entities
+            const textNode = document.createTextNode("");
+            const tempDiv = document.createElement("div");
+            tempDiv.innerHTML = arg;
+            textNode.nodeValue = tempDiv.textContent;
+            el.appendChild(textNode);
         } else if (arg instanceof Object) {
             for (const k in arg) {
                 const v = arg[k];

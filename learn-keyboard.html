@@ -3,12 +3,14 @@
     <head>
         <meta charset="utf-8" />
         <title>Learn the Steno Keyboard</title>
-        <link href="style.css" rel="stylesheet" type="text/css" />
+        <link href="style.less" rel="stylesheet/less" type="text/css" />
         <script src="type-jig.js"></script>
         <script src="utils/util.js"></script>
         <script src="word-drill.js"></script>
         <script src="utils/steno-display.js"></script>
         <script src="learn-keyboard.js"></script>
+
+        <script src="libs/less.js" ></script>
         <script src="libs/chart.js"></script>
         <script src="chartjs-plugin-datalabels.js"></script>
         <link rel="stylesheet" type="text/css" href="font-roboto.css" />
@@ -22,6 +24,11 @@
                         >How to get raw steno output</a
                     >
                 </p>
+                <a href="index.html"> 
+                    <div class="clickable-form-section center" id="word-drill">
+                        <h2>Go back</h2>
+                    </div>
+                </a>
                 <div class="form-section">
                     <form id="selectDrill">
                         <ul style="list-style-type: none">
@@ -48,8 +55,8 @@
                                     Speed (strokes per minute).</label
                                 >
                             </li>
-                            <li><input type="submit" value="Go" /></li>
                         </ul>
+                        <div class="form-section__submit-button"></div>
                     </form>
                 </div>
             </div>
@@ -82,19 +89,19 @@
                 <p class="center">
                     <a id="back" title="LeftArrow"
                         >&larr; Back to Menu
-                        <span class="shortcutkey">(LeftArrow)</span></a
+                        <span class="shortcut-key">(LeftArrow)</span></a
                     >
                 </p>
                 <p class="center">
                     <a id="again" title="Enter"
                         >&#8634; Restart
-                        <span class="shortcutkey">(Enter 3x)</span></a
+                        <span class="shortcut-key">(Enter 3x)</span></a
                     >
                 </p>
                 <p class="center">
                     <a id="end" title="Enter"
                         >&Cross; End
-                        <span class="shortcutkey">(Tab 3x)</span></a
+                        <span class="shortcut-key">(Tab 3x)</span></a
                     >
                 </p>
             </div>
