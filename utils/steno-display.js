@@ -51,7 +51,9 @@ function StenoDisplay(container, translations, showEmpty) {
     this.hintComputer = new Worker(workerUrl);
 
     this.hintComputer.onmessage = (event) => {
-        // console.log("Hint computer message", event.data);
+        if (!event.data) {
+            return;
+        }
         let result = event.data;
         this.cachedHints[result.text] = result.lookup;
     };

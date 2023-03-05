@@ -49,22 +49,25 @@
 			</div>
 		</a>
 		<br />
-		<a href="custom-dictionary-upload.html" class="button no-link-formatting ">
-			<div class="clickable-form-section">
+		<!-- <a href="custom-dictionary-upload.html" class="button no-link-formatting "> -->
+			<div class="form-section--disabled">
+				<b class="red">Under repair</b>
+
 				<div class="caption">
 					Upload a custom <strong>Dictionary</strong>
 				</div>
 				Do you have a custom made dictionary that differs from plovers default? Upload it here to improve the dynamic hint system
 			</div>
-		</a>
-		<a href="improvements.html" class="button no-link-formatting ">
-			<div class="clickable-form-section">
+		<!-- </a> -->
+		<!-- <a href="improvements.html" class="button no-link-formatting "> -->
+			<div class="form-section--disabled">
+				<b class="red">Under repair</b>
 				<div class="caption">
 					View <strong>Statistics</strong>
 				</div>
 				Have you been using this site for a while? View your statistics here!
 			</div>
-		</a>
+		<!-- </a> -->
 		<h1>Nerd Zone</h1>
 
 			<a href="custom-settings.html" class="button no-link-formatting ">
@@ -83,47 +86,72 @@
 		setTheme()
 		if (storageAvailable('localStorage')) {
 
-
-
 			let wrapper = document.querySelector('.wrapper')
-			let isDark = localStorage.theme === 'dark'
-			let checkbox = document.createElement('input')
-			checkbox.setAttribute('id', 'night-mode')
-			checkbox.setAttribute('type', 'checkbox')
-			checkbox.checked = isDark
-			checkbox.addEventListener('input', function (e) {
-				if (e.target.checked) {
-					localStorage.theme = 'dark'
-				} else {
-					localStorage.theme = 'light'
-				}
-				setTheme()
-			})
-			wrapper.appendChild(checkbox)
-			let label = document.createElement('label')
-			label.setAttribute('for', 'night-mode')
-			label.appendChild(document.createTextNode(' Night Mode'))
-			wrapper.appendChild(label)
+			// let isDark = localStorage.theme === 'dark'
+			// let checkbox = document.createElement('input')
+			// checkbox.setAttribute('id', 'night-mode')
+			// checkbox.setAttribute('type', 'checkbox')
+			// checkbox.checked = isDark
+			// checkbox.addEventListener('input', function (e) {
+			// 	if (e.target.checked) {
+			// 		localStorage.theme = 'dark'
+			// 	} else {
+			// 		localStorage.theme = 'light'
+			// 	}
+			// 	setTheme()
+			// })
+			// wrapper.appendChild(checkbox)
+			// let label = document.createElement('label')
+			// label.setAttribute('for', 'night-mode')
+			// label.appendChild(document.createTextNode(' Night Mode'))
+			// wrapper.appendChild(label)
 
 
+			let theme_select = N(
+				"select",
+				{
+					id: "themeable",
+					onchange: (e) => {
+						console.log(e.target.value);
+						// let theme = e.target.value;
+						// localStorage.setItem("theme", theme);
+						// setTheme();
+					},
+				},
+				[
+					N("optgroup", { label: "Light Themes" }, [
+						N("option", { value: "light" }, "Light"),
+						N("option", { value: "oasis" }, "Oasis"),
+						N("option", { value: "ocean" }, "Ocean"),
+						N("option", { value: "rustic" }, "Rustic"),
+					]),
+					N("optgroup", { label: "Dark Themes" }, [
+						N("option", { value: "dark" }, "Dark"),
+						N("option", { value: "breeze" }, "Breeze"),
+						N("option", { value: "retro-pop" }, "Retro Pop"),
+						N("option", { value: "autumn" }, "Autumn"),
+						N("option", { value: "odyssey" }, "Odyssey"),
+					]),
+				]
+			);
+
+			theme_select.value = localStorage.getItem("theme") || "light";
+
+			theme_select.onchange = (e) => {
+				let theme = e.target.value;
+				localStorage.setItem("theme", theme);
+				setTheme();
+			};
 			N($('.wrapper'), [
-				N('input', {
-					id: 'night-mode',
-					type: 'checkbox',
-					checked: localStorage.theme === 'dark',
-					oninput: function (e) {
-						if (e.target.checked) {
-							localStorage.theme = 'dark'
-						} else {
-							localStorage.theme = 'light'
-						}
-						setTheme()
-					}
-				}),
-				N('label', {
-					for: 'night-mode'
-				}, " Night Mode")
+				N("p", { class: "center" }, "Choose your theme:", [theme_select]),
 			])
+
+
+
+		
+
+
+
 		} else {
 			document.body.appendChild(document.createTextNode('localStorage not available.'))
 		}

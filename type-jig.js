@@ -99,7 +99,8 @@ TypeJig.prototype.reset = function () {
     this.lastTypedWordID = -1;
 
     this.display.style.width = "100%";
-    this.exercise.calculateBreakPoints(this.display);
+    console.log("this.display", this.display);
+    // this.exercise.calculateBreakPoints(this.display);
 
     document.getElementById("corrections").style.display = "none";
     document.getElementById("chartDiv").style.display = "none";
@@ -110,7 +111,7 @@ TypeJig.prototype.reset = function () {
 
     this.resultsDisplay.textContent = "";
     if (this.exercise && !this.exercise.started) {
-        this.display.textContent = "";
+        // this.display.textContent = "";
     }
     spans = this.display.querySelectorAll("span");
     if (this.speed)
@@ -554,8 +555,8 @@ TypeJig.prototype.displayTypedWords = function (typedWords, onResults = false) {
 
         //If the match has any erronius words, display them
         if (word.addedWords) {
-            for (let j = 0; j < word.addedWords.length; j++) {
-                var addedWord = word.addedWords[j];
+            for (const element of word.addedWords) {
+                var addedWord = element;
                 var addedWordNode = document.createElement("span");
                 addedWordNode.appendChild(document.createTextNode(addedWord));
                 if (this.options.show_live_grading || onResults) {
@@ -636,7 +637,11 @@ TypeJig.prototype.displayTypedWords = function (typedWords, onResults = false) {
             if (match == true) {
                 className = "correct";
             }
-            if (persistentData?.failed && this.options.show_corrections) {
+            if (
+                persistentData?.failed &&
+                this.options.show_corrections &&
+                word.correct
+            ) {
                 className = "corrected";
             }
         } else {
@@ -939,21 +944,38 @@ TypeJig.prototype.keyDown = function (e) {
     }
 };
 
-TypeJig.prototype.updateWords = function (words, hardReset) {
+TypeJig.prototype.updateWords = async function (words, hardReset) {
+    await new Promise((resolve) => {
+        setTimeout(resolve, 0);
+    });
+
     var display = this.display;
 
     if (hardReset) {
         display = document.createElement("div");
         display.id = this.display.id;
-        display.style.width = "200%";
+        display.style.width = "100%";
+        this.display.parentNode.replaceChild(display, this.display);
+        console.log(document.body.offsetWidth);
     }
+
+    var enterPoints;
+    if (hardReset) {
+        enterPoints = [];
+    } else {
+        enterPoints = this.exercise.enterPoints;
+    }
+    // var displayStyle = window.getComputedStyle(display);
+
+    var maxWidth = display.offsetWidth;
+    var x = 0;
 
     for (let i = 0; i < words.length; ++i) {
         var word = words[i];
 
         var typedWentOver =
             this.typedWords[i] && this.typedWords[i].typed.length > word.length;
-        if (hardReset) {
+        if (!hardReset) {
             if (this.exercise?.enterPoints?.includes(i)) {
                 display.appendChild(document.createTextNode("\n"));
             }
@@ -967,62 +989,86 @@ TypeJig.prototype.updateWords = function (words, hardReset) {
                 continue;
             }
         }
-
-        var finalObject = document.createElement("span");
-
         //See if the typed word has any erroneous words and account for them
         var erroneousWords =
             this.typedWords[i] && this.typedWords[i].addedWords;
+
+        var finalObject = N("span");
+
         if (erroneousWords) {
-            finalObject.classList.add("complex-word-container");
-            for (let j = 0; j < erroneousWords.length; j++) {
-                var erroneousWord = erroneousWords[j];
-                var div = document.createElement("span");
-                div.style.opacity = 0;
-
-                div.appendChild(document.createTextNode(erroneousWord + " "));
-
-                finalObject.appendChild(div);
-            }
+            N(
+                finalObject,
+                {
+                    class: "complex-word-container",
+                },
+                erroneousWords.map((word) =>
+                    N("span", word + " ", {
+                        style: {
+                            opacity: 0,
+                        },
+                    })
+                )
+            );
         }
 
         if (typedWentOver) {
-            finalObject.classList.add("complex-word-container");
-            // div.style.float = "left"
-
-            var typedSpan = document.createElement("span");
-            typedSpan.style.position = "absolute";
-            typedSpan.style.left = 0;
-            var expectedSpan = document.createElement("span");
-            expectedSpan.style.opacity = 0;
-
-            typedSpan.appendChild(document.createTextNode(word));
-
-            expectedSpan.appendChild(
-                document.createTextNode(this.typedWords[i].typed + " ")
+            N(
+                finalObject,
+                {
+                    class: "complex-word-container",
+                },
+                [
+                    N("span", word, {
+                        style: {
+                            position: "absolute",
+                            left: 0,
+                        },
+                    }),
+                    N("span", this.typedWords[i].typed + " ", {
+                        style: {
+                            opacity: 0,
+                        },
+                    }),
+                ]
             );
-            finalObject.appendChild(typedSpan);
-            finalObject.appendChild(expectedSpan);
         } else {
-            finalObject.style.display = "inline-block";
-
-            finalObject.appendChild(document.createTextNode(word + " "));
+            N(finalObject, word + " ", {
+                style: {
+                    display: "inline-block",
+                },
+            });
         }
 
         if (this.exercise.numOfExpectedWords <= i) {
             finalObject.classList.add("notYet");
         }
         finalObject.id = "word" + i;
-        var existingObject = display.querySelector("#word" + i);
-        if (existingObject) {
-            display.replaceChild(finalObject, existingObject);
-        } else {
+
+        if (hardReset) {
             display.appendChild(finalObject);
+
+            if (finalObject.offsetWidth + x > maxWidth) {
+                display.removeChild(finalObject);
+                display.appendChild(document.createTextNode("\n"));
+                display.appendChild(finalObject);
+                x = 0;
+                enterPoints.push(i);
+            }
+            x += finalObject.offsetWidth;
+        } else {
+            let existingObject = display.querySelector("#word" + i);
+
+            if (existingObject) {
+                display.replaceChild(finalObject, existingObject);
+            } else {
+                display.appendChild(finalObject);
+            }
         }
     }
-    if (hardReset) {
-        this.display.parentNode.replaceChild(display, this.display);
-    }
+
+    this.exercise.enterPoints = enterPoints;
+    display.style.width = "200%";
+
     function focusInput(evt) {
         self.input.focus();
         evt.preventDefault();
@@ -1900,16 +1946,23 @@ TypeJig.Exercise.prototype.calculateBreakPoints = function (display) {
     }
 
     var y = 0;
+    var r = display.getBoundingClientRect();
+    console.log(r, words);
+
+    var x = 0;
+
     for (let i = 0; i < words.length; ++i) {
         var word = words[i];
-        var span = document.createElement("span");
-        span.appendChild(document.createTextNode(word + " "));
+        var span = N("span", word + " ");
+
         display.appendChild(span);
 
-        var r = display.getBoundingClientRect();
-        if (r.bottom > y + 0.001 || word.includes("\n")) {
+        console.log(display);
+
+        console.log(word, span.getBoundingClientRect(), r.width, span);
+        if (word.includes("\n") || x > r.width) {
             if (i != 0) this.enterPoints.push(i);
-            y = r.bottom;
+            x = 0;
         }
         // output.appendChild(document.createTextNode("\n"));
         // if (endOfAnswer) {
@@ -1920,5 +1973,6 @@ TypeJig.Exercise.prototype.calculateBreakPoints = function (display) {
         // 		window.scrollBy(0, r.bottom - limit);
         // }
     }
+    console.log(this.enterPoints);
     return display;
 };

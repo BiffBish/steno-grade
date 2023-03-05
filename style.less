@@ -14,7 +14,6 @@ html, body {
 }
 
 :root {
-
 	--main-bg: #fff;
 	--main-fg: #000;
 	--link-text: #167EE8;
@@ -25,13 +24,20 @@ html, body {
 	--corrected-text-bg: rgb(255, 237, 204);
 	--unknown-text-bg: rgb(187, 187, 187);
 	--incorrect-text-bg: #fcc;
-
-
-
 	--form-border-thickness: 1px;
-
-
 	--form-gap: 0.5em;
+
+	--steno-key-outline: #000;
+    --steno-key-bg: #666;
+	--steno-key-fg: #000;
+	--steno-key-primary-bg: #fe7;
+	--steno-key-primary-fg: #000;
+	--steno-key-secondary-bg: #ff9e77;
+	--steno-key-secondary-fg: #000;
+	--steno-key-tertiary-bg: #ff9;
+	--steno-key-tertiary-fg: #000;
+	--steno-alt-key-bg: #888;
+	--steno-alt-key-fg: #555;
 }
 
 [data-theme="dark"] {
@@ -45,6 +51,221 @@ html, body {
 	--corrected-text-bg: rgb(51, 39, 0);
 	--unknown-text-bg: rgb(37, 37, 37);
 	--incorrect-text-bg: #300;
+
+	--steno-key-outline: #000;
+	--steno-key-primary-bg: #fbec82;
+	--steno-key-primary-fg: #000;
+	--steno-key-secondary-bg: #ff9e77;
+	--steno-key-secondary-fg: #000;
+	--steno-key-tertiary-bg: #8becf6;
+	--steno-key-tertiary-fg: #000;
+	--steno-alt-key-bg: #888;
+	--steno-alt-key-fg: #555;
+	
+}
+
+[data-theme="oasis"] {
+	--main-bg: #fff;
+	--main-fg: #0D1F2D;
+	--link-text: #167EE8;
+	--form-border: #e5e5e5;
+	--form-shadow: #ccc;
+	--answer-text: #555;
+	--correct-text-bg: #cfc;
+	--corrected-text-bg: rgb(255, 237, 204);
+	--unknown-text-bg: rgb(187, 187, 187);
+	--incorrect-text-bg: #fcc;
+
+	--steno-key-primary-bg: #fbec82;
+	--steno-key-primary-fg: #000;
+	--steno-key-secondary-bg: #ff9e77;
+	--steno-key-secondary-fg: #000;
+	--steno-key-tertiary-bg: #8becf6;
+	--steno-key-tertiary-fg: #000;
+	--steno-alt-key-bg: #c2c2c2;
+	--steno-alt-key-fg: #131313;
+	--steno-key-outline: #000;
+	--steno-key-bg: #e4e4e4;
+	--steno-key-fg: #000;
+
+}
+
+[data-theme="breeze"] {
+	--main-bg: #273740;
+	--main-fg: #DEEBF2;
+	--link-text: #68A2C2;
+	--form-border: #A2C2D8;
+	--form-shadow: #273740;
+	--answer-text: #DEEBF2;
+	--correct-text-bg: #68A2C2;
+	--corrected-text-bg: #4D748C;
+	--unknown-text-bg: #1E3346;
+	--incorrect-text-bg: #8C4D4D;
+
+
+	--steno-key-primary-bg: #7ec2c5;
+	--steno-key-primary-fg: #000;
+	--steno-key-secondary-bg: #76c067;
+	--steno-key-secondary-fg: #000;
+	--steno-key-tertiary-bg: #60d947;
+	--steno-key-tertiary-fg: #000;
+	--steno-alt-key-bg: #42525e;
+	--steno-alt-key-fg: #131313;
+	--steno-key-outline: #000;
+	--steno-key-bg: #647a8b;
+	--steno-key-fg: #000;
+}
+
+[data-theme="rustic"] {
+	--main-bg: #593E36;
+	--main-fg: #F3EADE;
+	--link-text: #F08A5D;
+	--form-shadow: #C2A59C;
+	--answer-text: #FFD6C2;
+	--correct-text-bg: #99765C;
+	--corrected-text-bg: #906262;
+	--incorrect-text-bg: #8C3D2F;
+
+
+
+	--steno-key-outline: #000;
+	--steno-key-bg: #957e7e;
+	--steno-key-fg: #000;
+	--steno-key-primary-bg: #f09a9a;
+	--steno-key-primary-fg: #000;
+	--steno-key-secondary-bg: #e86464;
+	--steno-key-secondary-fg: #000;
+	--steno-key-tertiary-bg: #ff9;
+	--steno-key-tertiary-fg: #000;
+	--steno-alt-key-bg: #736060;
+	--steno-alt-key-fg: #0a0a0a;
+}
+
+// [data-theme="vibrant"] {
+// 	--main-bg: #7F5C5A;
+// 	--main-fg: #F8F8F8;
+// 	--link-text: #F65058;
+// 	--form-border: #D7D7D7;
+// 	--form-shadow: #D7D7D7;
+// 	--answer-text: #C1C1C1;
+// 	--correct-text-bg: #4F4F4F;
+// 	--corrected-text-bg: #6F6F6F;
+// 	--unknown-text-bg: #B3B3B3;
+// 	--incorrect-text-bg: #E62B1E;
+// }
+
+// [data-theme="serenity"] {
+// 	--main-bg: #6B7F8C;
+// 	--main-fg: #F2F2F2;
+// 	--link-text: #40798C;
+// 	--form-border: #B5D4DD;
+// 	--form-shadow: #6B7F8C;
+// 	--answer-text: #BFD4D4;
+// 	--correct-text-bg: #40798C;
+// 	--corrected-text-bg: #A3C1B8;
+// 	--unknown-text-bg: #9FA8B3;
+// 	--incorrect-text-bg: #B83232;
+// }
+
+[data-theme="retro-pop"] {
+	--main-bg: #4A4E4D;
+	--main-fg: #F0D9B5;
+	--link-text: #FF5757;
+	--form-border: #C5D5CB;
+	--form-shadow: #4A4E4D;
+	--answer-text: #F0D9B5;
+	--correct-text-bg: #ae7f5b;
+	--corrected-text-bg: #70554C;
+	--unknown-text-bg: #9E9E9E;
+	--incorrect-text-bg: #B84930;
+
+	--steno-key-outline: #000;
+	--steno-key-bg: #a2a2a2;
+	--steno-key-fg: #000;
+	--steno-key-primary-bg: #e7d5a0;
+	--steno-key-primary-fg: #000;
+	--steno-key-secondary-bg: #dd8282;
+	--steno-key-secondary-fg: #000;
+	--steno-key-tertiary-bg: #99f1ff;
+	--steno-key-tertiary-fg: #000;
+	--steno-alt-key-bg: #847979;
+	--steno-alt-key-fg: #0a0a0a;
+}
+
+[data-theme="ocean"] {
+	--main-bg: #316598;
+	--main-fg: #B6E8E8;
+	--link-text: #74C8FF;
+	--form-border: #BDC3C7;
+	--form-shadow: #2C3E50;
+	--answer-text: #C9FBF4;
+	--correct-text-bg: #61BBCC;
+	--corrected-text-bg: #68A6D4;
+	--unknown-text-bg: #7F8C8D;
+	--incorrect-text-bg: #BD5F55;
+
+
+	--steno-key-outline: #000;
+	--steno-key-bg: #80b0d1;
+	--steno-key-fg: #000;
+	--steno-key-primary-bg: #17bbee;
+	--steno-key-primary-fg: #000;
+	--steno-key-secondary-bg: #009fff;
+	--steno-key-secondary-fg: #000;
+	--steno-key-tertiary-bg: #99f1ff;
+	--steno-key-tertiary-fg: #000;
+	--steno-alt-key-bg: #69879b;
+	--steno-alt-key-fg: #000;
+}
+
+[data-theme="autumn"] {
+	--main-bg: #392C50;
+	--main-fg: #FDEBD0;
+	--link-text: #9B59B6;
+	--form-border: #D7BDE2;
+	--form-shadow: #2C3E50;
+	--answer-text: #FADBD8;
+	--correct-text-bg: #A474DE;
+	--corrected-text-bg: #7B79B5;
+	--unknown-text-bg: #7F8C8D;
+	--incorrect-text-bg: #C02B63;
+	
+	--steno-key-outline: #000;
+	--steno-key-bg: #9680d1;
+	--steno-key-fg: #000;
+	--steno-key-primary-bg: #aa41c7;
+	--steno-key-primary-fg: #000;
+	--steno-key-secondary-bg: #6d3ed5;
+	--steno-key-secondary-fg: #000;
+	--steno-key-tertiary-bg: #bf1cbb;
+	--steno-key-tertiary-fg: #000;
+	--steno-alt-key-bg: #715c91;
+	--steno-alt-key-fg: #000;
+}
+
+[data-theme="odyssey"] {
+	--main-bg: #2C5030;
+	--main-fg: #FFF;
+	--link-text: #F1C40F;
+	--form-border: #ABB2B9;
+	--form-shadow: #2C3E50;
+	--answer-text: #C9FFD2;
+	--correct-text-bg: #2EF31266;
+	--corrected-text-bg: #BEDB3487;
+	--unknown-text-bg: #7F8C8D;
+	--incorrect-text-bg: #E7443CC4;
+
+	--steno-key-bg: #729771;
+	--steno-key-fg: #000;
+	--steno-key-primary-bg: #94da6d;
+	--steno-key-primary-fg: #000;
+	--steno-key-secondary-bg: #3ed556;
+	--steno-key-secondary-fg: #000;
+	--steno-key-tertiary-bg: #1cbfbf;
+	--steno-key-tertiary-fg: #000;
+	--steno-alt-key-bg: #566a49;
+	--steno-alt-key-fg: #000;
+
 }
 
 .red { color: #f55; }
@@ -68,6 +289,19 @@ body {
 	margin: 0 auto; /* Center it on screen */
 	text-align: center;
 }
+
+select {
+	.form-border();
+}
+
+select, option {
+	font: 15px Roboto, sans-serif;
+	background-color: var(--main-bg);
+	color: var(--main-fg);
+}
+
+
+
 
 #nav {
 	flex: 0 0;
@@ -150,10 +384,24 @@ body {
 a .clickable-form-section * {
 	text-decoration: none;
 }
+.form-section--disabled {
+	.form-section();
+	opacity: 0.5;
+
+	&:hover {
+		border-color: var(--form-border);
+		cursor: default;
+		color: var(--main-fg);
+	}
+	* {
+		pointer-events: none;
+	}
+}
 
 .form-section--selected {
 	border-color: red
 }
+
 
 /* On hover */
 
@@ -322,9 +570,9 @@ a, a:visited {
 }
 
 .strokes td {
-	background: #666;
-	color: #000;
-	border: thin solid black;
+	background: var(--steno-key-bg);
+	color: var(--steno-key-fg);
+	border: thin solid var(--steno-key-outline);
 	border-radius: 0.5ex;
 	padding: 0.25ex 0.33ex;
 	text-align: center;
@@ -337,22 +585,22 @@ a, a:visited {
 
 
 .strokes table tr td.asterisk-pressed {
-	color: #000;
-	background: rgb(255, 158, 119);
+	color: var(--steno-key-secondary-fg);
+	background: var(--steno-key-secondary-bg);
 }
 .strokes table tr td.pressed {
-	color: #000;
-	background: #fe7;
+	color: var(--steno-key-primary-fg);
+	background: var(--steno-key-primary-bg);
 }
 
 .strokes table tr td.number-pressed {
-	color: #000;
-	background: rgb(119, 167, 255);
+	color: var(--steno-key-tertiary-bg);
+	background: var(--steno-key-tertiary-bg);
 }
 
 .strokes td.alt {
-	color: #555;
-	background: #888;
+	color: var(--steno-alt-key-fg);
+	background: var(--steno-alt-key-bg);
 }
 
 .strokes > * { vertical-align: top; }

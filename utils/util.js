@@ -1,63 +1,4 @@
 function populatePage(options) {
-    // <div id="leftside">
-    // 	<h3 id="lesson-name" class="center"></h3>
-    // 	<div id="drill-content">
-    // 		<div id="answer"></div>
-    // 		<div id="exercise"></div>
-    // 		<div id="results"></div>
-    // 		<div style="height: 300px">
-    // 			<canvas id="chartDiv" width="400" height="400"></canvas>
-    // 		</div>
-    // 	</div>
-    // </div>
-
-    // <div id="nav">
-    // 	<p id="stroke-hint"></p>
-    // 	<p id="strokes"></p>
-    // 	<p id="clock" class="clock"></p>
-    // 	<p id="live-wpm-display" class="wpm"></p>
-    // 	<p class="center"><a id="back" title="LeftArrow">&larr; Back to Menu <span class="shortcut-key">(LeftArrow)</span></a></p>
-    // 	<p class="center"><a id="again" title="Enter">&#8634; Repeat Drill <span class="shortcut-key">(Enter 3x)</span></a></p>
-    // 	<p class="center"><a id="end" title="Enter">&Cross; End Drill <span class="shortcut-key">(Tab 3x)</span></a></p>
-    // 	<p class="center"><a id="new" title="RightArrow">&rarr; New Drill <span class="shortcut-key">(RightArrow)</span></a></p>
-    // </div>
-    //Populate the lession div with the html above
-    // var lesson = document.getElementById("lesson");
-    // lesson.innerHTML = `
-    // <div id="leftside">
-    // 	<h3 id="lesson-name" class="center"></h3>
-    // 	<div id="drill-content">
-    // 		<div id="answer"></div>
-    // 		<div id="exercise"></div>
-    // 		<div id="results"></div>
-    // 		<div style="height: 300px">
-    // 			<canvas id="chartDiv" width="400" height="400"></canvas>
-    // 		</div>
-    //         <table id="corrections" style="display:none">
-    //             <tr>
-    //                 <th>Expected</th>
-    //                 <th>Hesitation</th>
-    //                 <th>Attempts</th>
-    //             </tr>
-    //         </table>
-    // 	</div>
-    // </div>
-
-    // <div id="nav">
-    // 	<p id="stroke-hint"></p>
-    // 	<p class="strokes"></p>
-    // 	<p id="clock" class="clock"></p>
-    // 	<p id="live-wpm-display" class="wpm"></p>
-    // 	<p class="center"><a id="back" title="LeftArrow">&larr; Back to Menu <span class="shortcut-key">(LeftArrow)</span></a></p>
-    // 	<p class="center"><a id="again" title="Enter">&#8634; Repeat Drill <span class="shortcut-key">(Enter 3x)</span></a></p>
-    // 	<p class="center"><a id="end" title="Enter">&Cross; End Drill <span class="shortcut-key">(Tab 3x)</span></a></p>
-    // 	<p class="center"><a id="new" title="RightArrow">&rarr; New Drill <span class="shortcut-key">(RightArrow)</span></a></p>
-    //     <p class="center"><a id="show-hint" title="UpArrow">Show Hint <span class="shortcut-key">(UpArrow)</span></a></p>
-    // 	<p class="center"><a id="hide-hint" title="UpArrow">Hide Hint <span class="shortcut-key">(DownArrow)</span></a></p>
-    // </div>
-    // <textarea id="input"></textarea>
-    // `;
-
     let leftSide = N("div", { id: "leftside" }, [
         N("h3", { id: "lesson-name", class: "center" }),
         N("div", { id: "drill-content" }, [
@@ -117,6 +58,42 @@ function populatePage(options) {
         },
     ];
 
+    let theme_select = N(
+        "select",
+        {
+            id: "themeable",
+            onchange: (e) => {
+                console.log(e.target.value);
+                // let theme = e.target.value;
+                // localStorage.setItem("theme", theme);
+                // setTheme();
+            },
+        },
+        [
+            N("optgroup", { label: "Light Themes" }, [
+                N("option", { value: "light" }, "Light"),
+                N("option", { value: "oasis" }, "Oasis"),
+                N("option", { value: "ocean" }, "Ocean"),
+                N("option", { value: "rustic" }, "Rustic"),
+            ]),
+            N("optgroup", { label: "Dark Themes" }, [
+                N("option", { value: "dark" }, "Dark"),
+                N("option", { value: "breeze" }, "Breeze"),
+                N("option", { value: "retro-pop" }, "Retro Pop"),
+                N("option", { value: "autumn" }, "Autumn"),
+                N("option", { value: "odyssey" }, "Odyssey"),
+            ]),
+        ]
+    );
+
+    theme_select.value = localStorage.getItem("theme") || "light";
+
+    theme_select.onchange = (e) => {
+        let theme = e.target.value;
+        localStorage.setItem("theme", theme);
+        setTheme();
+    };
+
     let nav = N("div", { id: "nav" }, [
         N("p", { id: "stroke-hint" }),
         N("p", { class: "strokes" }),
@@ -128,6 +105,8 @@ function populatePage(options) {
                 N("span", { class: "shortcut-key" }, button.shortcut),
             ]);
         }),
+        //Lets add a dropdown for all 8 of the themes, light, dark, etc.
+        N("p", { class: "center" }, "Choose your theme:", [theme_select]),
     ]);
 
     let textarea = N("textarea", { id: "input" });
@@ -153,6 +132,7 @@ function populatePage(options) {
             </p>;
         `);
     }
+    console.log("Populated page");
 }
 
 function parseQueryString(query) {
