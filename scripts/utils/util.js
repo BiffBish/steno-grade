@@ -301,9 +301,12 @@ function setTheme() {
         localStorage.theme ??= "dark";
 
         if (localStorage.theme == null) {
-            document.body.removeAttribute("data-theme");
+            document.documentElement.removeAttribute("data-theme");
         } else {
-            document.body.setAttribute("data-theme", localStorage.theme);
+            document.documentElement.setAttribute(
+                "data-theme",
+                localStorage.theme
+            );
         }
         console.log("Setting theme", mergedSettings);
         //Get the settings from local storage
@@ -323,6 +326,29 @@ function setTheme() {
         }
     }
 }
+function criticalTheme() {
+    if (storageAvailable("localStorage")) {
+        //get both settings and custom settings. merging them
+        var settings = localStorage.getItem("settings") ?? "{}";
+        var customSettings = localStorage.getItem("custom_settings") ?? "{}";
+        var mergedSettings = {
+            ...(JSON.parse(settings) ?? {}),
+            ...(JSON.parse(customSettings) ?? {}),
+        };
+        localStorage.theme ??= "dark";
+
+        if (localStorage.theme == null) {
+            //Attach the theme to the html element
+            document.documentElement.removeAttribute("data-theme");
+        } else {
+            document.documentElement.setAttribute(
+                "data-theme",
+                localStorage.theme
+            );
+        }
+    }
+}
+
 function setCustomThemeSetting(setting, value, dontApplyIfFalse = false) {
     if (dontApplyIfFalse && !value) return;
     var body = document.body;

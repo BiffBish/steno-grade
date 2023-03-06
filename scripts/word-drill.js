@@ -15,7 +15,7 @@
 
 function wordDrill(params) {
     console.log("wordDrill", params);
-    var words = getDrillWords(params.drill, +params.count || 0);
+    var words = [...getDrillWords(params.drill, +params.count || 0)];
     if (!words.length) return;
     var name = words.name;
 

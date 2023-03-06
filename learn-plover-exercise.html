@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+       
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta charset="utf-8" />
+        <title>Learn Plover Lessons</title>
+        <!-- <link href="base.css" rel="stylesheet" type="text/css" /> -->
+        <link href="base.css" rel="stylesheet" type="text/css" />
+        <link href="style.less" rel="stylesheet/less" type="text/css" />
+        <script src="scripts/libs/less.js" ></script>
+        
+        <script src="scripts/type-jig.js"></script>
+        <script src="scripts/learn-keyboard.js"></script>
+        <script src="scripts/utils/util.js"></script>
+        <script src="scripts/word-drill.js"></script>
+        <script src="scripts/utils/steno-display.js"></script>
+        <script src="scripts/plover-translations.js"></script>
+        <script src="scripts/learn-plover.js"></script>
+
+        
+        <script src="scripts/libs/chart.js"></script>
+        <script src="scripts/libs/chartjs-plugin-datalabels.js"></script>
+        <script src="scripts/libs/jquery-3.6.0.min.js"></script>
+        <script src="scripts/spectra/spectra.js"></script>
+        <script src="scripts/spectra/rules.js"></script>
+        <script>
+            criticalTheme();
+        </script>
+        <link rel="stylesheet" type="text/css" href="font-roboto.css" />
+    </head>
+    <body>
+        <script>
+            setTheme();
+        </script>
+        <style>
+            /*critical CSS code */
+            /* body {
+                background-color: #000000;
+            }  */
+        </style>
+        
+        <div class="wrapper">
+        </div>
+
+        <div id="lesson" class="wrapper">
+            
+        </div>
+
+        <script>
+            setTheme();
+
+            $(document).ready(function () {
+                var fields = parseQueryString(document.location.search);
+
+                populatePage();
+                var jig;
+                function loadExersize() {
+                    var fields = parseQueryString(document.location.search);
+                    var oldWordSets = TypeJig.WordSets;
+                    TypeJig.WordSets = TypeJig.WordSets.LearnPlover;
+                    var exercise = wordDrill(fields);
+                    if (exercise) {
+                        if (fields.hints) {
+                            var strokes = document.getElementById("strokes");
+                            if (fields.floating_hints) {
+                                strokes.style.position = "fixed";
+                            }
+                            var translations =
+                                TypeJig.shortestTranslations(
+                                    PloverTranslations
+                                );
+                            
+                        }
+                        fields.menu = "learn-plover";
+                        jig = setExercise(
+                            exercise.name,
+                            exercise,
+                            null,
+                            fields
+                        );
+                    }
+                    TypeJig.WordSets = oldWordSets;
+
+                }
+
+                loadExersize();
+
+                $("#again")[0].addEventListener("click", function (evt) {
+                    evt.preventDefault();
+                    evt.stopImmediatePropagation();
+                    var oldWordSets = TypeJig.WordSets;
+                    TypeJig.WordSets = TypeJig.WordSets.LearnPlover;
+                    var exercise = wordDrill(fields);
+                    TypeJig.WordSets = oldWordSets;
+                    jig.setExercise(exercise);
+                });
+
+                
+                // // var jig = setExercise(name, exercise, null, fields);
+
+                // // var another = document.getElementById("new");
+                // // var nextSeed = prepareNextSeed(another);
+                // // another.addEventListener("click", function (evt) {
+                // //     evt.preventDefault();
+                // //     window.history.replaceState(
+                // //         "",
+                // //         "",
+                // //         updateURLParameter(window.location.href, "seed", nextSeed)
+                // //     );
+                // //     let rng = new_rng(nextSeed);
+                // //     let exercise = generateMarkovExercise(
+                // //         ngrams,
+                // //         word_count,
+                // //         rng,
+                // //         bias
+                // //     );
+                // //     jig.exercise = exercise;
+                // //     jig.reset();
+                // //     nextSeed = prepareNextSeed(another);
+                // // });
+
+                // var fields = parseQueryString(document.location.search);
+                // TypeJig.WordSets = TypeJig.WordSets.LearnKeyboard;
+                // console.log(TypeJig.WordSets);
+                // var exercise = wordDrill(fields);
+                // if (exercise) {
+                //     fields.menu = "learn-keyboard";
+
+                //     var jig = setExercise(
+                //         exercise.name,
+                //         exercise,
+                //         null,
+                //         fields
+                //     );
+                // }
+
+                // var back = document.getElementById("back");
+                // back.href = back.href.replace("markov", "form");
+                initializeButtons(jig);
+            });
+
+            // window.onload = function () {
+            //     if (document.location.search === "") {
+            //         var form = document.getElementById("selectDrill");
+            //         var drill = form.elements.drill;
+            //         var order = TypeJig.WordSets.LearnPloverOrder;
+            //         for (var i = 0; i < order.length; ++i) {
+            //             var option = document.createElement("option");
+            //             option.appendChild(document.createTextNode(order[i]));
+            //             drill.appendChild(option);
+            //         }
+            //         drill.focus();
+
+            //         loadFormState(form);
+            //         form.addEventListener("submit", function () {
+            //             saveFormState(form);
+            //         });
+            //     } else {
+            //         
+            //     }
+            // };
+
+            // function selectRandomly() {
+            //     var form = document.getElementById("selectDrill");
+            //     form.elements.type[0].checked = true;
+            // }
+
+            // function saveFormState(form) {
+            //     let radioButtons =
+            //         document.getElementById("selectDrill").elements["type"];
+            //     let drillType;
+            //     for (let i = 0; i < radioButtons.length; ++i) {
+            //         if (radioButtons[i].checked) {
+            //             drillType = radioButtons[i].value;
+            //             break;
+            //         }
+            //     }
+            //     save({
+            //         drill: form.drill.value,
+            //         hints: form.hints.checked,
+            //         type: drillType,
+            //         timeLimit: form.timeLimit.value,
+            //     });
+            // }
+
+            // function loadFormState(form) {
+            //     var loaded = load();
+            //     if (loaded.drill != null) {
+            //         form.drill.value = loaded.drill;
+            //     }
+            //     if (loaded.hints != null) form.hints.checked = !!loaded.hints;
+            //     if (loaded.type != null) {
+            //         let radioButtons =
+            //             document.getElementById("selectDrill").elements["type"];
+            //         for (let i = 0; i < radioButtons.length; ++i) {
+            //             let b = radioButtons[i];
+            //             b.checked = b.value === loaded.type;
+            //         }
+            //     }
+            //     form.type.value = loaded.type;
+            //     if (loaded.timeLimit) {
+            //         form.timeLimit.value = loaded.timeLimit;
+            //     }
+            // }
+
+            // var LOCAL_STORAGE_KEY = "learn-plover-form";
+
+            // function save(obj) {
+            //     try {
+            //         localStorage.setItem(
+            //             LOCAL_STORAGE_KEY,
+            //             JSON.stringify(obj)
+            //         );
+            //     } catch (e) {
+            //         console.error(e);
+            //     }
+            // }
+
+            // function load() {
+            //     try {
+            //         return (
+            //             JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) ||
+            //             {}
+            //         );
+            //     } catch (e) {
+            //         console.error(e);
+            //         return {};
+            //     }
+            // }
+
+            // setTheme();
+        </script>
+    </body>
+</html>

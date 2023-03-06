@@ -86,6 +86,12 @@ function TypeJig(exercise, options, hint = null) {
     this.reset();
 }
 
+TypeJig.prototype.setExercise = function (exercise) {
+    console.log("setExercise", exercise);
+    this.exercise = exercise;
+    this.reset();
+};
+
 TypeJig.prototype.reset = function () {
     this.enter_count = 0;
 
@@ -1200,7 +1206,7 @@ TypeJig.prototype.endExercise = function (seconds) {
 
     if (document.activeElement != document.body) document.activeElement.blur();
 
-    if (this.exercise.endless) {
+    if (this.exercise.endless || seconds === undefined) {
         // remove all words not yet typed
         let words = this.exercise.words.slice(0, this.typedWords.length);
         this.exercise.words = words;
@@ -1370,6 +1376,7 @@ TypeJig.prototype.showResults = function (persistantData) {
         typedWords,
         this.exercise.words
     );
+    console.log("gradingResults", gradingResults);
     var errorCount = gradingResults.errorCount;
     var totalWordCount = gradingResults.totalCount;
 
