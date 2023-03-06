@@ -10,8 +10,6 @@
 // It needs a bunch of help from styles: see the `#stroke` entries
 // in `style.css`.
 
-
-
 const workerCode = `
   self.onmessage = function(event) {
     const eventType = event.data.eventType;
@@ -59,11 +57,11 @@ function StenoDisplay(container, translations, showEmpty) {
     };
 
     urls = [
-        "type-jig.js",
-        "plover-translations.js",
-        "spectra/rules.js",
-        "spectra/spectra.js",
-        "precomputeHints.js",
+        "scripts/type-jig.js",
+        "scripts/plover-translations.js",
+        "scripts/spectra/rules.js",
+        "scripts/spectra/spectra.js",
+        "scripts/precomputeHints.js",
     ];
 
     this.hintComputer.postMessage({
@@ -139,7 +137,6 @@ StenoDisplay.prototype.update = function (text, x, y) {
         this.set("", true);
     }
 };
-
 StenoDisplay.prototype.lookup = function (text) {
     if (/^[0-9]+$/.test(text)) {
         return { strokes: this.numberStrokes(text), rules: [] };
@@ -255,7 +252,6 @@ StenoDisplay.prototype.lookup = function (text) {
 
     return null;
 };
-
 StenoDisplay.prototype.lookupEntry = function (text, dictionary) {
     for (let index = 0; index < this.pseudoStenoFor.length; index++) {
         const dictionary = this.pseudoStenoFor[index];
@@ -1059,7 +1055,7 @@ var leftFromPseudo = {
     X: "KP",
     Z: "STKPW",
 };
-var vowelFromPseudo = {
+let vowelFromPseudo = {
     AY: "AEU",
     OH: "OE",
     EE: "AOE",
@@ -1073,7 +1069,7 @@ var vowelFromPseudo = {
     OA: "AO",
     OO: "AO",
 };
-var rightFromPseudo = {
+let rightFromPseudo = {
     TH: "*T",
     CH: "FP",
     SH: "RB",
@@ -1088,12 +1084,13 @@ var rightFromPseudo = {
     J: "PBLG",
     RBGS: "RBGS",
 };
-var left_re = /C|L|G|Z|N|J|X|B|V|F|Y|Q|D|M|0|1|2|3|4|5|6|7|8|9|S|T|K|P|W|H|R/g;
-var vowel_re =
+
+let left_re = /[CLGZNJXBVFYQDM0123456789STKPWHR]/g;
+let vowel_re =
     /AY|OA|OO|AW|EA|EE|OH|UU|OI|IE|OW|I|0|1|2|3|4|5|6|7|8|9|A|O|E|U/g;
-var right_re =
+let right_re =
     /RBGS|KSHN|SHN|RCH|CH|SH|NG|NK|TH|K|J|N|M|0|1|2|3|4|5|6|7|8|9|\*|F|R|P|B|L|G|T|S|D|Z/g;
-var separation_re = /([^AOEUI*-]*)([AO*EUI-][AO*EUIHYW-]*|)(.*)/;
+let separation_re = /([^AOEUI*-]*)([AO*EUI-][AO*EUIHYW-]*|)(.*)/;
 
 function pseudoStrokeToSteno(stroke) {
     var match = separation_re.exec(stroke);
@@ -1114,7 +1111,7 @@ function pseudoStrokeToSteno(stroke) {
 
 // ---------------------------------------------------------------------
 
-var unicodeWordChar =
+let unicodeWordChar =
     "\u0041-\u005a\u00c0-\u00d6\u00d8-\u00de\u0100\u0102\u0104\u0106\u0108" +
     "\u010a\u010c\u010e\u0110\u0112\u0114\u0116\u0118\u011a\u011c\u011e\u0120" +
     "\u0122\u0124\u0126\u0128\u012a\u012c\u012e\u0130\u0132\u0134\u0136\u0139" +
@@ -1289,7 +1286,7 @@ var unicodeWordChar =
     "\u2776-\u2793\u2cfd\u3192-\u3195\u3220-\u3229\u3251-\u325f\u3280-\u3289" +
     "\u32b1-\u32bf\ua830-\ua835";
 
-var preOrPostChars = new RegExp(
+let preOrPostChars = new RegExp(
     "^([^" +
         unicodeWordChar +
         "]*)" +

@@ -14,6 +14,7 @@
 //   - `shuffled`: drill words once in a random order.
 
 function wordDrill(params) {
+    console.log("wordDrill", params);
     var words = getDrillWords(params.drill, +params.count || 0);
     if (!words.length) return;
     var name = words.name;
@@ -42,12 +43,26 @@ function wordDrill(params) {
         name = "Randomized " + name;
         shuffleTail(words, words.length);
     }
-    console.log(words)
+    console.log(words);
+
+    const moreWords = getDrillWords(params.drill, +params.count || 0).flat(2);
+    console.log("moreWords", moreWords);
+    const getMoreWords = (min) => {
+        const output = [];
+        while (output.length < min) {
+            output.push(
+                moreWords[Math.floor(Math.random() * moreWords.length)]
+            );
+        }
+        return output.flat();
+    };
+
     var exercise = new TypeJig.Exercise(
         words,
         timeLimit,
         randomly,
-        params.select
+        timeLimit ? getMoreWords : undefined,
+        10
     );
     exercise.name = name;
     return exercise;

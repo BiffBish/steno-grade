@@ -18,14 +18,20 @@ function numberSentences(params) {
     randomize(actions);
 
     console.log(nouns, actions);
+
     console.log(nextNumberSentence(nouns, actions));
     let words = [];
 
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 1; i++) {
         words.push(nextNumberSentence(nouns, actions));
     }
 
-    let exercise = new TypeJig.Exercise(words, seconds);
+    const getNextText = (min) => {
+        let nextWords = nextNumberSentence(nouns, actions);
+        return nextWords;
+    };
+
+    let exercise = new TypeJig.Exercise(words, seconds, false, getNextText, 10);
 
     exercise.name = "Number Sentences";
     return exercise;

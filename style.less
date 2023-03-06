@@ -221,7 +221,7 @@ html, body {
 [data-theme="autumn"] {
 	--main-bg: #392C50;
 	--main-fg: #FDEBD0;
-	--link-text: #9B59B6;
+	--link-text: #C37CDF;
 	--form-border: #D7BDE2;
 	--form-shadow: #2C3E50;
 	--answer-text: #FADBD8;
@@ -440,6 +440,10 @@ a, a:visited {
 	color: var(--link-text);
 }
 
+
+
+
+
 #lesson {
 	display: flex;
 	flex-direction: row;
@@ -636,6 +640,12 @@ a, a:visited {
 	flex-direction: row;
 }
 
+.row--gap {
+	.row();
+	gap: var(--form-gap);
+}
+
+
 .flex {
 	flex: 1 0;
 }
@@ -648,6 +658,20 @@ a, a:visited {
 	/* Affect children elements */
 }
 
+.button-styling {
+	.form-border();
+
+	&:hover {
+		cursor: pointer;
+		color: var(--link-text);
+		border: 1px solid var(--link-text);
+	}
+
+	
+
+	padding: 0.5em;
+}
+
 
 
 .button-radio-row > * {
@@ -656,3 +680,147 @@ a, a:visited {
 	/* Align children elements in the center */
 	align-self: stretch;
 }
+
+
+
+.radio-buttons {
+	display: flex;
+	flex-direction: row;
+	gap: 0.5em;
+	position: relative;
+
+	//I want an outline above and below the buttons
+	// &::before {
+	// 	content: "";
+	// 	display: block;
+	// 	position: absolute;
+	// 	border-top: 1px solid var(--main-fg);
+	// 	width: 100%;
+	// 	top: calc((-1 * var(--form-gap))/3);
+	// }
+
+	// &::after {
+	// 	content: "";
+	// 	display: block;
+	// 	position: absolute;
+	// 	border-bottom: 1px solid var(--main-fg);
+	// 	width: 100%;
+	// 	bottom: calc((-1 * var(--form-gap))/3);
+	// }
+
+
+	label {
+		.button-styling();
+		border-color: var(--main-fg);
+		padding: 0.5em;
+		.center();
+
+		//The min width is the basis, 
+		//Then expand to fit the content
+
+		flex: 1 0 auto;
+
+		&.active {
+			color: var(--link-text);
+			border: 1px solid var(--link-text);
+		}
+
+		&:not(.active):hover {
+			cursor: pointer;
+			color: var(--link-text);
+			border: 1px solid var(--main-fg);
+		}
+
+		//Mouse down
+		&:hover:active {
+			border: 1px solid var(--link-text);
+		}
+
+		
+		input {
+			display: none;
+			margin-right: 0.5em;
+		}
+
+	}
+}
+
+.radio-buttons--row {
+	.radio-buttons();
+	flex-direction: row;
+}
+
+.radio-buttons--column {
+	.radio-buttons();
+	flex-direction: column;
+	display: flex;
+}
+
+
+
+
+.checkbox-label {
+	.button-styling();
+	border-color: var(--main-fg);
+	padding: 0.5em;
+	
+
+	&.active {
+		color: var(--link-text);
+		border: 1px solid var(--link-text);
+	}
+
+	&:not(.active):hover {
+		cursor: pointer;
+		color: var(--link-text);
+		border: 1px solid var(--main-fg);
+	}
+
+	//Mouse down
+	&:hover:active {
+		border: 1px solid var(--link-text);
+	}
+
+	
+	input {
+		display: none;
+		margin-right: 0.5em;
+	}
+}
+
+.checkbox {
+	display: flex;
+	flex-direction: row;
+	gap: 0.5em;
+
+	label {
+		.checkbox-label()
+	}
+}
+
+
+
+//All input fields
+input, textarea{
+	.form-border();
+	padding: 0.5em;
+	background: var(--main-bg);
+	color: var(--main-fg);
+}
+
+button {
+	.form-border();
+	padding: 0.5em;
+	background: var(--main-bg);
+	color: var(--main-fg);
+	cursor: pointer;
+}
+
+
+
+
+
+
+
+
+

@@ -1,23 +1,24 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta charset="utf-8" />
         <title>Steno Grade</title>
         <link href="style.less" rel="stylesheet/less" type="text/css" />
-        <script src="type-jig.js"></script>
-        <script src="utils/util.js"></script>
-        <script src="word-drill.js"></script>
-        <script src="number-sentences.js"></script>
-        <script src="utils/steno-display.js"></script>
-        <script src="word-sets.js"></script>
-        <script src="plover-translations.js"></script>
+        <script src="scripts/type-jig.js"></script>
+        <script src="scripts/utils/util.js"></script>
+        <script src="scripts/word-drill.js"></script>
+        <script src="scripts/number-sentences.js"></script>
+        <script src="scripts/utils/steno-display.js"></script>
+        <script src="scripts/word-sets.js"></script>
+        <script src="scripts/plover-translations.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
-        <script src="libs/less.js" ></script>
-        <script src="libs/chart.js"></script>
-        <script src="chartjs-plugin-datalabels.js"></script>
-        <script src="spectra/spectra.js"></script>
-        <script src="spectra/rules.js"></script>
+        <script src="scripts/libs/less.js" ></script>
+        <script src="scripts/libs/chart.js"></script>
+        <script src="scripts/libs/chartjs-plugin-datalabels.js"></script>
+        <script src="scripts/spectra/spectra.js"></script>
+        <script src="scripts/spectra/rules.js"></script>
         <link rel="stylesheet" type="text/css" href="font-roboto.css" />
     </head>
     <body>
@@ -37,18 +38,19 @@
                 </div>
                 <br />
 
-                <div name="hints">
-                    <label
-                        ><input
+                <div name="hints" class="radio-buttons--row">
+                    <label>
+                        <input
                             id="hints"
                             type="radio"
                             name="hints"
                             value="true"
                             checked
-                        />Show hints</label
-                    >
-                    <label
-                        ><input
+                        />
+                        Show hints
+                    </label>
+                    <label>
+                        <input
                             id="hints"
                             type="radio"
                             name="hints"
@@ -86,18 +88,20 @@
                 </div>
                 <br />
 
-                <input
-                    id="multi_word_hints"
-                    type="checkbox"
-                    name="multi_word_hints"
-                    value="true"
-                    checked
-                />Show multi-word briefs <small>(These are strokes that don't follow traditional steno rules. So they may be confusing to a beginner. And the hint system may not be 100% accurate)</small> </label
-                    >
+                <div class="checkbox">
+                    <label class="checkbox-label" for="multi_word_hints">
+                        <input
+                            id="multi_word_hints"
+                            type="checkbox"
+                            name="multi_word_hints"
+                            value="true"
+                            checked
+                        />
+                        Show multi-word briefs <small>(These are strokes that don't follow traditional steno rules. So they may be confusing to a beginner. And the hint system may not be 100% accurate)</small> 
+                    </label>
+                </div>
                 <br />
-                <br />
-
-                <div name="live_wpm">
+                <div name="live_wpm" class="checkbox">
                     <label
                         ><input
                             id="live_wpm"
@@ -110,7 +114,7 @@
                 </div>
                 <br />
 
-                <div name="show_timer">
+                <div name="show_timer" class="checkbox">
                     <label
                         ><input
                             id="show_timer"
@@ -133,8 +137,18 @@
                             step="5"
                         />
                         Speed (words per minute) (or
-                        <input type="checkbox" id="cpm" value="1" /> x5 chars
-                        per minute)
+                        <div class="checkbox" style="display:inline-block">
+                            <label class="checkbox-label" for="cpm">
+                                <input
+                                    id="cpm"
+                                    type="checkbox"
+                                    name="cpm"
+                                    value="1"
+                                />
+                                x5 chars per minute
+                            </label>
+                        </div>
+                        )
                     </label>
                 </div>
                 <br />
@@ -151,18 +165,19 @@
                 </div>
                 <br />
 
-                <div name="grading_options">
-                    <label
-                        ><input
+                <div name="grading_options" class="row--gap">
+                    <label class="checkbox-label">
+                        <input
                             id="show_corrections"
                             type="checkbox"
                             name="show_corrections"
                             value="1"
                             checked
-                        />Show Correction marks</label
-                    >
-                    <label
-                        ><input
+                        />
+                        Show Correction marks
+                    </label>
+                    <label class="checkbox-label">
+                        <input
                             id="show_live_grading"
                             type="checkbox"
                             name="show_live_grading"
@@ -264,8 +279,8 @@
                 </form>
             </div>
 
-            <div class="form-section--disabled">
-                <b class="red">Under repair</b>
+            <div class="form-section">
+                <!-- <b class="red">Under repair</b> -->
                 <div class="caption">
                     Randomly <strong>Chosen</strong> Sentences
                 </div>
@@ -316,13 +331,13 @@
                                         : "gutenberg.html";
                             });
                     </script>
-                <!-- <button class="form-section__submit-button"></button> -->
+                <button class="form-section__submit-button"></button>
                 </form>
                 <footer>
                     extracted from
                     <a href="https://www.gutenberg.org/">Project Gutenberg</a>
                 </footer>
-                <b class="red">Under repair</b>
+                <!-- <b class="red">Under repair</b> -->
 
             </div>
 
@@ -415,10 +430,66 @@
                     >.
                 </div>
 
-                <form class="drill-options" action="monkeytype-quote.html">
+                <form class="drill-options center" action="monkeytype-quote.html">
                     Drill length:
-                    <ul>
-                        <li style="list-style: none">
+                    <!-- <ul> -->
+                        <div>
+
+                            <div name="length" class="radio-buttons--column">
+                                <label>
+                                    <input
+                                        id="monkeytype-quote-length"
+                                        type="radio"
+                                        name="monkeytype-quote-length"
+                                        value="all"
+                                        checked
+                                    />
+                                    All
+                                </label>
+                                <label>
+                                    <input
+                                        id="monkeytype-quote-length"
+                                        type="radio"
+                                        name="monkeytype-quote-length"
+                                        value="short"
+                                    />
+                                    Short (&lt;100 characters)
+                                </label>
+
+                                <label>
+                                    <input
+                                        id="monkeytype-quote-length"
+                                        type="radio"
+                                        name="monkeytype-quote-length"
+                                        value="medium"
+                                    />
+                                    Medium (101-300 characters)
+                                </label>
+
+                                <label>
+                                    <input
+                                        id="monkeytype-quote-length"
+                                        type="radio"
+                                        name="monkeytype-quote-length"
+                                        value="long"
+                                    />
+                                    Long (301-600 characters)
+                                </label>
+
+                                <label>
+                                    <input
+                                        id="monkeytype-quote-length"
+                                        type="radio"
+                                        name="monkeytype-quote-length"
+                                        value="thicc"
+                                    />
+                                    Thicc (&gt;600 characters)
+                                </label>
+                            </div>
+                        </div>
+
+
+                        <!-- <li style="list-style: none">
                             <input
                                 type="radio"
                                 name="length"
@@ -461,8 +532,8 @@
                             /><label for="length"
                                 >Thicc (&gt;600 characters)</label
                             >
-                        </li>
-                    </ul>
+                        </li> -->
+                    <!-- </ul> -->
                     <button class="form-section__submit-button"></button>
                 </form>
             </div>
@@ -520,7 +591,7 @@
 
             </div>
 
-            <div class="form-section--disabled">
+            <div class="form-section">
                 <b class="red">Under Repair</b>
                 <div class="caption">
                     Da Dreaded Dueling Digit Duo <strong>Finger Drills</strong>
@@ -544,7 +615,7 @@
                         step="5"
                     />
                     times.<br />
-                    <!-- <button class="form-section__submit-button"></button> -->
+                    <button class="form-section__submit-button"></button>
                 </form>
                 <b class="red">Under Repair</b>
 
@@ -660,6 +731,7 @@
         <div id="lesson" class="wrapper" style="display: none"></div>
     </body>
     <script>
+        prepareInput("monkeytype-quote-length");
         setTheme()
         function runExercise(fields) {
             if (fields.drill === "NumberSentences")

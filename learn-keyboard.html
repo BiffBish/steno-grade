@@ -1,18 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta charset="utf-8" />
         <title>Learn the Steno Keyboard</title>
         <link href="style.less" rel="stylesheet/less" type="text/css" />
-        <script src="type-jig.js"></script>
-        <script src="utils/util.js"></script>
-        <script src="word-drill.js"></script>
-        <script src="utils/steno-display.js"></script>
-        <script src="learn-keyboard.js"></script>
+        <script src="scripts/type-jig.js"></script>
+        <script src="scripts/utils/util.js"></script>
+        <script src="scripts/word-drill.js"></script>
+        <script src="scripts/utils/steno-display.js"></script>
+        <script src="scripts/learn-keyboard.js"></script>
 
-        <script src="libs/less.js" ></script>
-        <script src="libs/chart.js"></script>
-        <script src="chartjs-plugin-datalabels.js"></script>
+        <script src="scripts/libs/less.js" ></script>
+        <script src="scripts/libs/chart.js"></script>
+        <script src="scripts/libs/chartjs-plugin-datalabels.js"></script>
         <link rel="stylesheet" type="text/css" href="font-roboto.css" />
     </head>
     <body>
@@ -30,9 +31,9 @@
                     </div>
                 </a>
                 <div class="form-section">
-                    <form id="selectDrill">
+                    <form id="selectDrill" action="keyboard.html">
                         <ul style="list-style-type: none">
-                            <li><select name="drill"></select></li>
+                            <li><select  name="drill"></select></li>
                             <li>
                                 <label
                                     ><input
@@ -56,7 +57,7 @@
                                 >
                             </li>
                         </ul>
-                        <div class="form-section__submit-button"></div>
+                        <button class="form-section__submit-button"></button>
                     </form>
                 </div>
             </div>
@@ -203,17 +204,17 @@
                     var exercise = wordDrill(fields);
                     if (exercise) {
                         var hints;
-                        if (fields.hints) {
-                            var strokes = document.getElementById("strokes");
+                        // if (fields.hints) {
+                        //     var strokes = document.getElementById("strokes");
 
-                            hints = new StenoDisplay(strokes, [], true);
-                            hints.lookup = function (word) {
-                                if (word.split(" ").length > 1) {
-                                    return "";
-                                }
-                                return word;
-                            };
-                        }
+                        //     hints = new StenoDisplay(strokes, [], true);
+                        //     hints.lookup = function (word) {
+                        //         if (word.split(" ").length > 1) {
+                        //             return "";
+                        //         }
+                        //         return word;
+                        //     };
+                        // }
                         fields.menu = "learn-keyboard";
                         fields.actualWords = {
                             unit: "strokes per minute",
@@ -221,7 +222,7 @@
                         };
 
                         displayOnly("lesson");
-                        var jig = setExercise(exercise.name, exercise, hints, {
+                        var jig = setExercise(exercise.name, exercise, null, {
                             ...fields,
                             gradingRules: btoa(
                                 JSON.stringify({
@@ -252,6 +253,7 @@
                 }
                 form.hints.checked = loaded.hints;
                 if (loaded.timeLimit) {
+                    form.timeLimit ??= document.createElement("input");
                     form.timeLimit.value = loaded.timeLimit;
                 }
             }

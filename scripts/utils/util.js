@@ -241,9 +241,9 @@ function setExercise(name, exercise, hints = null, options, jig) {
 
     if (settings) {
         options = {
-            ...options,
             ...(JSON.parse(settings) ?? {}),
             ...custom_settings,
+            ...options,
         };
     }
     console.log("Setting exersize", exercise, hints, options);
@@ -382,14 +382,13 @@ function loadSetting(settingName, defaultValue = null) {
 
         case "radio":
             const hints = document.getElementsByName(settingName);
-            console.log(hints);
             for (const hint of hints) {
-                console.log(hint, hint.value);
                 hint.addEventListener("click", function (evt) {
-                    console.log(evt);
                     setLocalSetting(settingName, evt.target.value);
                 });
-                if (hint.value === value) hint.checked = true;
+                if (hint.value === value) {
+                    hint.checked = true;
+                }
             }
             break;
         case "text":
@@ -397,6 +396,49 @@ function loadSetting(settingName, defaultValue = null) {
             element.addEventListener("input", function (evt) {
                 setLocalSetting(settingName, evt.target.value);
             });
+            break;
+    }
+
+    prepareInput(settingName);
+}
+
+function prepareInput(settingName) {
+    const element = document.getElementById(settingName);
+    if (!element) return;
+    if (!(element.nodeName === "INPUT")) return;
+
+    switch (element.type) {
+        case "checkbox":
+            if (element.checked) {
+                element.parentElement.classList.add("active");
+            }
+            element.addEventListener("input", function (evt) {
+                evt.target.parentElement.classList.toggle("active");
+            });
+
+            break;
+        case "number":
+            break;
+
+        case "radio":
+            const hints = document.getElementsByName(settingName);
+            console.log(hints);
+            for (const hint of hints) {
+                if (hint.checked) {
+                    hint.parentElement.classList.add("active");
+                }
+                hint.addEventListener("click", function (evt) {
+                    console.log(evt);
+                    for (const hint of hints) {
+                        hint.parentElement.classList.remove("active");
+                        evt.target.checked = false;
+                    }
+                    evt.target.parentElement.classList.add("active");
+                    evt.target.checked = true;
+                });
+            }
+            break;
+        case "text":
             break;
     }
 }

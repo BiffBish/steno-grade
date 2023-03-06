@@ -16,9 +16,7 @@ function HintManager() {
 
 HintManager.prototype.lookup = function (text) {
     for (const element of this.pseudoStenoFor) {
-        const dictionary = element;
-
-        // console.log("Looking up", text, index);
+        const dictionary = element;;
 
         var strokes = this.lookupEntry(text, dictionary);
         if (!strokes) {
