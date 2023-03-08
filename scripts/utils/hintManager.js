@@ -70,6 +70,7 @@ HintManager.prototype.lookup = function (text) {
         });
         if (true) {
             console.log("Found", text, strokes);
+            throw new Error("Deprecated");
             var analysisResult = Analyze(strokes, text);
             if (analysisResult.outline.length > 0) {
                 return {

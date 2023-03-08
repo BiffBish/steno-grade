@@ -7,6 +7,7 @@
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css"> -->
     <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
     <script src="scripts/utils/util.js"></script>
+    <link href="base.css" rel="stylesheet" type="text/css" />
     <link href="style.less" rel="stylesheet/less" type="text/css" />
     <script src="scripts/libs/less.js"></script>
 </head>
@@ -20,7 +21,7 @@
             <h2 class="subtitle">
                 Upload a custom dictionary file and give it a name.
             </h2>
-            <form action="custom-dictionary-upload.php" method="post" enctype="multipart/form-data">
+            <form action="" method="post" enctype="multipart/form-data">
                 <div class="form-section">
                     <label class="label" >Files (Priority top to bottom)</label>
                     <!-- Allow unload of many files and have drag and drop encouraged-->
@@ -97,5 +98,29 @@
         
 
     });
+
+
+    //Load the files into the page
+    document.addEventListener("DOMContentLoaded", function (event) {
+        //Load the custom dictionaries
+        var customDictionaries = JSON.parse(localStorage.getItem("customDictionaries"));
+        if (customDictionaries) {
+            customDictionaries.forEach((dictionary, index) => {
+                console.log(dictionary);
+                var fileInput = document.getElementById("fileToUpload" + (index + 1));
+                const myFile = new File(['Hello World!'], 'customDict.txt', {
+                    type: 'text/plain',
+                    lastModified: new Date(),
+                });
+
+                // Now let's create a DataTransfer to get a FileList
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(myFile);
+                fileInput.files = dataTransfer.files;
+                //Give the file a name of "Custom Dictionary"
+            });
+        }
+    });
+
 </script>
 </html>

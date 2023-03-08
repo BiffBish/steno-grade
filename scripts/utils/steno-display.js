@@ -31,6 +31,73 @@ const workerUrl = URL.createObjectURL(
     new Blob([workerCode], { type: "text/javascript" })
 );
 
+function StrokeGroup(parentStenoDisplay, translations, showEmpty) {
+    console.log(
+        "Creating StenoGroup",
+        parentStenoDisplay,
+        translations,
+        showEmpty
+    );
+
+    let parentContainer = parentStenoDisplay.container;
+
+    if (typeof parentContainer === "string") {
+        parentContainer = document.getElementById(parentContainer);
+    }
+
+    //Make a div inside the parent container to hold the strokes
+    this.container = document.createElement("div");
+    parentContainer.appendChild(this.container);
+
+    this.titleContainer = document.createElement("div");
+    this.titleContainer.classList.add("steno-group-title");
+    this.container.appendChild(this.titleContainer);
+
+    this.strokesContainer = document.createElement("div");
+    this.strokesContainer.classList.add("steno-group-strokes");
+    this.container.appendChild(this.strokesContainer);
+
+    this.strokes = [];
+}
+StrokeGroup.prototype.setTitle = function (title) {
+    this.titleContainer.innerText = title;
+};
+
+/**
+ *
+ * @param {ProcessedResult} strokeAnalysis
+ * @param {*} showEmpty
+ */
+StrokeGroup.prototype.set = function (strokeAnalysis, showEmpty) {
+    console.log("Setting", strokeAnalysis, showEmpty);
+    this.strokes.forEach((stroke) => {
+        stroke.hide();
+    });
+
+    if (!strokeAnalysis.outline) {
+        return;
+    }
+
+    // if (showEmpty) {
+    let typedStrokes = strokeAnalysis.outline.split("/");
+
+    for (let i = 0; i < typedStrokes.length; ++i) {
+        if (i >= this.strokes.length) {
+            this.strokes.push(new StenoDisplay.Stroke(this.strokesContainer));
+        }
+        // console.log(pseudoSteno, i0, separator, rules);
+        this.strokes[i].set(
+            typedStrokes[i],
+            "",
+            strokeAnalysis.rules.filter((rule) => {
+                return rule.wordNum == i;
+            })
+        );
+        this.strokes[i].show();
+    }
+    // }
+};
+
 function StenoDisplay(container, translations, showEmpty) {
     console.log("Creating StenoDisplay", container, translations, showEmpty);
     if (typeof container === "string") {
@@ -38,13 +105,16 @@ function StenoDisplay(container, translations, showEmpty) {
     }
     this.container = container;
     this.strokes = [];
+
+    this.strokeGroups = [];
+
     this.pseudoStenoFor = translations;
     this.lastText = false;
     this.showEmpty = showEmpty;
     this.errorLog = document.getElementById("error-log");
 
-    var styles = window.getComputedStyle(container);
-    var position = styles.getPropertyValue("position");
+    let styles = window.getComputedStyle(container);
+    let position = styles.getPropertyValue("position");
     this.placeNearText = position === "fixed";
     this.hintComputer = new Worker(workerUrl);
 
@@ -52,25 +122,30 @@ function StenoDisplay(container, translations, showEmpty) {
         if (!event.data) {
             return;
         }
+        console.log("Got message", event.data);
+
         let result = event.data;
         this.cachedHints[result.text] = result.lookup;
     };
 
-    urls = [
+    let urls = [
         "scripts/type-jig.js",
-        "scripts/plover-translations.js",
+        "data/plover-translations.js",
         "scripts/spectra/rules.js",
         "scripts/spectra/spectra.js",
         "scripts/precomputeHints.js",
     ];
+
+    /**
+     * @type {{[key: string]: AnalyzeResult}}
+     */
+    this.cachedHints = {};
 
     this.hintComputer.postMessage({
         // new URL("precomputeHints.js", document.baseURI).href,
         scriptUrls: urls.map((url) => new URL(url, document.baseURI).href),
         eventType: "load",
     });
-
-    this.cachedHints = {};
 }
 
 StenoDisplay.prototype.startupPrecompute = function (fullText, options) {
@@ -101,20 +176,20 @@ StenoDisplay.prototype.update = function (text, x, y) {
         this.lastText = text;
         //The input text is 10 words long. see if 10 words matches. if not try 9 words. ect
 
-        var words = text.split(" ");
+        let words = text.split(" ");
 
-        for (var i = words.length; i > 0; i--) {
-            var subString = words.slice(0, i).join(" ");
+        for (let i = words.length; i > 0; i--) {
+            let subString = words.slice(0, i).join(" ");
 
-            var lookupResult = this.lookup(subString);
-            if (lookupResult == null) {
+            let analyzeResult = this.lookup(subString);
+            if (analyzeResult == null) {
                 continue;
             }
-            if (!lookupResult.strokes) {
-                // this.errorLog.innerHTML += "No strokes for: " + text + "<br>";
-                continue;
-            }
-            this.set(lookupResult, this.showEmpty);
+            // if (!analyzeResult.strokes) {
+            //     // this.errorLog.innerHTML += "No strokes for: " + text + "<br>";
+            //     continue;
+            // }
+            this.set(analyzeResult, this.showEmpty);
 
             if (this.placeNearText) {
                 x = Math.round(x + 36);
@@ -125,7 +200,7 @@ StenoDisplay.prototype.update = function (text, x, y) {
 
             //Find the item with id "stroke-hint" and set its text to the text
             //that was entered
-            var hint = document.getElementById("stroke-hint");
+            let hint = document.getElementById("stroke-hint");
             if (i > 1) {
                 hint.innerHTML =
                     "There is a " + i + " word phrase brief available.";
@@ -145,12 +220,10 @@ StenoDisplay.prototype.lookup = function (text) {
         return this.cachedHints[text];
     }
 
-    for (let index = 0; index < this.pseudoStenoFor.length; index++) {
-        const dictionary = this.pseudoStenoFor[index];
-
+    for (const dictionary of this.pseudoStenoFor) {
         // console.log("Looking up", text, index);
 
-        var strokes = this.lookupEntry(text, dictionary);
+        let strokes = this.lookupEntry(text, dictionary);
         if (!strokes) {
             text = text.toLowerCase();
             strokes = this.lookupEntry(text, dictionary);
@@ -165,7 +238,7 @@ StenoDisplay.prototype.lookup = function (text) {
 
             let addSymbolBefore = "";
             let addSymbolAfter = "";
-            for (var key in PloverPunctuation) {
+            for (let key in PloverPunctuation) {
                 // console.log("Checking", key, PloverPunctuation[key]);
                 let value = PloverPunctuation[key];
                 if (key.length > 1 && key.startsWith("-")) {
@@ -229,23 +302,26 @@ StenoDisplay.prototype.lookup = function (text) {
             continue;
         }
         strokes.sort(function (a, b) {
-            var aSlashes = a.split("/").length;
-            var bSlashes = b.split("/").length;
+            let aSlashes = a.split("/").length;
+            let bSlashes = b.split("/").length;
             return aSlashes - bSlashes;
         });
         if (true) {
             // console.log("Found", text, strokes);
-            var analysisResult = Analyze(strokes, text);
-            if (analysisResult?.outline?.length > 0) {
-                return {
-                    strokes: analysisResult.outline,
-                    rules: analysisResult.rules,
-                };
+            let analysisResult = Analyze(strokes, text);
+            console.log("PrecomputeHints.js", analysisResult);
+            if (analysisResult?.[0]?.res?.rules?.length > 0) {
+                return analysisResult;
             }
-            return {
-                strokes: strokes,
-                rules: [],
-            };
+            return [
+                {
+                    title: "Unknown",
+                    res: {
+                        outline: strokes[0],
+                        rules: [],
+                    },
+                },
+            ];
         }
         return { strokes: strokes, rules: null };
     }
@@ -253,10 +329,9 @@ StenoDisplay.prototype.lookup = function (text) {
     return null;
 };
 StenoDisplay.prototype.lookupEntry = function (text, dictionary) {
-    for (let index = 0; index < this.pseudoStenoFor.length; index++) {
-        const dictionary = this.pseudoStenoFor[index];
+    for (const dictionary of this.pseudoStenoFor) {
         // console.log(dictionary)
-        var strokes = dictionary[text] || "";
+        let strokes = dictionary[text] || "";
         // console.log("Strokes", strokes);
         if (!strokes && /^[0-9]+$/.test(text)) {
             strokes = this.numberStrokes(text);
@@ -274,14 +349,14 @@ StenoDisplay.prototype.lookupEntry = function (text, dictionary) {
     return "";
 };
 
-var stenoNumKeyOrder = "#123450I6789D";
+let stenoNumKeyOrder = "#123450I6789D";
 
 function cmpStenoNumKeys(a, b) {
     return stenoNumKeyOrder.indexOf(a) - stenoNumKeyOrder.indexOf(b);
 }
 
 StenoDisplay.prototype.numberStrokes = function (text) {
-    var keys = {
+    let keys = {
         1: "S",
         2: "T",
         3: "P",
@@ -293,9 +368,9 @@ StenoDisplay.prototype.numberStrokes = function (text) {
         8: "L",
         9: "T",
     };
-    var strokes = "",
+    let strokes = "",
         stroke = [];
-    for (var i = 0; i < text.length; i += 2) {
+    for (let i = 0; i < text.length; i += 2) {
         if (strokes !== "") strokes += "/";
         stroke = text.slice(i, i + 2).split("");
         if (stroke.length === 1) {
@@ -305,10 +380,10 @@ StenoDisplay.prototype.numberStrokes = function (text) {
             else if (cmpStenoNumKeys(stroke[0], stroke[1]) > 0)
                 stroke.push("I");
             stroke.sort(cmpStenoNumKeys);
-            var right;
+            let right;
             right = false;
             stroke = stroke.map(function (x) {
-                var out = keys[x] || x;
+                let out = keys[x] || x;
                 if ("AOEUI".indexOf(out) !== -1) right = true;
                 if ((out === "D" || +x > 5) && !right) {
                     out = "-" + out;
@@ -322,21 +397,32 @@ StenoDisplay.prototype.numberStrokes = function (text) {
     return strokes;
 };
 
-StenoDisplay.prototype.set = function (stenoStroke, showEmpty) {
-    // console.log("Setting", stenoStroke, showEmpty);
-    for (i = 0; i < this.strokes.length; ++i) this.strokes[i].hide();
-    if (!stenoStroke.strokes) stenoStroke.strokes = "";
-    if (stenoStroke.strokes || showEmpty) {
-        if (stenoStroke?.strokes?.multi) {
-            var i0 = 0;
-            for (var i = 0; i < stenoStroke.strokes.length; ++i) {
-                var pseudoKey = stenoStroke.strokes[i];
-                i0 = this.showAlternatives(pseudoKey, "\xA0", i0);
-            }
-        } else {
-            this.showAlternatives(stenoStroke);
+/**
+ * @param {AnalyzeResult} strokeAnalysis
+ * @param {*} showEmpty
+ */
+StenoDisplay.prototype.set = function (strokeAnalysis, showEmpty) {
+    console.log("Setting", strokeAnalysis, showEmpty);
+    for (let i = 0; i < this.strokes.length; ++i) this.strokes[i].hide();
+
+    // if (!strokeAnalysis.strokes) strokeAnalysis.strokes = "";
+
+    for (let i = 0; i < strokeAnalysis.length; ++i) {
+        if (i >= this.strokeGroups.length) {
+            this.strokeGroups.push(new StrokeGroup(this));
         }
+        this.strokeGroups[i].setTitle(strokeAnalysis[i].title);
+        this.strokeGroups[i].set(strokeAnalysis[i].res);
     }
+
+    // if (strokeAnalysis?.strokes?.multi) {
+    //     let i0 = 0;
+    //     for (const pseudoKey of strokeAnalysis.strokes) {
+    //         i0 = this.showAlternatives(pseudoKey, "\xA0", i0);
+    //     }
+    // } else {
+    // this.showAlternatives(strokeAnalysis);
+    // }
 };
 
 StenoDisplay.prototype.showAlternatives = function (stenoStroke, firstSep, i0) {
@@ -346,8 +432,8 @@ StenoDisplay.prototype.showAlternatives = function (stenoStroke, firstSep, i0) {
     if (typeof stenoStroke.strokes === "string")
         stenoStroke.strokes = [stenoStroke.strokes];
     // console.log(stenoStroke);
-    for (var i = 0; i < stenoStroke.strokes.length; ++i) {
-        var sep = i ? " or " : firstSep;
+    for (let i = 0; i < stenoStroke.strokes.length; ++i) {
+        let sep = i ? " or " : firstSep;
         i0 += this.showTranslation(
             stenoStroke.strokes[i],
             i0,
@@ -364,12 +450,12 @@ StenoDisplay.prototype.showTranslation = function (
     separator,
     rules
 ) {
-    var strokes = pseudoSteno.split("/");
+    let strokes = pseudoSteno.split("/");
     for (var i = 0; i < strokes.length; ++i) {
         if (i + i0 >= this.strokes.length) {
             this.strokes.push(new StenoDisplay.Stroke(this.container));
         }
-        // console.log(pseudoSteno, i0, separator, rules);
+        console.log(pseudoSteno, i0, separator, rules);
         this.strokes[i + i0].set(
             strokes[i],
             separator,
@@ -402,7 +488,7 @@ StenoDisplay.Stroke = function (container) {
     // container.appendChild(this.separator);
     this.keys = document.createElement("table");
 
-    var spacer = document.createElement("tr");
+    let spacer = document.createElement("tr");
     spacer.style.lineHeight = "1px";
     spacer.style.opacity = "0";
     for (let index = 0; index < 10; index++) {
@@ -411,9 +497,9 @@ StenoDisplay.Stroke = function (container) {
         spacer.appendChild(newElement);
     }
 
-    var num = document.createElement("tr");
-    var numCell = document.createElement("td");
-    var numBar = document.createElement("div");
+    let num = document.createElement("tr");
+    let numCell = document.createElement("td");
+    let numBar = document.createElement("div");
     numBar.className = "numberBar";
     numCell.colSpan = 10;
     numCell.appendChild(numBar);
@@ -421,18 +507,18 @@ StenoDisplay.Stroke = function (container) {
     this.keys.appendChild(spacer);
     this.keys.appendChild(num);
 
-    var upper = document.createElement("tr");
-    var lower = document.createElement("tr");
-    var vowel = document.createElement("tr");
+    let upper = document.createElement("tr");
+    let lower = document.createElement("tr");
+    let vowel = document.createElement("tr");
     this.keys.appendChild(upper);
     this.keys.appendChild(lower);
     this.keys.appendChild(vowel);
-    var upperKeys = ["S", "T", "P", "H", "*", "F", "P", "L", "T", "D"];
-    var lowerKeys = ["K", "W", "R", "R", "B", "G", "S", "Z"];
-    var vowelKeys = ["", "A", "O", "", "E", "U"];
-    var upperCells = addCells(upper, upperKeys);
-    var lowerCells = addCells(lower, lowerKeys);
-    var vowelCells = addCells(vowel, vowelKeys);
+    let upperKeys = ["S", "T", "P", "H", "*", "F", "P", "L", "T", "D"];
+    let lowerKeys = ["K", "W", "R", "R", "B", "G", "S", "Z"];
+    let vowelKeys = ["", "A", "O", "", "E", "U"];
+    let upperCells = addCells(upper, upperKeys);
+    let lowerCells = addCells(lower, lowerKeys);
+    let vowelCells = addCells(vowel, vowelKeys);
 
     upperCells[0].rowSpan = 2;
     upperCells[4].rowSpan = 2;
@@ -483,12 +569,12 @@ StenoDisplay.Stroke = function (container) {
 };
 
 StenoDisplay.Stroke.prototype.hide = function () {
-    if (this.separator) addClass(this.separator, "hide");
+    // if (this.separator) addClass(this.separator, "hide");
     addClass(this.keys, "hide");
 };
 
 StenoDisplay.Stroke.prototype.show = function () {
-    if (this.separator) removeClass(this.separator, "hide");
+    // if (this.separator) removeClass(this.separator, "hide");
     removeClass(this.keys, "hide");
 };
 
@@ -634,8 +720,8 @@ StenoDisplay.Stroke.prototype.applyNumberRules = function (stroke) {
 StenoDisplay.Stroke.prototype.applyRules = function (rules) {
     // console.log("Applying rules to stroke", rules);
 
-    var self = this;
-    var appliedRules = [];
+    let self = this;
+    let appliedRules = [];
 
     rules.forEach(function (rule) {
         if (rule.subRules.length === 0) {
@@ -650,7 +736,7 @@ StenoDisplay.Stroke.prototype.applyRules = function (rules) {
 
     appliedRules.forEach((rule) => {
         let className = "pressed";
-        var outline = rule.outline;
+        let outline = rule.outline;
         let replacedText = rule.target;
 
         if (replacedText == "") replacedText = rule.ruleSound[0];

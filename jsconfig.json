@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "checkJs": true
+    },
+    "exclude": [
+        "/data/short-sentences-data.js",
+        "/data/tatoeba-sentences.js",
+        "/data/plover-translations.js",
+        "/data/gutenberg-data.js",
+        "/data/monkeytype-data.js",
+        "./data/**/*.js"
+    ]
+}

@@ -1008,16 +1008,16 @@ TypeJig.prototype.addWordToExercise = function (
     stopOnNewline,
     opacity
 ) {
-    console.log(
-        "addWordToExercise",
-        word,
-        i,
-        hardReset,
-        x,
-        maxLength,
-        stopOnNewline,
-        opacity
-    );
+    // console.log(
+    //     "addWordToExercise",
+    //     word,
+    //     i,
+    //     hardReset,
+    //     x,
+    //     maxLength,
+    //     stopOnNewline,
+    //     opacity
+    // );
     var display = this.display;
     var enterPoints = this.exercise.enterPoints;
     var maxWidth = maxLength;

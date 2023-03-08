@@ -29,6 +29,10 @@ function compute(data) {
     processAllWords();
 }
 
+/**
+ * @param {*} text 
+ * @returns {AnalyzeResult | null}
+ */
 function lookup(text) {
     for (const element of translations) {
         const dictionary = element;
@@ -120,17 +124,22 @@ function lookup(text) {
         });
         if (true) {
             // console.log("Found", text, strokes);
+            console.log("PrecomputeHints.js", text, strokes);
             var analysisResult = Analyze(strokes, text);
-            if (analysisResult?.rules?.length > 0) {
-                return {
-                    strokes: analysisResult.outline,
-                    rules: analysisResult.rules,
-                };
+            console.log("PrecomputeHints.js", analysisResult);
+            if (analysisResult?.[0]?.res?.rules?.length > 0) {
+                return analysisResult;
             }
-            return {
-                strokes: strokes,
-                rules: [],
-            };
+            return [
+                {
+                    title: "Unknown",
+                    // @ts-ignore
+                    res: {
+                        outline: strokes,
+                        rules: [],
+                    },
+                },
+            ];
         }
         // return { strokes: strokes, rules: null };
     }
@@ -211,10 +220,6 @@ function processAllWords() {
             // console.log("Looking up", subString);
             var lookupResult = lookup(subString);
             if (lookupResult == null) {
-                continue;
-            }
-            if (!lookupResult.strokes) {
-                // this.errorLog.innerHTML += "No strokes for: " + text + "<br>";
                 continue;
             }
             postMessage({
