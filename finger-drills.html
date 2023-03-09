@@ -5,17 +5,15 @@
         <meta charset="utf-8" />
         <title>Finger Drills</title>
         <link href="base.css" rel="stylesheet" type="text/css" />
+        <script src="scripts/utils/theme.mjs" type="module"></script>
+
+
         <link href="style.less" rel="stylesheet/less" type="text/css" />
-        <script src="scripts/type-jig.js"></script>
-        <script src="scripts/utils/util.js"></script>
-        <script src="scripts/utils/steno-display.js"></script>
-        <script src="data/plover-translations.js"></script>
-        <script src="data/finger-drill-data.js"></script>
-        <script src="scripts/stenotype-finger-technique.js"></script>
+        <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> -->
 
         <script src="scripts/libs/less.js" ></script>
         <script src="scripts/libs/chart.js"></script>
-        <!-- <script src="scripts/libs/chartjs-plugin-datalabels.js"></script> -->
+        <script src="scripts/libs/chartjs-plugin-datalabels.js"></script>
         <script src="scripts/libs/jquery-3.6.0.min.js"></script>
 
         <link rel="stylesheet" type="text/css" href="font-roboto.css" />
@@ -23,7 +21,13 @@
     <body>
         <div id="lesson" class="wrapper"></div>
     </body>
-    <script>
+    <script type="module">
+        import { setTheme, displayOnly, prepareInput, loadSettings,storageAvailable,populatePage,getFormFields ,parseQueryString} from "./scripts/utils/util.mjs";
+        import {numberSentences} from "./scripts/number-sentences.mjs";
+        import {TypeJig, setExercise} from "./scripts/type-jig.mjs";
+        import {wordDrill} from "./scripts/word-drill.mjs";
+
+        import {dreadedDuo} from "./data/finger-drill-data.mjs";
         setTheme();
 
         function addSet(strokes, iterations, drill) {
@@ -116,7 +120,6 @@
             }
 
             var jig = setExercise(exercise.name, exercise, null, fields);
-            initializeButtons(jig);
         });
     </script>
 </html>

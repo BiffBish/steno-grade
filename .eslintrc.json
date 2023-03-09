@@ -1,0 +1,23 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "extends": "google",
+    "overrides": [],
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "sourceType": "module"
+    },
+    "rules": {
+        "indent": ["error", 4],
+        "linebreak-style": ["error", "windows"],
+        "require-jsdoc": "off",
+        "quotes": ["error", "double"],
+        "max-len": ["error", { "code": 120 }],
+        "valid-jsdoc": "off",
+        "new-cap": "off",
+        "spaced-comment": "off"
+    },
+    "ignorePatterns": ["**/data/*.mjs", "**/data/*.js", "**/libs/*.js"]
+}

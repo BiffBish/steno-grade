@@ -2,14 +2,21 @@
     "compilerOptions": {
         "target": "es6",
         "module": "commonjs",
-        "checkJs": true
+        "checkJs": true,
+        "types": ["jquery"],
+        "lib": ["ES2016", "DOM", "ES2019"]
     },
+
     "exclude": [
         "/data/short-sentences-data.js",
         "/data/tatoeba-sentences.js",
         "/data/plover-translations.js",
         "/data/gutenberg-data.js",
         "/data/monkeytype-data.js",
-        "./data/**/*.js"
+        "./data/**/*.js",
+        "./data/**/*.mjs",
+        "**/data/*.mjs",
+        "**/data/*.js",
+        "**/libs/*.js"
     ]
 }

@@ -1,21 +1,61 @@
+// import {SpectraRules} from "./rules.mjs";
 // @ts-ignore
-Spectra = {
-    /**
-     * @param {string} code
-     */
-};
 
 
+let SpectraRules = null;
+// @ts-ignore
+if (typeof importScripts === "function") {
+    try {
+        // @ts-ignore
+        importScripts("./rules.mjs");
+    } catch (e) {
+        // @ts-ignore
+        importScripts("./spectra/rules.mjs");
+    }
+    // @ts-ignore
+    SpectraRules = _SpectraRules;
+// @ts-ignore
+} else if (typeof require === "function") {
+    console.log("require is defined");
+    try {
+        // @ts-ignore
+        SpectraRules = require("./rules.mjs").SpectraRules;
+    } catch (e) {
+        // @ts-ignore
+        SpectraRules = require("./spectra/rules.mjs").SpectraRules;
+    }
+    // @ts-ignore
+    SpectraRules ??= window._SpectraRules;
+} else {
+    console.log("import is defined");
+    try {
+        import("./rules.mjs").then((rules) => {
+            // @ts-ignore
+            // @ts-ignore
+            SpectraRules = rules.SpectraRules;
+            // @ts-ignore
+            SpectraRules ??= window._SpectraRules;
+        });
+    } catch (e) {
+        // @ts-ignore
+        SpectraRules = import("./spectra/rules.mjs").then((rules) => {
+            SpectraRules = rules.SpectraRules;
+        });
+    }
+}
+if (typeof window !== "undefined") {
+    // @ts-ignore
+    SpectraRules ??= window._SpectraRules;
+}
 
-
-
-
-
-
-
-
-
-
+/* eslint-disable valid-jsdoc */
+/* eslint-disable guard-for-in */
+// @ts-ignore
+// Spectra = {
+//     /**
+//      * @param {string} code
+//      */
+// };
 
 /**
  *
@@ -27,18 +67,18 @@ function removeStartingPart(
     outline,
     removing,
     debug = false,
-    randomNumber = 0
+    randomNumber = 0,
 ) {
-    if (debug)
-        console.log(
-            "---".repeat(depth) + "Removing",
-            removing,
-            "from",
-            outline + " " + randomNumber
-        );
-    var strokes = outline.split("/");
-    //Remove the first part of the outline that matches the removing part and save it in a variable
-    var resulting;
+    // if (debug)
+    //     console.log(
+    //         "---".repeat(depth) + "Removing",
+    //         removing,
+    //         "from",
+    //         outline + " " + randomNumber
+    //     );
+    let strokes = outline.split("/");
+    // Remove the first part of the outline that matches the removing part and save it in a variable
+    let resulting;
     let includeDash = false;
     let includeAsterisk = false;
     let firstStroke = strokes[0];
@@ -49,7 +89,7 @@ function removeStartingPart(
     if (!firstStroke.startsWith(removing)) {
         if (firstStroke.match(/\*/)) {
             includeAsterisk = true;
-            let firstStrokeHasMiddleCharacter = firstStroke.match(/[AOEU-]/);
+            const firstStrokeHasMiddleCharacter = firstStroke.match(/[AOEU-]/);
             if (firstStrokeHasMiddleCharacter) {
                 firstStroke = firstStroke.replace(/\*/, "");
             } else {
@@ -75,257 +115,311 @@ function removeStartingPart(
         resulting = "-" + resulting;
     }
     if (resulting == "-") resulting = "";
-    //Add back in the other strokes seperated by a /
+    // Add back in the other strokes seperated by a /
 
     strokes[0] = resulting;
 
     strokes = strokes.filter((stroke) => stroke != "");
-    if (debug)
+    if (debug) {
         console.log(
             "---".repeat(depth) + "Removing",
             removing,
             "from",
             outline,
             ": ",
-            strokes.join("/") + " " + randomNumber
+            strokes.join("/") + " " + randomNumber,
         );
+    }
     return strokes.join("/");
 }
 
-
-
-
-
 function haveCommonLetters(a, b) {
-  for (let i = 0; i < a.length; i++) {
-    if (b.indexOf(a[i]) !== -1) {
-      return true;
+    for (const element of a) {
+        if (b.indexOf(element) !== -1) {
+            return true;
+        }
     }
-  }
-  return false;
+    return false;
 }
 
+// const leftRE = /[CLGZNJXBVFYQDM0123456789STKPWHR]/g;
+// const vowelRE =
+//     /AY|OA|OO|AW|EA|EE|OH|UU|OI|IE|OW|I|0|1|2|3|4|5|6|7|8|9|A|O|E|U/g;
+// const _right_re =
+//     /RBGS|KSHN|SHN|RCH|CH|SH|NG|NK|TH|K|J|N|M|0|1|2|3|4|5|6|7|8|9|\*|F|R|P|B|L|G|T|S|D|Z/g;
+// const separationRE = /([^AOEUI*-]*)([AO*EUI-][AO*EUIHYW-]*|)(.*)/;
 
+// function combineStrokeToOutline(stroke, outline) {
+//     const strokes = outline.split("/");
+//     const lastStroke = strokes[strokes.length - 1];
 
+//     // console.log("Combining", stroke, "to", lastStroke);
 
-let _left_re = /[CLGZNJXBVFYQDM0123456789STKPWHR]/g;
-let _vowel_re =
-    /AY|OA|OO|AW|EA|EE|OH|UU|OI|IE|OW|I|0|1|2|3|4|5|6|7|8|9|A|O|E|U/g;
-let _right_re =
-    /RBGS|KSHN|SHN|RCH|CH|SH|NG|NK|TH|K|J|N|M|0|1|2|3|4|5|6|7|8|9|\*|F|R|P|B|L|G|T|S|D|Z/g;
-let _separation_re = /([^AOEUI*-]*)([AO*EUI-][AO*EUIHYW-]*|)(.*)/;
+//     const seperator = "_";
 
-function combineStrokeToOutline(stroke, outline) {
-   
-     
-    var strokes = outline.split("/");
-    var lastStroke = strokes[strokes.length - 1];
+//     const [, lastLeft, lastVowel, lastRight] =
+//         lastStroke.match(separationRE);
 
-    // console.log("Combining", stroke, "to", lastStroke);
+//     const [, strokeLeft, strokeVowel, strokeRight] =
+//         stroke.match(separationRE);
 
-    var seperator = "_";
+//     if (outline == "") {
+//         if (
+//             !strokeLeft &&
+//             strokeVowel &&
+//             strokeRight &&
+//             strokeVowel == "-"
+//         ) {
+//             return false;
+//         }
 
+//         return stroke;
+//     }
 
-    let [_, last_left, last_vowel, last_right] = lastStroke.match(_separation_re);
+//     if (!lastLeft && !lastVowel && lastRight) {
+//         throw new Error("Invalid stroke" + lastStroke);
+//     }
 
-    let [__, stroke_left, stroke_vowel, stroke_right] = stroke.match(_separation_re);
+//     if (!strokeLeft && !strokeVowel && strokeRight) {
+//         throw new Error("Invalid stroke" + stroke);
+//     }
 
+//     if (lastLeft && !lastVowel && lastRight) {
+//         throw new Error("Invalid stroke" + lastStroke);
+//     }
 
-     if (outline == "") {
+//     if (strokeLeft && !strokeVowel && strokeRight) {
+//         throw new Error("Invalid stroke" + stroke);
+//     }
 
-        if (!stroke_left && stroke_vowel && stroke_right && stroke_vowel == "-") {
-            return false;
-        }
-         
-        return stroke;
-     }
+//     if (strokeLeft && strokeVowel && !strokeRight) {
+//         throw new Error("Invalid stroke" + stroke);
+//     }
 
-        
-    if (!last_left && !last_vowel && last_right) {
-        throw "Invalid stroke" + lastStroke;
-    }
+//     // S + R = SR
+//     if (lastLeft && !lastVowel && strokeLeft && !strokeVowel) {
+//         if (haveCommonLetters(lastLeft, strokeLeft)) {
+//             // return outline + seperator + "/" + stroke;
+//             return false;
+//         }
+//         return outline + seperator + stroke;
+//     }
 
-    if (!stroke_left && !stroke_vowel && stroke_right) {
-        throw "Invalid stroke" + stroke;
+//     // S-R + R = S-R/R
+//     if (lastLeft && lastVowel && lastRight && strokeLeft && !strokeVowel) {
+//         return outline + seperator + "/" + stroke;
+//     }
 
-    }
+//     // S-R + -B = S-RB
+//     if (
+//         lastLeft &&
+//         lastVowel &&
+//         lastRight &&
+//         !strokeLeft &&
+//         strokeVowel &&
+//         strokeRight
+//     ) {
+//         if (haveCommonLetters(lastRight, strokeRight)) {
+//             // return outline + seperator + "/" + stroke;
+//             return false;
+//         }
+//         return outline + seperator + strokeRight;
+//     }
 
-    if (last_left && !last_vowel && last_right) {
-        throw "Invalid stroke" + lastStroke;
-    }
+//     // -R + -B = -RB
+//     if (
+//         !lastLeft &&
+//         lastVowel &&
+//         lastRight &&
+//         !strokeLeft &&
+//         strokeVowel &&
+//         strokeRight
+//     ) {
+//         if (haveCommonLetters(lastRight, strokeRight)) {
+//             // return outline +seperator +  "/" + stroke;
+//             return false;
+//         }
+//         return outline + seperator + strokeRight;
+//     }
 
-    if (stroke_left && !stroke_vowel && stroke_right) {
-        throw "Invalid stroke" + stroke;
-    }
+//     // -R + R = -R/R
+//     if (
+//         !lastLeft &&
+//         lastVowel &&
+//         lastRight &&
+//         strokeLeft &&
+//         !strokeVowel
+//     ) {
+//         return outline + seperator + "/" + stroke;
+//     }
 
-    if (stroke_left && stroke_vowel && !stroke_right) {
-        throw "Invalid stroke" + stroke;
-    }
+//     // S + -B = S-B
+//     if (
+//         lastLeft &&
+//         !lastVowel &&
+//         !strokeLeft &&
+//         strokeVowel &&
+//         strokeRight
+//     ) {
+//         return outline + seperator + stroke;
+//     }
 
+//     // E + T = E/T
+//     if (
+//         !lastLeft &&
+//         lastVowel &&
+//         strokeLeft &&
+//         !strokeVowel &&
+//         !strokeRight
+//     ) {
+//         return outline + seperator + "/" + stroke;
+//     }
 
+//     // S + E = SE
+//     if (
+//         lastLeft &&
+//         !lastVowel &&
+//         !strokeLeft &&
+//         strokeVowel &&
+//         !strokeRight
+//     ) {
+//         return outline + seperator + stroke;
+//     }
 
-    // S + R = SR
-    if (last_left && !last_vowel && stroke_left && !stroke_vowel) {
-        if (haveCommonLetters(last_left, stroke_left)) {
-            // return outline + seperator + "/" + stroke;
-            return false;
-        }
-        return outline + seperator + stroke;
-    }
+//     // SE + S = SE/S
+//     if (
+//         lastLeft &&
+//         lastVowel &&
+//         !lastRight &&
+//         strokeLeft &&
+//         !strokeVowel
+//     ) {
+//         return outline + seperator + "/" + stroke;
+//     }
 
-    // S-R + R = S-R/R
-    if (last_left && last_vowel && last_right && stroke_left && !stroke_vowel) {
-        return outline + seperator + "/" + stroke;
-    }
+//     // SE + EB = SE/EB
+//     if (
+//         lastLeft &&
+//         lastVowel &&
+//         !lastRight &&
+//         !strokeLeft &&
+//         strokeVowel &&
+//         strokeRight
+//     ) {
+//         if (haveCommonLetters(lastVowel, strokeVowel)) {
+//             // return outline + seperator + "/" + stroke;
+//             return false;
+//         }
+//         return outline + seperator + strokeVowel + strokeRight;
+//     }
 
-    // S-R + -B = S-RB
-    if (last_left && last_vowel && last_right && !stroke_left && stroke_vowel && stroke_right) {
-        if (haveCommonLetters(last_right, stroke_right)) {
-            // return outline + seperator + "/" + stroke;
-            return false;
+//     // E + -B = EB
 
-        }
-        return outline + seperator + stroke_right;
-    }
+//     if (
+//         !lastLeft &&
+//         lastVowel &&
+//         !lastRight &&
+//         !strokeLeft &&
+//         strokeVowel &&
+//         strokeRight
+//     ) {
+//         if (haveCommonLetters(lastVowel, strokeVowel)) {
+//             // return outline + seperator + "/" + stroke;
+//             return false;
+//         }
+//         return outline + seperator + strokeVowel + strokeRight;
+//     }
 
-    // -R + -B = -RB
-    if (!last_left && last_vowel && last_right && !stroke_left && stroke_vowel && stroke_right) {
-        if (haveCommonLetters(last_right, stroke_right)) {
-            // return outline +seperator +  "/" + stroke;
-            return false;
+//     // -B + E = B/E
+//     if (
+//         !lastLeft &&
+//         lastVowel &&
+//         lastRight &&
+//         !strokeLeft &&
+//         strokeVowel &&
+//         !strokeRight
+//     ) {
+//         return outline + seperator + "/" + stroke;
+//     }
 
-        }
-        return outline +seperator +  stroke_right;
-    }
+//     // S-B + E = S-B/E
+//     if (
+//         lastLeft &&
+//         lastVowel &&
+//         lastRight &&
+//         !strokeLeft &&
+//         strokeVowel &&
+//         !strokeRight
+//     ) {
+//         return outline + seperator + "/" + stroke;
+//     }
 
-    // -R + R = -R/R
-    if (!last_left && last_vowel && last_right && stroke_left && !stroke_vowel) {
-        return outline +seperator +  "/" + stroke;
-    }
-
-    // S + -B = S-B
-    if (last_left && !last_vowel && !stroke_left && stroke_vowel && stroke_right) {
-        return outline + seperator + stroke;
-    }
-
-    // E + T = E/T
-    if (!last_left && last_vowel && stroke_left && !stroke_vowel && !stroke_right) {
-        return outline + seperator + "/" + stroke;
-    }
-
-    // S + E = SE
-    if (last_left && !last_vowel && !stroke_left && stroke_vowel && !stroke_right) {
-        return outline + seperator + stroke;
-    }
-
-    // SE + S = SE/S
-    if (last_left && last_vowel && !last_right && stroke_left && !stroke_vowel) {
-        return outline + seperator + "/" + stroke;
-    }
-
-
-    // SE + EB = SE/EB
-    if (last_left && last_vowel && !last_right && !stroke_left && stroke_vowel && stroke_right) {
-        if (haveCommonLetters(last_vowel, stroke_vowel)) {
-            // return outline + seperator + "/" + stroke;
-            return false;
-
-        }
-        return outline + seperator + stroke_vowel + stroke_right;
-    }
-
-    // E + -B = EB
-
-    if (!last_left && last_vowel && !last_right && !stroke_left && stroke_vowel && stroke_right) {
-        if (haveCommonLetters(last_vowel, stroke_vowel)) {
-            // return outline + seperator + "/" + stroke;
-            return false;
-        }
-        return outline + seperator + stroke_vowel + stroke_right;
-    }
-
-    // -B + E = B/E
-    if (!last_left && last_vowel && last_right && !stroke_left && stroke_vowel && !stroke_right) {
-        return outline + seperator + "/" + stroke;
-    }
-
-    // S-B + E = S-B/E
-    if (last_left && last_vowel && last_right && !stroke_left && stroke_vowel && !stroke_right) {
-        return outline + seperator + "/" + stroke;
-    }
-        
-        
-
-
-
-
-
-
-    console.log("Unknown combination", stroke, outline);
-    console.log(`[${last_left}, ${last_vowel}, ${last_right}] + [${stroke_left}, ${stroke_vowel}, ${stroke_right}]`);
-    throw "Unknown combination";
-}
-
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//     console.log("Unknown combination", stroke, outline);
+//     console.log(
+//         `[${lastLeft}, ${lastVowel}, ${lastRight}] + [${strokeLeft}, ${strokeVowel}, ${strokeRight}]`,
+//     );
+//     throw new Error("Unknown combination");
+// }
 
 /**
  * A number, or a string containing a number.
  * @typedef {{
- *      inputOutline: string
- *      inputTarget: string,
+ *      ruleName: string,
+ *      target: string,
  *      outline: string,
+ *      description: string,
+ *      ruleSound: string[],
+ *      subRules: TestingRule[],
+ *  }
+ * } TestingRule
+ */
+
+/**
+ * A number, or a string containing a number.
+ * @typedef {{
+ *      rule: TestingRule,
+ *      identifier: number,
+ *      inputOutline: string,
+ *      inputTarget: string,
+ *      remainingOutline: string,
+ *      remainingTarget: string,
+ *      skippedLetters: number,
+ *  }
+ * } TestRuleResult
+ */
+
+/**
+ * A number, or a string containing a number.
+ * @typedef {{
+ *      rule: TestingRule,
+ *      subResult: UnpackedResult[],
+ *      inputOutline: string,
+ *      inputTarget: string,
  *      remainingOutline: string,
  *      remainingTarget:string,
- *      ruleName: string,
- *      ruleSound: string,
- *      description: string,
- *      subRules: UnpackedRule[],
  *      skippedLetters: number,
- *      target: string,
  *  }
- * } UnpackedRule
+ * } UnpackedResult
  */
 
 /**
  *
- * @param {UnpackedRule[][]} results
+ * @param {UnpackedResult[][]} results
  */
 
 /**
  * A processed Rule
- * @typedef {{
- *      name:string,
- *      target:string,
- *      outline:string,
- *      skippedLetters:number
- *      ruleSound:string,
- *      description:string,
- *      subRules: UnpackedRule[],
- *      wordNum:number,
- *  }
+ * @typedef { TestingRule & {
+ *    wordNum: number,
+ * }
  * } ProcessedRule
- * 
+ *
 /**
  * A processed Result
  * @typedef {{
- *      rules: ProcessedRule[] ,
+ *      rules: ProcessedRule[],
  *      skippedLetterCount:number,
- *      skippedKeyCount:number, 
+ *      skippedKeyCount:number,
  *      skippedKeys: string,
  *      outline: string,
  *  }
@@ -333,9 +427,10 @@ function combineStrokeToOutline(stroke, outline) {
  */
 
 /**
- *
- * @param { UnpackedRule[][]} results
- * @returns {ProcessedResult | null}
+ * A processed Result
+ * @param {(UnpackedResult[])[]} results
+ * @param {string} outline
+ * @return {ProcessedResult}
  */
 function processResults(results, outline) {
     let bestPerformer = null;
@@ -343,30 +438,21 @@ function processResults(results, outline) {
         /**
          * @type {ProcessedResult}
          */
-        var returnValue = {
+        const returnValue = {
             outline: outline,
             skippedKeyCount: 0,
             skippedKeys: "",
             skippedLetterCount: 0,
             rules: [],
         };
-        var numOfWords = result[0].inputOutline.split("/").length;
-        // console.log("numOfWords : ", result[0]);
-        // console.log("numOfWords : ", numOfWords);
-        result.forEach((rule) => {
+        const numOfWords = result[0].inputOutline.split("/").length;
+        result.forEach((res) => {
+            const rule = res.rule;
             returnValue.rules.push({
-                name: rule.ruleName,
-                target: rule.target,
-                outline: rule.outline,
-                ruleSound: rule.ruleSound,
-                description: rule.description,
-                remaningOutline: rule.remainingOutline,
-                subRules: rule.subRules,
-                skippedLetters: rule.skippedLetters,
-                wordNum: numOfWords - rule.inputOutline.split("/").length,
+                ...rule,
+                wordNum: numOfWords - res.inputOutline.split("/").length,
             });
-            // returnValue.skippedKeyCount += rule.;
-            returnValue.skippedLetterCount += rule.skippedLetters;
+            returnValue.skippedLetterCount += res.skippedLetters;
         });
         if (bestPerformer == null) bestPerformer = returnValue;
 
@@ -378,51 +464,44 @@ function processResults(results, outline) {
 }
 
 /**
- * @param {*} result
- * @returns {UnpackedRule[][]}
+ * @param {UnpackedResult[]} results
+ * @return {(UnpackedResult[])[]}
  */
-function UnpackRecursively(result) {
-    var finalResult = [];
-    // console.log("Processing Result");
-    if (!result) return [];
-    if (result?.subResults === undefined) return [[]];
-    result.subResults.forEach((element, index) => {
-        // console.log("element", element);
+function unpackRecursively(results) {
+    const finalResult = [];
+    if (!results) return [];
+    if (results === undefined) return [[]];
 
-        if (element.subResult === true) {
-            // console.log("TRUE ELEMENT", element);
+    results.forEach((element) => {
+        if (element.subResult.length == 0) {
             finalResult.push([element]);
             return;
-            // return [[element]];
         }
-        var newResult = UnpackRecursively(element.subResult);
-        // element.subResult = [];
-        for (let i = 0; i < newResult.length; i++) {
-            finalResult.push([element, ...newResult[i]]);
+        for (const el of unpackRecursively(element.subResult)) {
+            finalResult.push([element, ...el]);
         }
     });
     return finalResult;
 }
 
+// const defaultRules = {
+//     rules: [
+//         {
+//             param: "stroke",
+//             type: "minimize",
+//         },
+//         {
+//             param: "skippedKeys",
+//             type: "minimize",
+//         },
+//         {
+//             param: "skippedLetters",
+//             type: "minimize",
+//         },
+//     ],
+// };
 
-var defaultRules = {
-    rules: [
-        {
-            param: "stroke",
-            type: "minimize",
-        },
-        {
-            param: "skippedKeys",
-            type: "minimize",
-        },
-        {
-            param: "skippedLetters",
-            type: "minimize",
-        },
-    ],
-};
-
-var breifRules = {
+const breifRules = {
     title: "Breif",
     rules: [
         {
@@ -448,7 +527,7 @@ var breifRules = {
     ],
 };
 
-var mostAccurateRules = {
+const mostAccurateRules = {
     title: "Most Accurate",
     rules: [
         {
@@ -478,18 +557,29 @@ var mostAccurateRules = {
     ],
 };
 
-var analysisParameters = {
+const analysisParameters = {
     rules: [mostAccurateRules, breifRules],
 };
 
 /**
+ * @typedef {{
+ *   rules: {
+ *       param: string,
+ *       type: string,
+ *   }[],
+ *   title: string,
+ * }} SortingRules
+ */
+
+/**
  * @param {ProcessedResult} best
  * @param {ProcessedResult} processed
- * @returns {number}
+ * @param {SortingRules} sortingRules
+ * @return {number}
  * @description Compares two ProcessedResults and returns a number based on which one is better.
  * 1 if a is better, -1 if b is better, 0 if they are equal.
  */
-function ComparePreformer(best, processed, sortingRules) {
+function comparePreformer(best, processed, sortingRules) {
     console.log("Comparing", best, processed);
 
     /**
@@ -500,75 +590,75 @@ function ComparePreformer(best, processed, sortingRules) {
      * @type {*}
      */
     let b;
-    let res = ((a, b) => {
+    const res = ((a, b) => {
         for (const rule of sortingRules.rules) {
             console.log("Comparing rule", rule, sortingRules);
             switch (rule.param) {
-                case "stroke":
-                    a = processed.outline.split("/").length;
-                    b = best.outline.split("/").length;
-                    if (a < b) {
-                        return 1;
-                    }
-                    if (a > b) {
-                        return -1;
-                    }
-                    break;
-                case "skippedLetters":
-                    a = processed.skippedLetterCount;
-                    b = best.skippedLetterCount;
-                    if (a < b) {
-                        return 1;
-                    }
-                    if (a > b) {
-                        return -1;
-                    }
-                    break;
-                case "skippedKeys":
-                    a = processed.skippedKeyCount;
-                    b = best.skippedKeyCount;
-                    if (a < b) {
-                        return 1;
-                    }
-                    if (a > b) {
-                        return -1;
-                    }
-                    break;
-                case "rules":
-                    a = processed.rules.length;
-                    b = best.rules.length;
-                    if (a < b) {
-                        return 1;
-                    }
-                    if (a > b) {
-                        return -1;
-                    }
-                    break;
+            case "stroke":
+                a = processed.outline.split("/").length;
+                b = best.outline.split("/").length;
+                if (a < b) {
+                    return 1;
+                }
+                if (a > b) {
+                    return -1;
+                }
+                break;
+            case "skippedLetters":
+                a = processed.skippedLetterCount;
+                b = best.skippedLetterCount;
+                if (a < b) {
+                    return 1;
+                }
+                if (a > b) {
+                    return -1;
+                }
+                break;
+            case "skippedKeys":
+                a = processed.skippedKeyCount;
+                b = best.skippedKeyCount;
+                if (a < b) {
+                    return 1;
+                }
+                if (a > b) {
+                    return -1;
+                }
+                break;
+            case "rules":
+                a = processed.rules.length;
+                b = best.rules.length;
+                if (a < b) {
+                    return 1;
+                }
+                if (a > b) {
+                    return -1;
+                }
+                break;
 
-                case "Asterisk":
-                    //The number of "*" characters in the outline
-                    a = processed.outline.match(/\*/g)?.length || 0;
-                    b = best.outline.match(/\*/g)?.length || 0;
-                    if (a < b) {
-                        return 1;
-                    }
-                    if (a > b) {
-                        return -1;
-                    }
-                    break;
-                case "Keys":
-                    //The number of keys in the outline
-                    a = processed.outline.length;
-                    b = best.outline.length;
-                    if (a < b) {
-                        return 1;
-                    }
-                    if (a > b) {
-                        return -1;
-                    }
-                    break;
-                default:
-                    break;
+            case "Asterisk":
+                // The number of "*" characters in the outline
+                a = processed.outline.match(/\*/g)?.length || 0;
+                b = best.outline.match(/\*/g)?.length || 0;
+                if (a < b) {
+                    return 1;
+                }
+                if (a > b) {
+                    return -1;
+                }
+                break;
+            case "Keys":
+                // The number of keys in the outline
+                a = processed.outline.length;
+                b = best.outline.length;
+                if (a < b) {
+                    return 1;
+                }
+                if (a > b) {
+                    return -1;
+                }
+                break;
+            default:
+                break;
             }
         }
         return 0;
@@ -576,8 +666,6 @@ function ComparePreformer(best, processed, sortingRules) {
     console.log("Comparing Result", res);
     return res;
 }
-
-//Define an Analyze result
 
 /**
  * @typedef {{
@@ -590,17 +678,20 @@ function ComparePreformer(best, processed, sortingRules) {
  *
  * @param {*} outlines
  * @param {*} target
- * @returns {AnalyzeResult}
+ * @return {AnalyzeResult}
  *
  */
-function Analyze(outlines, target) {
-    console.log("Analyzing", outlines, target);
-    target = target.toLowerCase();
-    // outlines = ["KPAPL"];
+function _analyze(outlines, target) {
+    // target = target.toLowerCase();
 
+    //Lowercase the target if it is not a stanalone vowel
+    // console
+    if (target.match(/[AEIOU]/g) == null) {
+        target = target.toLowerCase();
+    }
     const results = [];
     for (const sortingRules of analysisParameters.rules) {
-        let parameters = {
+        const parameters = {
             maxOneRuleSkip: 0,
             maxSkippedKeys: 0,
             maxSkippedLetters: 0,
@@ -609,7 +700,7 @@ function Analyze(outlines, target) {
          * @type {ProcessedResult|null}
          */
         let bestPerformer = null;
-        //Reduce the outlines to the ones with the least amount of /
+        // Reduce the outlines to the ones with the least amount of /
 
         let smallestNumOfSlashes = Infinity;
         outlines.forEach((outline) => {
@@ -620,30 +711,33 @@ function Analyze(outlines, target) {
         console.log("Smallest number of slashes", smallestNumOfSlashes);
         if (sortingRules.rules[0].param == "stroke") {
             outlines = outlines.filter(
-                (outline) => outline.split("/").length == smallestNumOfSlashes
+                (outline) => outline.split("/").length == smallestNumOfSlashes,
             );
         }
 
         // console.log("Analyzing :" + outlines, target);
 
-        for (let index = 0; index < 5; index++) {
+        for (let index = 0; index < 3; index++) {
             outlines.forEach((outline) => {
-                console.log("Trying :", index, outline);
+                // console.log("Trying :", index, outline);
                 // console.log("outline", outline);
 
                 // outline = "PH*ET/SEUL/*EUPB";
-                var result = FindRulesThatFitRecursively(
+                const result = findRulesThatFitRecursively(
                     {},
                     0,
                     outline,
                     target.replace(" ", ""),
                     false,
                     {},
-                    parameters
+                    parameters,
                 );
                 if (result == null) return;
-                var unpacked = UnpackRecursively(result);
-                var processed = processResults(unpacked, outline);
+                console.log("Result", result);
+
+                const unpacked = unpackRecursively(result);
+                console.log("Unpacked", unpacked);
+                const processed = processResults(unpacked, outline);
 
                 if (processed == null) return;
                 if (bestPerformer == null) {
@@ -655,7 +749,7 @@ function Analyze(outlines, target) {
                 }
                 console.log("Comparing", bestPerformer, processed);
                 if (
-                    ComparePreformer(bestPerformer, processed, sortingRules) ==
+                    comparePreformer(bestPerformer, processed, sortingRules) ==
                     1
                 ) {
                     bestPerformer = {
@@ -693,207 +787,194 @@ function Analyze(outlines, target) {
     return results;
 }
 
-//Lets try a recursive solution
-
-function TestRuleOutline(depth, ruleOutline, outline) {
+// @ts-ignore
+function testRuleOutline(depth, ruleOutline, outline) {
     // console.log(
     //     "---".repeat(depth) + "Testing rule outline",
     //     ruleOutline,
     //     "on",
     //     outline
     // );
-    var firstWord = outline.split("/")[0];
+    const firstWord = outline.split("/")[0];
 
     if (outline == "*" && !firstWord.match(/\*/)) return false;
 
-    //Catch the trivial cases
+    // Catch the trivial cases
     if (outline.startsWith(ruleOutline)) return true;
 
     if (!(!ruleOutline.match(/\*/) && firstWord.match(/\*/))) return false;
-    //If theres a astersk remaning but no astersk in the rule
-    //Because asterisks can be used in a later rule we will allow under some conditions
+    // If theres a astersk remaning but no astersk in the rule
+    // Because asterisks can be used in a later rule we will allow under some conditions
 
-    //We need to remove the asterisk from the first word while following steno rules
+    // We need to remove the asterisk from the first word while following steno rules
 
-    let firstWordHasMiddleCharacter = firstWord.match(/[AOEU-]/);
+    const firstWordHasMiddleCharacter = firstWord.match(/[AOEU-]/);
 
     if (firstWordHasMiddleCharacter) {
-        let firstWordWithoutAsterisk = firstWord.replace(/\*/, "");
+        const firstWordWithoutAsterisk = firstWord.replace(/\*/, "");
 
         if (firstWordWithoutAsterisk.startsWith(ruleOutline)) return true;
         return false;
     }
 
-    //Replace the asterisk with a dash
-    let firstWordWithoutAsterisk = firstWord.replace(/\*/, "-");
+    // Replace the asterisk with a dash
+    const firstWordWithoutAsterisk = firstWord.replace(/\*/, "-");
 
     if (firstWordWithoutAsterisk.startsWith(ruleOutline)) return true;
     return false;
 }
-
 /**
- *
- * @param {*} outline
- * @param {*} ruleName
- * @param {*} target
- * @returns {false | object}
+ * @param {*} memorizedData The memorized data
+ * @param {number} depth The depth of the recursion
+ * @param {string} inputOutline The outline string
+ * @param {string} ruleName The rule name
+ * @param {string} inputTarget The target string
+ * @param {boolean} debug Debug mode
+ * @return {null | TestRuleResult}
  */
-function TestRule(
+function testRule(
     memorizedData,
     depth,
-    outline,
+    inputOutline,
     ruleName,
-    target,
+    inputTarget,
     debug = false,
-    currentParameters,
-    acceptableParameters
 ) {
-    // if (ruleName == "ex.") debug = true;
-    // if(memorizedData[ruleName]){
+    const randomNumber = Math.floor(Math.random() * 10000000);
 
-    // if (ruleName != "!c") debug = false;
-    let randomNumber = Math.floor(Math.random() * 10000000);
+    if (inputTarget == "" || inputOutline == "") return null;
 
-    if (target == "" && outline == "") return false;
-    var rules = SpectraRules;
-    // console.log(ruleName);
-    let rule = rules[ruleName];
-    if (rule == undefined) return false;
-    let ruleSound = [rule[2]];
+    const rules = SpectraRules;
+    const ruleDef = rules[ruleName];
 
-    if (!TestRuleOutline(depth, rule[0], outline)) return false;
-    if (debug)
+    if (ruleDef == undefined) {
+        console.log("Rule not found", ruleName, rules);
+        return null;
+    }
+
+    /**
+     * @type {TestingRule}
+     */
+    const rule = {
+        ruleName: ruleName,
+        description: ruleDef[4],
+        ruleSound: ruleDef[2],
+        outline: ruleDef[0],
+        target: ruleDef[1],
+        subRules: [],
+    };
+
+    if (rule == undefined) return null;
+
+    if (debug) {
         console.log(
-            "---".repeat(depth) + "Testing rule :" + ruleName,
-            target,
-            outline,
-            randomNumber,
-            currentParameters
+            `${"---".repeat(depth)} Testing rule : ["${ruleName}", "${
+                rule.target
+            }", "${
+                rule.outline
+            }"] ["${inputTarget}", "${inputOutline}"] ${randomNumber}`,
         );
+    }
 
-    let letterFit = rule[1];
+    const letterParts = rule.target.match(/\(.*?\)|[^\(]*/g);
 
-    let letterParts = letterFit.match(/\(.*?\)|[^\(]*/g);
+    let remainingTargetLetters = inputTarget;
+    let remainingOutlineLetters = inputOutline;
+    const skippedLetters = 0;
 
-    let remainingTargetLetters = target;
-    let remainingOutlineLetters = outline;
-    let skippedLetters = 0;
-    let subRules = [];
+    /**
+     * @type {TestingRule[]}
+     */
+    const subRules = [];
     for (const letterPart of letterParts) {
         if (letterPart == "") continue;
-        if (debug)
+        if (debug) {
             console.log(
                 "---".repeat(depth) + "-LetterPart",
                 letterPart,
-                randomNumber
+                randomNumber,
             );
+        }
 
-        //Handle sub rules
+        // Handle sub rules
         if (letterPart.startsWith("(")) {
             let subRuleName = letterPart.substring(1, letterPart.length - 1);
-            if (debug)
-                console.log(
-                    "---".repeat(depth) + "-SubRuleName",
-                    subRuleName,
-                    randomNumber
-                );
-
-            let result = TestRule(
+            let optional = false;
+            if (subRuleName.startsWith("|")) {
+                optional = true;
+                subRuleName = subRuleName.substring(1);
+            }
+            const result = testRule(
                 memorizedData,
                 depth + 1,
                 remainingOutlineLetters,
                 subRuleName,
                 remainingTargetLetters,
                 debug,
-                currentParameters,
-                acceptableParameters
             );
-            if (debug)
+
+            if (debug) {
+                console.log(
+                    "---".repeat(depth) + "-SubRuleName",
+                    subRuleName,
+                    randomNumber,
+                );
                 console.log(
                     "---".repeat(depth) + "-SubRuleName Result: ",
-                    result
+                    result,
                 );
-            subRules.push(result);
-            // ruleSound.push(result.ruleSound);
-            if (!result) return false;
+            }
+
+            if (!result) {
+                if (optional) {
+                    continue;
+                }
+                return null;
+            }
+            subRules.push(result.rule);
+
             remainingOutlineLetters = result.remainingOutline;
             remainingTargetLetters = result.remainingTarget;
-        } else if (remainingTargetLetters.startsWith(letterPart)) {
-            remainingTargetLetters = remainingTargetLetters.substring(
-                letterPart.length
+            continue;
+        }
+
+        if (!remainingTargetLetters.startsWith(letterPart)) {
+            return null;
+        }
+        remainingTargetLetters = remainingTargetLetters.substring(
+            letterPart.length,
+        );
+        if (debug) {
+            console.log(
+                "---".repeat(depth) + "-LetterPart Matches",
+                letterPart,
+                remainingTargetLetters,
             );
-            if (debug)
-                console.log(
-                    "---".repeat(depth) + "-LetterPart Matches",
-                    letterPart,
-                    remainingTargetLetters
-                );
-        } else {
-            //Remove one letter from the target and try again
-            if (remainingTargetLetters.length > 0) {
-                skippedLetters++;
-                if (skippedLetters > acceptableParameters.maxOneRuleSkip) {
-                    return false;
-                }
-                currentParameters ??= {};
-                currentParameters.skippedLetters ??= 0;
-                currentParameters.skippedLetters++;
-                if (
-                    currentParameters.skippedLetters >
-                    acceptableParameters.maxSkippedLetters
-                ) {
-                    return false;
-                }
-
-                remainingTargetLetters = remainingTargetLetters.substring(1);
-                let result = TestRule(
-                    memorizedData,
-                    depth + 1,
-                    remainingOutlineLetters,
-                    ruleName,
-                    remainingTargetLetters,
-                    debug,
-                    currentParameters,
-                    acceptableParameters
-                );
-
-                if (!result) {
-                    if (debug) console.log("---".repeat(depth) + "-failed");
-                    return false;
-                }
-                if (debug) console.log("---".repeat(depth) + "-passed", result);
-
-                remainingOutlineLetters = result.remainingOutline;
-                remainingTargetLetters = result.remainingTarget;
-
-                skippedLetters += result.skippedLetters;
-            }
         }
     }
 
     remainingOutlineLetters = removeStartingPart(
         depth,
-        outline,
-        rule[0],
+        inputOutline,
+        rule.outline,
         debug,
-        randomNumber
+        randomNumber,
     );
-    if (debug)
+    if (debug) {
         console.log(
             "---".repeat(depth) + "RemainingOutline",
             remainingOutlineLetters,
-            randomNumber
+            randomNumber,
         );
+    }
 
+    rule.subRules = subRules;
     return {
-        ruleName: ruleName,
-        description: rule[4],
-        outline: rule[0],
-        target: rule[1],
-        ruleSound: ruleSound,
-        subRules: subRules,
-        inputOutline: outline,
-        inputTarget: target,
+        rule: rule,
+
+        inputOutline: inputOutline,
+        inputTarget: inputTarget,
+
         skippedLetters: skippedLetters,
 
         remainingOutline: remainingOutlineLetters,
@@ -902,163 +983,255 @@ function TestRule(
         identifier: randomNumber,
     };
 }
-
-function FindRulesThatFitRecursively(
+/**
+ *
+ * @param {*} memorizedData
+ * @param {*} depth
+ * @param {*} outline
+ * @param {*} target
+ * @param {*} debug
+ * @param {*} currentParameters
+ * @param {*} acceptableParameters
+ * @return {UnpackedResult[]}
+ */
+function findRulesThatFitRecursively(
     memorizedData,
     depth,
     outline,
     target,
     debug = false,
     currentParameters = {},
-    acceptableParameters = {}
+    acceptableParameters = {},
 ) {
-    if (target == "") {
-        currentParameters.skippedKeys ??= 0;
-        currentParameters.skippedKeys += outline.length;
+    currentParameters.skippedKeys ??= 0;
+    currentParameters.skippedLetters ??= 0;
 
-        if (
-            currentParameters.skippedKeys >
-                acceptableParameters.maxSkippedKeys ??
-            0
-        ) {
-            return false;
-        }
+    /**
+     * @type {UnpackedResult[]} workingRules
+     */
+    const workingRules = [];
 
-        return true;
+    if (target == "" || outline == "") {
+        return [];
     }
 
-    if (debug)
+    if (debug) {
         console.log(
             "---".repeat(depth) + "FindRulesThatFitRecursively",
-            outline + "_" + target
+            outline + "_" + target,
         );
+    }
     if (memorizedData[outline + "_" + target]) {
         if (debug) console.log("---".repeat(depth) + "Memorized");
         return memorizedData[outline + "_" + target];
     }
 
-    var rules = SpectraRules;
+    const rules = SpectraRules;
 
-    var workingRules = [];
-
-    var minSkippedLetters = Infinity;
-    // while(outline.length>)
     for (const ruleName in rules) {
-        if (debug)
+        if (debug) {
             // console.log(" --- ".repeat(depth) + "Testing rule :" + ruleName);
-            var doNothing = 0;
+        }
 
-        var newParameters = { ...currentParameters };
-        var result = TestRule(
-            memorizedData,
-            depth,
-            outline,
-            ruleName,
-            target,
-            debug,
-            newParameters,
-            acceptableParameters
-        );
-        // console.log(result);
-        if (result) {
-            if (debug)
-                console.log("---".repeat(depth) + "-Rule", ruleName, "fits");
-            if (debug)
-                console.log(
-                    "---".repeat(depth) + "-Remaining outline",
-                    result.remainingOutline
-                );
-            if (debug)
-                console.log(
-                    "---".repeat(depth) + "-Remaining target",
-                    result.remainingTarget
-                );
+        let ruleResult = null;
+        let testingTarget = target;
+        const rule = rules[ruleName];
 
-            let subResult = FindRulesThatFitRecursively(
+        if (!testRuleOutline(depth, rule[0], outline)) continue;
+
+        if (!haveCommonLetters(rule[1], target) && !rule[1].includes("(")) {
+            if (debug) {
+                console.log(
+                    `${"---".repeat(depth)} No common letters ${
+                        rule[1]
+                    } ${target}`,
+                );
+            }
+            continue;
+        }
+
+        const parameters = {...currentParameters};
+        let skippedLetters = 0;
+
+        for (
+            let i = parameters.skippedLetters;
+            i <= acceptableParameters.maxSkippedLetters;
+            i++
+        ) {
+            ruleResult = testRule(
                 memorizedData,
-                depth + 1,
-                result.remainingOutline,
-                result.remainingTarget,
+                depth,
+                outline,
+                ruleName,
+                testingTarget,
                 debug,
-                newParameters,
-                acceptableParameters
             );
-            if (debug)
-                console.log("---".repeat(depth) + "-SubResult", subResult);
 
-            if (subResult) {
-                workingRules.push({
-                    subResult: subResult,
-                    ...result,
-                });
+            if (ruleResult) {
+                if (
+                    ruleResult.remainingOutline == "" &&
+                    ruleResult.remainingTarget == ""
+                ) {
+                    break;
+                }
+
+                if (
+                    ruleResult.remainingOutline == "" &&
+                    ruleResult.remainingTarget != ""
+                ) {
+                    skippedLetters += ruleResult.remainingTarget.length;
+                    ruleResult.remainingTarget = "";
+                    break;
+                }
+
+                if (
+                    ruleResult.remainingOutline != "" &&
+                    ruleResult.remainingTarget == ""
+                ) {
+                    parameters.skippedKeys +=
+                        ruleResult.remainingOutline.length;
+                    ruleResult.remainingOutline = "";
+                }
+                break;
             }
 
-            let skippedKeys =
-                (currentParameters?.skippedKeys ?? 0) +
-                result.remainingOutline.length;
-            let allowedOutlineLetters =
-                acceptableParameters?.maxSkippedKeys ?? 0;
+            skippedLetters++;
 
-            if (skippedKeys > 2) {
-                continue;
+            testingTarget = testingTarget.substring(1);
+            if (testingTarget == "") {
+                break;
             }
-            memorizedData[outline + "_" + target] = { ...result };
+
+            if (debug) {
+                console.log(
+                    "---".repeat(depth) + "-Rule",
+                    ruleName,
+                    "does not fit, skipping one letter",
+                );
+            }
+        }
+
+        if (
+            !ruleResult ||
+            parameters.skippedKeys > acceptableParameters.maxSkippedKeys ||
+            parameters.skippedLetters + skippedLetters >
+                acceptableParameters.maxSkippedLetters
+        ) {
+            continue;
+        }
+
+        parameters.skippedLetters += skippedLetters;
+
+        if (
+            ruleResult.remainingOutline != "" &&
+            ruleResult.remainingTarget == ""
+        ) {
+            console.error("Rule " + ruleName + " is not valid", ruleResult);
+            throw new Error("Rule " + ruleName + " is not valid");
+        }
+
+        if (debug) {
+            console.log(
+                `${"---".repeat(depth)}-Rule ["${ruleName}"] fits, result: [${
+                    ruleResult.remainingOutline
+                }] [${ruleResult.remainingTarget}]`,
+            );
+        }
+
+        const subResult = findRulesThatFitRecursively(
+            memorizedData,
+            depth + 1,
+            ruleResult.remainingOutline,
+            ruleResult.remainingTarget,
+            debug,
+            parameters,
+            acceptableParameters,
+        );
+        if (debug) console.log("---".repeat(depth) + "-SubResult", subResult);
+
+        const skippedKeys =
+            (currentParameters?.skippedKeys ?? 0) +
+            ruleResult.remainingOutline.length;
+
+        if (subResult) {
+            workingRules.push({
+                rule: ruleResult.rule,
+                inputOutline: ruleResult.inputOutline,
+                inputTarget: ruleResult.inputOutline,
+                remainingOutline: ruleResult.remainingOutline,
+                remainingTarget: ruleResult.remainingTarget,
+                skippedLetters: skippedLetters,
+                subResult: subResult,
+            });
+        }
+
+        if (skippedKeys > 2) {
+            continue;
         }
     }
-    memorizedData[outline + "_" + target] = {
-        minSkippedLetters: minSkippedLetters,
-        subResults: workingRules,
-    };
+
+    memorizedData[outline + "_" + target] = workingRules;
     if (workingRules.length == 0) {
         memorizedData[outline + "_" + target] = null;
         return null;
     }
-    return {
-        minSkippedLetters: minSkippedLetters,
-        subResults: workingRules,
-    };
+    return workingRules;
 }
 
-function AnalyzeRecursive(outline, target) {
-    var rules = SpectraRules;
-    // console.log("Analyzing :" + outline, target);
-}
+// function GenerateOutlinesFromInputRecursively(target, outline, depth) {
+//     // console.log("GenerateOutlinesFromInputRecursively", target, outline, depth);
+//     if (depth > 10) {
+//         return [];
+//     }
 
-function GenerateOutlinesFromInputRecursively(target, outline, depth) {
-    // console.log("GenerateOutlinesFromInputRecursively", target, outline, depth);
-    if (depth > 10) {
-        return [];
-    }
+//     if (target == "") {
+//         return [outline];
+//     }
+//     const rules = GeneratorRules;
+//     let outlines = [];
+//     for (const ruleName in rules) {
+//         const rule = rules[ruleName];
+//         if (rule[1].length == 0) {
+//             continue;
+//         }
 
-    if (target == "") {
-        return [outline];
-    }
-    var rules = GeneratorRules;
-    var outlines = [];
-    for (const ruleName in rules) {
-        var rule = rules[ruleName];
-        if (rule[1].length == 0) {
-            continue;
-        }
+//         if (target.startsWith(rule[1])) {
+//             if (rule[3] == "REFERENCE") {
+//                 continue;
+//             }
+//             // var newOutline = combineStrokeToOutline(rule[0],outline);
+//             const newOutlineB = combineStrokeToOutline(rule[0], outline);
+//             const newOutline = `$${ruleName}$` + newOutlineB;
+//             if (!newOutlineB) {
+//                 continue;
+//             }
+//             const newTarget = target.substring(rule[1].length);
+//             const newOutlines = GenerateOutlinesFromInputRecursively(
+//                 newTarget,
+//                 newOutline,
+//                 depth + 1,
+//             );
+//             outlines = outlines.concat(newOutlines);
+//         }
+//     }
+//     return outlines;
+// }
 
-        if (target.startsWith(rule[1])) {
-            if (rule[3] == "REFERENCE") {
-                continue;
-            }
-            // var newOutline = combineStrokeToOutline(rule[0],outline);
-            var newOutlineB = combineStrokeToOutline(rule[0], outline);
-            var newOutline = `$${ruleName}$` + newOutlineB;
-            if (!newOutlineB) {
-                continue;
-            }
-            var newTarget = target.substring(rule[1].length);
-            var newOutlines = GenerateOutlinesFromInputRecursively(
-                newTarget,
-                newOutline,
-                depth + 1
-            );
-            outlines = outlines.concat(newOutlines);
-        }
-    }
-    return outlines;
-}
+
+// //If this is a module then export _analyze
+// if (typeof module !== "undefined") {
+//     module.exports = {
+//         _analyze,
+//         Tesging: "Testing",
+//     };
+// }
+
+// if (typeof self !== 'undefined' && typeof self.importScripts === 'function') {
+//   // We're being loaded with importScripts(), so we need to assign the function to self.
+//   self._analyze = _analyze;
+// } else {
+//   // We're being loaded as a module, so we can export the function.
+//   module.exports = _analyze;
+// }
+// @ts-ignore
+self._analyze = _analyze;

@@ -5,21 +5,14 @@
         <meta charset="utf-8" />
         <title>Steno Grade</title>
         <link href="base.css" rel="stylesheet" type="text/css" />
+        <script src="scripts/utils/theme.mjs" type="module"></script>
         <link href="style.less" rel="stylesheet/less" type="text/css" />
-        <script src="scripts/type-jig.js"></script>
-        <script src="scripts/utils/util.js"></script>
-        <script src="scripts/word-drill.js"></script>
-        <script src="scripts/number-sentences.js"></script>
-        <script src="scripts/utils/steno-display.js"></script>
-        <script src="scripts/word-sets.js"></script>
-        <script src="data/plover-translations.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> -->
 
         <script src="scripts/libs/less.js" ></script>
         <script src="scripts/libs/chart.js"></script>
         <script src="scripts/libs/chartjs-plugin-datalabels.js"></script>
-        <script src="scripts/spectra/spectra.js"></script>
-        <script src="scripts/spectra/rules.js"></script>
+        <script src="scripts/libs/jquery-3.6.0.min.js"></script>
         <link rel="stylesheet" type="text/css" href="font-roboto.css" />
     </head>
     <body>
@@ -731,35 +724,29 @@
 
         <div id="lesson" class="wrapper" style="display: none"></div>
     </body>
-    <script>
+    <script type="module">
+        if (document.location.search !== "") {
+            displayOnly("lesson");
+        }  
+        import { setTheme, displayOnly, prepareInput, loadSettings,storageAvailable,populatePage,getFormFields,parseQueryString} from "./scripts/utils/util.mjs";
+        import {numberSentences} from "./scripts/number-sentences.mjs";
+        import {TypeJig,setExercise } from "./scripts/type-jig.mjs";
+        import {wordDrill} from "./scripts/word-drill.mjs";
+        import {WordSets} from "./scripts/word-sets.mjs";
         prepareInput("monkeytype-quote-length");
         setTheme()
         function runExercise(fields) {
-            if (fields.drill === "NumberSentences")
-                exercise = numberSentences(fields);
-            else exercise = wordDrill(fields);
+            let exercise = fields.drill === "NumberSentences" ? numberSentences(fields) : wordDrill(fields);
             console.log("Setting Exersize" + exercise);
             if (exercise) {
-                if (fields.hints) {
-                    var strokes = document.getElementsByClassName("strokes")[0];
-                    if (fields.floating_hints) {
-                        strokes.style.position = "fixed";
-                    }
-                    var translations =
-                        TypeJig.shortestTranslations(PloverTranslations);
-                    var hints = new StenoDisplay(strokes, translations, true);
-                }
-                var options = fields;
-
-                // options.hints = 1;
                 displayOnly("lesson");
-                return setExercise(exercise.name, exercise, hints, options);
+                return setExercise(exercise.name, exercise, null, fields);
             }
         }
 
         function runCustom(evt) {
             evt.preventDefault();
-            var fields = getFormFields(this);
+            let fields = getFormFields(this);
             if (storageAvailable("localStorage")) {
                 localStorage.custom = fields.drill;
             }
@@ -773,11 +760,11 @@
             }
             let drill = fields.drill.trim().split(/\s+/m);
             let n = +fields.repeat || 1;
-            TypeJig.WordSets.custom = [];
-            for (let i = 0; i < n; ++i) TypeJig.WordSets.custom.push(...drill);
+            WordSets.custom = [];
+            for (let i = 0; i < n; ++i) WordSets.custom.push(...drill);
             fields.drill = "custom";
-            var jig = runExercise(fields);
-            initializeButtons(jig);
+            runExercise(fields);
+            // initializeButtons(jig);
         }
 
         loadSettings();
@@ -789,28 +776,36 @@
         $(document).ready(function () {
             populatePage();
 
+            /**
+             * @typedef {import("./scripts/type-jig.mjs").TypeJig} TypeJig3
+             */
+
+
+            /**
+             * @type {TypeJig3}
+             */
+            let jig;
+
             if (document.location.search !== "") {
-                var jig = runExercise(
+                jig = runExercise(
                     parseQueryString(document.location.search)
                 );
-                initializeButtons(jig);
+                // initializeButtons(jig);
             } else {
                 // Add event listeners to get settings before submitting.
-                // var forms = document.querySelectorAll("form");
+                // let forms = document.querySelectorAll("form");
                 for (const form of $("form")) {
                     if (form.id === "custom") {
                         form.addEventListener("submit", runCustom);
                     }
                 }
             }
-            var another = $("#new");
-            another.click(function () {
-                let exercise = wordDrill(
-                    parseQueryString(document.location.search)
-                );
-                jig.exercise = exercise;
-                jig.reset();
-                // initializeButtons(jig);
+            $("#new").click(function () {
+                let fields = parseQueryString(document.location.search)
+                let exercise = fields.drill === "NumberSentences" ? numberSentences(fields) : wordDrill(fields);
+                console.log("Setting Exersize", exercise);
+
+                jig?.setExercise(exercise)
             });
 
             // Get keyboard input from entire page
@@ -819,11 +814,11 @@
                 //prevent deafault
                 //If key is down find the div with the class "form-section--selected". If there is no div with the class "form-section--selected" then select the first div.
                 //Then set the div below it to be the div with the class "form-section--selected".
-                var keyString = e.key;
+                let keyString = e.key;
                 switch (keyString) {
                     case "Enter":
                         // Enter key
-                        var selected = $(".form-section--selected");
+                        let selected = $(".form-section--selected");
                         //Find the button inside of the selected div and click it. recurse
                         console.log(selected);
                         selected.find("button").click();
@@ -844,8 +839,8 @@
                         e.preventDefault();
 
                         // Down arrow
-                        var selectedDiv = $(".form-section--selected");
-                        var targetDiv = selectedDiv.length == 0
+                        let selectedDiv = $(".form-section--selected");
+                        let targetDiv = selectedDiv.length == 0
                             ? $(".form-section").first()
                             : selectedDiv.next();
                         if (targetDiv.length > 0) {
@@ -857,14 +852,14 @@
                     case "ArrowUp":
                         e.preventDefault();
                         // Up arrow
-                        var selectedDiv = $(".form-section--selected");
-                        var targetDiv = selectedDiv.length == 0
+                        let _selectedDiv = $(".form-section--selected");
+                        let _targetDiv = _selectedDiv.length == 0
                             ? $(".form-section").first()
-                            : selectedDiv.prev();
-                        if (targetDiv.length > 0) {
-                            selectedDiv.removeClass("form-section--selected");
-                            targetDiv.addClass("form-section--selected");
-                            targetDiv[0].scrollIntoView({ block: "center" });
+                            : _selectedDiv.prev();
+                        if (_targetDiv.length > 0) {
+                            _selectedDiv.removeClass("form-section--selected");
+                            _targetDiv.addClass("form-section--selected");
+                            _targetDiv[0].scrollIntoView({ block: "center" });
                         }
                         break;
                     default:

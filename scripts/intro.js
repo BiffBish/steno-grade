@@ -1,7 +1,7 @@
 // Wrap everything in a function to avoid polluting the global namespace.
 (function() {
 	let Intro = {}
-	TypeJig.WordSets.Intro = Intro
+	WordSets.Intro = Intro
 
 	// pep weapon help rep
 	// pet wet het ret

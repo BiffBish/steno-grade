@@ -4,32 +4,31 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta charset="utf-8" />
         <title>Steno Grade</title>
-        <link href="base.css" rel="stylesheet" type="text/css" />
+       <link href="base.css" rel="stylesheet" type="text/css" />
+        <script src="scripts/utils/theme.mjs" type="module"></script>
         <link href="style.less" rel="stylesheet/less" type="text/css" />
-        <script src="scripts/type-jig.js"></script>
-        <script src="scripts/utils/util.js"></script>
-        <script src="scripts/utils/steno-display.js"></script>
-        <script src="scripts/word-sets.js"></script>
-        <script src="data/plover-translations.js"></script>
+        <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> -->
 
         <script src="scripts/libs/less.js" ></script>
         <script src="scripts/libs/chart.js"></script>
         <script src="scripts/libs/chartjs-plugin-datalabels.js"></script>
+        <script src="scripts/libs/jquery-3.6.0.min.js"></script>
         <link rel="stylesheet" type="text/css" href="font-roboto.css" />
     </head>
     <body>
+        <p class="wrapper">
+            To capitalize the first word, hit <code>KPA</code> or
+            <code>KPA*</code>, or tell plover to start capitalized
+            (Configure -&gt; Output -&gt; Start Capitalized). If your
+            keyboard has conflicts with the longer strokes (like
+            <code>TP-PL</code> for period), you can hold one key and
+            press the others in succesion.
+        </p>
         <div id="lesson" class="wrapper">
-            <div id="leftside">
+            <!-- <div id="leftside">
                 <h3 class="center">(Mostly) Two-Key Sentences</h3>
 
-                <p class="wrapper">
-                    To capitalize the first word, hit <code>KPA</code> or
-                    <code>KPA*</code>, or tell plover to start capitalized
-                    (Configure -&gt; Output -&gt; Start Capitalized). If your
-                    keyboard has conflicts with the longer strokes (like
-                    <code>TP-PL</code> for period), you can hold one key and
-                    press the others in succesion.
-                </p>
+               
 
                 <div id="drill-content">
                     <div id="answer"></div>
@@ -42,48 +41,63 @@
             </div>
 
             <div id="nav">
-                <p id="stroke-hint"></p>
+                 <p id="stroke-hint"></p>
                 <p id="strokes"></p>
                 <p id="clock" class="clock"></p>
                 <p id="live-wpm-display" class="wpm"></p>
 
                 <p class="center"><a id="back">&larr; Back to Menu</a></p>
-                <p class="center"><a id="again">&#8634; Restart</a></p>
-            </div>
+                <p class="center"><a id="again">&#8634; Restart</a></p> -->
+            <!-- </div> -->
 
-            <textarea id="input"></textarea>
+            <!-- <textarea id="input"></textarea> -->
         </div>
 
-        <script>
-            var query = parseQueryString(document.location.search);
-            var words = TypeJig.WordSets.twoKeySentences;
-            var translations = TypeJig.shortestTranslations(PloverTranslations);
-            var extra = {
-                "?": "H-F",
-                charge: "KH",
-                every: "EF",
-                perfect: "P-F",
-                recall: "-RL",
-                tuberculosis: "T*B",
-                from: "PR",
-                reason: "R-P",
-                on: "OB",
-                we: "WE",
-                who: "HO",
-                kilograms: "K-G/-S",
-            };
-            for (key in extra) translations[key] = extra[key];
-            var strokes = document.getElementById("strokes");
-            var hints = new StenoDisplay(strokes, translations, true);
-            if (query.hints === "") hints = null;
-            var exercise = new TypeJig.Exercise(words);
-            var jig = new TypeJig(exercise);
+        <script type="module">
+            import { setTheme, displayOnly, prepareInput, loadSettings,storageAvailable,populatePage,getFormFields,parseQueryString} from "./scripts/utils/util.mjs";
+            import {numberSentences} from "./scripts/number-sentences.mjs";
+            import {TypeJig,setExercise} from "./scripts/type-jig.mjs";
+            import {wordDrill} from "./scripts/word-drill.mjs";
+            import {WordSets} from "./scripts/word-sets.mjs";
+            import {PloverTranslations} from "./data/plover-translations.mjs";
+            import {StenoDisplay} from "./scripts/utils/steno-display.mjs";
 
-            var back = document.getElementById("back");
-            back.href = "form.html";
-            var again = document.getElementById("again");
-            var end = document.getElementById("end");
-            again.href = document.location.href;
+            $(document).ready(function () {
+                populatePage();
+                var words = WordSets.twoKeySentences;
+                var exercise = new TypeJig.Exercise(words, 0, false, "ordered");
+                // var jig = new TypeJig(exercise);
+
+                // var back = document.getElementById("back");
+                // back.href = "form.html";
+                // var again = document.getElementById("again");
+                // var end = document.getElementById("end");
+                // again.href = document.location.href;
+
+
+                setExercise("Two-Key Sentences",exercise);
+
+            });
+            // var translations = TypeJig.shortestTranslations(PloverTranslations);
+            // var extra = {
+            //     "?": "H-F",
+            //     charge: "KH",
+            //     every: "EF",
+            //     perfect: "P-F",
+            //     recall: "-RL",
+            //     tuberculosis: "T*B",
+            //     from: "PR",
+            //     reason: "R-P",
+            //     on: "OB",
+            //     we: "WE",
+            //     who: "HO",
+            //     kilograms: "K-G/-S",
+            // };
+            // for (let key in extra) translations[key] = extra[key];
+            // var strokes = document.getElementById("strokes");
+            // var hints = new StenoDisplay(strokes, translations, true);
+            // if (query.hints === "") hints = null;
+            
 
             setTheme();
         </script>

@@ -5,31 +5,30 @@
         <meta charset="utf-8" />
         <title>Markov-chain generated sentences</title>
         <link href="base.css" rel="stylesheet" type="text/css" />
+        <script src="scripts/utils/theme.mjs" type="module"></script>
         <link href="style.less" rel="stylesheet/less" type="text/css" />
-        <script src="scripts/type-jig.js"></script>
-        <script src="scripts/utils/util.js"></script>
-        <script src="scripts/utils/steno-display.js"></script>
-        <script src="data/plover-translations.js"></script>
-        <script src="data/tatoeba-sentences.js"></script>
-        <script src="scripts/libs/jquery-3.6.0.min.js"></script>
+        
 
+        <script src="scripts/libs/jquery-3.6.0.min.js"></script>
         <script src="scripts/libs/less.js" ></script>
         <script src="scripts/libs/chart.js"></script>
         <script src="scripts/libs/chartjs-plugin-datalabels.js"></script>
-        <script src="scripts/spectra/spectra.js"></script>
-        <script src="scripts/spectra/rules.js"></script>
         <link rel="stylesheet" type="text/css" href="font-roboto.css" />
     </head>
     <body>
         <div id="lesson" class="wrapper"></div>
     </body>
-    <script>
+    <script type="module">
+
+        import { setTheme, populatePage ,parseQueryString, newRNG,  prepareNextSeed, N,updateURLParameter} from "./scripts/utils/util.mjs";
+        import { TypeJig, setExercise} from "./scripts/type-jig.mjs";
+        import { sentences } from "./data/tatoeba-sentences.mjs";
         setTheme();
 
         function compute_ngrams(sentences, order) {
             const ngrams = { "": [] };
-            for (let i = 0; i < sentences.length; ++i) {
-                const words = sentences[i].split(/\s+/);
+            for (const element of sentences) {
+                const words = element.split(/\s+/);
                 for (let j = 0; j < words.length - order; ++j) {
                     const Gram = words.slice(j, j + order).join(" ");
                     if (j === 0) ngrams[""].push(Gram);
@@ -141,7 +140,7 @@
             var fields = parseQueryString(document.location.search);
             var bias = parseFloat(fields["bias"] ?? 40) / 100;
 
-            var rng = new_rng(fields.seed);
+            var rng = newRNG(fields.seed);
 
             var word_count =
                 fields.word_count == null ? 100 : parseInt(fields.word_count);
@@ -167,7 +166,7 @@
                     "",
                     updateURLParameter(window.location.href, "seed", nextSeed)
                 );
-                let rng = new_rng(nextSeed);
+                let rng = newRNG(nextSeed);
                 let exercise = generateMarkovExercise(
                     ngrams,
                     word_count,
@@ -181,7 +180,6 @@
 
             var back = document.getElementById("back");
             back.href = back.href.replace("markov", "form");
-            initializeButtons(jig);
         });
     </script>
 </html>

@@ -113,7 +113,7 @@
             	if(document.location.search === '') {
             		var form = document.getElementById('selectDrill')
             		var drill = form.elements.drill
-            		var order = Object.keys(TypeJig.WordSets.Intro)
+            		var order = Object.keys(WordSets.Intro)
             		for(var i=0; i<order.length; ++i) {
             			var option = document.createElement('option')
             			option.appendChild(document.createTextNode(order[i]))
@@ -127,12 +127,12 @@
             		let L = document.getElementById('lesson')
             		L.style['max-width'] = '22em'
             		var fields = parseQueryString(document.location.search)
-            		TypeJig.WordSets = TypeJig.WordSets.Intro
+            		WordSets = WordSets.Intro
 
             		let drills = Array.isArray(fields.drill) ? fields.drill : [fields.drill]
             		let alternate = null
             		for(let drill of drills) {
-            			let d = TypeJig.WordSets[drill]
+            			let d = WordSets[drill]
             			if(d.alternate) { alternate = d.alternate; break }
             		}
 

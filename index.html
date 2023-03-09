@@ -5,11 +5,12 @@
 	<meta charset="utf-8">
 	<title>Steno Grade</title>
     <link href="base.css" rel="stylesheet" type="text/css" />
+	<script src="scripts/utils/theme.mjs" type="module"></script>
 	<link href="style.less" rel="stylesheet/less" type="text/css" />
 	<link rel="stylesheet" type="text/css" href="font-roboto.css">
 	<script src="scripts/libs/less.js"></script>
 	<script src="scripts/libs/jquery-3.6.0.min.js"></script>
-	<script src="scripts/utils/util.js"></script>
+	<script src="scripts/utils/util.mjs" type="module"></script>
 </head>
 
 <body>
@@ -50,16 +51,16 @@
 			</div>
 		</a>
 		<br />
-		<!-- <a href="custom-dictionary-upload.html" class="button no-link-formatting "> -->
-			<div class="form-section--disabled">
-				<b class="red">Under repair</b>
+		<a href="custom-dictionary-upload.html" class="button no-link-formatting ">
+			<div class="clickable-form-section">
+				<!-- <b class="red">Under repair</b> -->
 
 				<div class="caption">
 					Upload a custom <strong>Dictionary</strong>
 				</div>
 				Do you have a custom made dictionary that differs from plovers default? Upload it here to improve the dynamic hint system
 			</div>
-		<!-- </a> -->
+		</a>
 		<!-- <a href="improvements.html" class="button no-link-formatting "> -->
 			<div class="form-section--disabled">
 				<b class="red">Under repair</b>
@@ -83,31 +84,12 @@
 
 	</div>
 
-	<script>
+	<script type="module">
+		import { setTheme, storageAvailable, N } from './scripts/utils/util.mjs'
 		setTheme()
 		if (storageAvailable('localStorage')) {
 
 			let wrapper = document.querySelector('.wrapper')
-			// let isDark = localStorage.theme === 'dark'
-			// let checkbox = document.createElement('input')
-			// checkbox.setAttribute('id', 'night-mode')
-			// checkbox.setAttribute('type', 'checkbox')
-			// checkbox.checked = isDark
-			// checkbox.addEventListener('input', function (e) {
-			// 	if (e.target.checked) {
-			// 		localStorage.theme = 'dark'
-			// 	} else {
-			// 		localStorage.theme = 'light'
-			// 	}
-			// 	setTheme()
-			// })
-			// wrapper.appendChild(checkbox)
-			// let label = document.createElement('label')
-			// label.setAttribute('for', 'night-mode')
-			// label.appendChild(document.createTextNode(' Night Mode'))
-			// wrapper.appendChild(label)
-
-
 			let theme_select = N(
 				"select",
 				{
@@ -135,9 +117,7 @@
 					]),
 				]
 			);
-
 			theme_select.value = localStorage.getItem("theme") || "light";
-
 			theme_select.onchange = (e) => {
 				let theme = e.target.value;
 				localStorage.setItem("theme", theme);
@@ -146,58 +126,9 @@
 			N($('.wrapper'), [
 				N("p", { class: "center" }, "Choose your theme:", [theme_select]),
 			])
-
-
-
-		
-
-
-
 		} else {
 			document.body.appendChild(document.createTextNode('localStorage not available.'))
 		}
-
-		// document.getElementById("submit").addEventListener("click", function (event) {
-		// 	console.log("clicked");
-		// 	event.preventDefault();
-		// 	var filesToUpload = document.getElementById("fileToUpload1").files[0];
-		// 	var filesToUpload2 = document.getElementById("fileToUpload2").files[0];
-		// 	var filesToUpload3 = document.getElementById("fileToUpload3").files[0];
-		// 	var filesToUpload4 = document.getElementById("fileToUpload4").files[0];
-
-		// 	var texts = []
-		// 	if (filesToUpload) texts.push(filesToUpload.text());
-		// 	if (filesToUpload2) texts.push(filesToUpload2.text());
-		// 	if (filesToUpload3) texts.push(filesToUpload3.text());
-		// 	if (filesToUpload4) texts.push(filesToUpload4.text());
-
-
-		// 	Promise.all(texts).then(function (values) {
-		// 		console.log(values);
-		// 		customDictionaries = values;
-		// 		localStorage.setItem("customDictionaries", JSON.stringify(customDictionaries));
-
-		// 		// var reader = new FileReader();
-		// 		// reader.onload = function (e) {
-		// 		//     var text = reader.result;
-		// 		//     console.log(text);
-
-		// 		//     //Get the local storage value customDictionaries. The value is a list of dictionaries.
-		// 		//     var customDictionaries = JSON.parse(localStorage.getItem("customDictionaries"));
-		// 		//     if (customDictionaries == null) {
-		// 		//         customDictionaries = [];
-		// 		//     }
-
-		// 		//     //Add the dictionary to the list of dictionaries
-		// 		//     customDictionaries[index] = text;
-		// 		//     //Save the list of dictionaries to local storage
-		// 		// };
-		// 		// reader.readAsText(filesToUpload);
-		// 	});
-
-
-
-		// });
 	</script>
 
 </body>

@@ -4,12 +4,22 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta charset="utf-8" />
         <title>Steno Grade</title>
+        
         <link href="base.css" rel="stylesheet" type="text/css" />
+        <script src="scripts/utils/theme.mjs" type="module"></script>
         <link href="style.less" rel="stylesheet/less" type="text/css" />
-        <link rel="stylesheet" type="text/css" href="font-roboto.css" />
+        <link rel="stylesheet" type="text/css" href="font-roboto.css">
+        <script src="scripts/libs/less.js"></script>
+        <script src="scripts/libs/jquery-3.6.0.min.js"></script>
+        <script src="scripts/utils/util.mjs" type="module"></script>
     </head>
     <body>
         <div id="form" class="wrapper">
+            <a href="learn-keyboard.html">
+                    <div class="clickable-form-section center" id="word-drill">
+                        <h2>Go back</h2>
+                    </div>
+                </a>
             <p>
                 For finger drills and learning the keys on the steno keyboard,
                 you'll want to make Plover send the raw output instead of

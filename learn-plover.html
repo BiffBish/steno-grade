@@ -4,18 +4,15 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta charset="utf-8" />
         <title>Learn Plover Lessons</title>
-        <link href="base.css" rel="stylesheet" type="text/css" />
+        <<link href="base.css" rel="stylesheet" type="text/css" />
+        <script src="scripts/utils/theme.mjs" type="module"></script>
         <link href="style.less" rel="stylesheet/less" type="text/css" />
-        <script src="scripts/type-jig.js"></script>
-        <script src="scripts/utils/util.js"></script>
-        <script src="scripts/word-drill.js"></script>
-        <script src="scripts/utils/steno-display.js"></script>
-        <script src="scripts/learn-plover.js"></script>
-        <script src="data/plover-translations.js"></script>
+        <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> -->
 
         <script src="scripts/libs/less.js" ></script>
         <script src="scripts/libs/chart.js"></script>
         <script src="scripts/libs/chartjs-plugin-datalabels.js"></script>
+        <script src="scripts/libs/jquery-3.6.0.min.js"></script>
         <link rel="stylesheet" type="text/css" href="font-roboto.css" />
     </head>
     <body>
@@ -108,15 +105,24 @@
         <div id="lesson" class="wrapper" style="display: none">
         </div>
 
-        <script>
+        <script type="module">
+            import { setTheme, displayOnly, prepareInput, loadSettings,storageAvailable,populatePage,getFormFields,parseQueryString} from "./scripts/utils/util.mjs";
+            import {numberSentences} from "./scripts/number-sentences.mjs";
+            import {TypeJig,setExercise } from "./scripts/type-jig.mjs";
+            import {wordDrill} from "./scripts/word-drill.mjs";
+            import {WordSets} from "./scripts/word-sets.mjs";
+
+            import {LearnPloverOrder} from "./scripts/learn-plover.mjs";
+
+
+
             window.onload = function () {
                 if (document.location.search === "") {
                     var form = document.getElementById("selectDrill");
                     var drill = form.elements.drill;
-                    var order = TypeJig.WordSets.LearnPloverOrder;
-                    for (var i = 0; i < order.length; ++i) {
+                    for (var i = 0; i < LearnPloverOrder.length; ++i) {
                         var option = document.createElement("option");
-                        option.appendChild(document.createTextNode(order[i]));
+                        option.appendChild(document.createTextNode(LearnPloverOrder[i]));
                         drill.appendChild(option);
                     }
                     drill.focus();
@@ -127,7 +133,7 @@
                     });
                 } else {
                     var fields = parseQueryString(document.location.search);
-                    TypeJig.WordSets = TypeJig.WordSets.LearnPlover;
+                    WordSets = WordSets.LearnPlover;
                     var exercise = wordDrill(fields);
                     if (exercise) {
                         if (fields.hints) {

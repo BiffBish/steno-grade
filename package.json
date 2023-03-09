@@ -1,5 +1,9 @@
 {
   "dependencies": {
     "git-extras": "^0.0.14"
+  },
+  "devDependencies": {
+    "eslint": "^8.35.0",
+    "eslint-config-google": "^0.14.0"
   }
 }

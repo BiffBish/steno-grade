@@ -35,7 +35,7 @@ function generateExercise(word_count, top_n, rng) {
 window.onload = function () {
     var fields = parseQueryString(document.location.search);
 
-    var rng = new_rng(fields.seed);
+    var rng = newRNG(fields.seed);
 
     var top_n = fields.top == null ? 100 : parseInt(fields.top);
     top_n = clamp_top_n(top_n);
@@ -72,7 +72,7 @@ window.onload = function () {
             "",
             updateURLParameter(window.location.href, "seed", nextSeed)
         );
-        let rng = new_rng(nextSeed);
+        let rng = newRNG(nextSeed);
         let exercise = generateExercise(word_count, top_n, rng);
         jig.exercise = exercise;
         jig.reset();

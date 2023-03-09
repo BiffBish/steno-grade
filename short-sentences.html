@@ -5,28 +5,30 @@
         <meta charset="utf-8" />
         <title>Short sentences from Project Gutenberg Books</title>
         <link href="base.css" rel="stylesheet" type="text/css" />
+        <script src="scripts/utils/theme.mjs" type="module"></script>
         <link href="style.less" rel="stylesheet/less" type="text/css" />
-        <script src="scripts/type-jig.js"></script>
-        <script src="scripts/utils/util.js"></script>
-        <script src="scripts/alea-prng.js"></script>
-        <script src="scripts/utils/steno-display.js"></script>
-        <script src="data/short-sentences-data.js"></script>
-        <script src="scripts/libs/jquery-3.6.0.min.js"></script>
+        <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> -->
 
         <script src="scripts/libs/less.js" ></script>
         <script src="scripts/libs/chart.js"></script>
         <script src="scripts/libs/chartjs-plugin-datalabels.js"></script>
-
-        <script src="data/plover-translations.js"></script>
-
-        <script src="scripts/spectra/spectra.js"></script>
-        <script src="scripts/spectra/rules.js"></script>
+        <script src="scripts/libs/jquery-3.6.0.min.js"></script>
         <link rel="stylesheet" type="text/css" href="font-roboto.css" />
     </head>
     <body>
         <div id="lesson" class="wrapper"></div>
 
-        <script>
+        <script type="module">
+
+            import { setTheme, displayOnly, prepareInput, loadSettings,storageAvailable,populatePage,getFormFields,parseQueryString,prepareNextSeed } from "./scripts/utils/util.mjs";
+            import {numberSentences} from "./scripts/number-sentences.mjs";
+            import {TypeJig,setExercise } from "./scripts/type-jig.mjs";
+            import {wordDrill} from "./scripts/word-drill.mjs";
+            import {WordSets} from "./scripts/word-sets.mjs";
+            import {PRNG} from "./scripts/alea-prng.mjs";
+
+            import {shortSentences} from "./data/short-sentences-data.mjs"
+
             setTheme();
             const choose = (a, rnd) => a[Math.floor(rnd() * a.length)];
 
@@ -113,7 +115,6 @@
                     jig.reset();
                     nextSeed = prepareNextSeed(another);
                 });
-                initializeButtons(jig);
 
             });
         </script>
