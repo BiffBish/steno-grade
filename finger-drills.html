@@ -48,6 +48,18 @@
         function generateFingerDrill(drills, iterations, name) {
             let out = [];
             for (const drill of drills) addSet(drill, iterations, out);
+
+            /**
+             * @type {import("./scripts/type-jig").ExerciseOptions}
+             */
+            var options = {
+                name: "Finger Drill",
+                iterations: iterations,
+                actualWords: { unit: "strokes per minute", u: "SPM" },
+                require_raw_steno: true,
+            };
+
+
             var exercise = new TypeJig.Exercise(out, 0, false, "ordered");
             if (name) exercise.name = name;
             else exercise.name = "Finger Drill: " + drills.join(" ");
