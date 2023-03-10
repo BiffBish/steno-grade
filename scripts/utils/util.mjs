@@ -284,6 +284,165 @@ export function setTheme() {
                 mergedSettings.theme_form_border_thickness ?? "1px",
             );
         }
+
+
+        /* add a JavaScript function to extract the RGB values of --main-bg */
+        function getRGBValues(color) {
+            var match = color.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+            if (match) {
+                return [match[1], match[2], match[3]];
+            }
+
+            var hexMatch = color.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
+
+            if (hexMatch) {
+                return [
+                    parseInt(hexMatch[1], 16),
+                    parseInt(hexMatch[2], 16),
+                    parseInt(hexMatch[3], 16),
+                ];
+            }
+
+            var shortHexMatch = color.match(/^#([0-9a-f])([0-9a-f])([0-9a-f])$/i);
+            if (shortHexMatch) {
+                return [
+                    parseInt(shortHexMatch[1] + shortHexMatch[1], 16),
+                    parseInt(shortHexMatch[2] + shortHexMatch[2], 16),
+                    parseInt(shortHexMatch[3] + shortHexMatch[3], 16),
+                ];
+            }
+            return null;
+        }
+
+        function rgb2hsv (r, g, b) {
+            let rabs, gabs, babs, rr, gg, bb, h, s, v, diff, diffc, percentRoundFn;
+            rabs = r / 255;
+            gabs = g / 255;
+            babs = b / 255;
+            v = Math.max(rabs, gabs, babs),
+            diff = v - Math.min(rabs, gabs, babs);
+            diffc = c => (v - c) / 6 / diff + 1 / 2;
+            percentRoundFn = num => Math.round(num * 100) / 100;
+            if (diff == 0) {
+                h = s = 0;
+            } else {
+                s = diff / v;
+                rr = diffc(rabs);
+                gg = diffc(gabs);
+                bb = diffc(babs);
+
+                if (rabs === v) {
+                    h = bb - gg;
+                } else if (gabs === v) {
+                    h = (1 / 3) + rr - bb;
+                } else if (babs === v) {
+                    h = (2 / 3) + gg - rr;
+                }
+                if (h < 0) {
+                    h += 1;
+                }else if (h > 1) {
+                    h -= 1;
+                }
+            }
+            return [
+                Math.round(h * 360),
+                percentRoundFn(s * 100),
+                percentRoundFn(v * 100)
+            ];
+        }
+
+         const RGBToHSL = (r, g, b) => {
+                r /= 255;
+                g /= 255;
+                b /= 255;
+                const l = Math.max(r, g, b);
+                const s = l - Math.min(r, g, b);
+                const h = s
+                    ? l === r
+                    ? (g - b) / s
+                    : l === g
+                    ? 2 + (b - r) / s
+                    : 4 + (r - g) / s
+                    : 0;
+                return [
+                    60 * h < 0 ? 60 * h + 360 : 60 * h,
+                    100 * (s ? (l <= 0.5 ? s / (2 * l - s) : s / (2 - (2 * l - s))) : 0),
+                    (100 * (2 * l - s)) / 2,
+                ];
+            };
+
+        //Go through all propertyValues and if they are colors then lets populate a crap ton of variables
+        const propertyValues = getComputedStyle(document.documentElement);
+
+        for (const element of propertyValues) {
+            const property = element;
+            const value = propertyValues.getPropertyValue(property);
+            console.log(property, value);
+            // if (value.startsWith("rgb")) {
+            const rgb = getRGBValues(value);
+            if (!rgb) continue;
+            const hsl = RGBToHSL(rgb[0], rgb[1], rgb[2]);
+           
+
+
+            document.documentElement.style.setProperty(
+                property + "-rgb",
+                rgb.join(", "),
+            );
+                
+            document.documentElement.style.setProperty(
+                property + "-r",
+                rgb[0],
+            );
+            document.documentElement.style.setProperty(
+                property + "-g",
+                rgb[1],
+            );
+            document.documentElement.style.setProperty( 
+                property + "-b",
+                rgb[2],
+            );
+
+
+
+            document.documentElement.style.setProperty(
+                property + "-hsl",
+                hsl.join(", "),
+            );
+
+            document.documentElement.style.setProperty(
+                property + "-h",
+                hsl[0],
+            );
+            document.documentElement.style.setProperty(
+                property + "-s",
+                hsl[1] + "%",
+            );
+            document.documentElement.style.setProperty( 
+                property + "-l",
+                hsl[2] + "%",
+            );
+
+            // } else if (value.startsWith("#")) {
+
+
+            // }
+        }
+
+
+
+
+
+
+        /* use JavaScript to set the --main-bg-rgb variable to the RGB values of --main-bg */
+        var mainBg = getComputedStyle(document.documentElement).getPropertyValue('--main-bg');
+        console.log("Main bg", mainBg);
+
+        var mainBgRGB = getRGBValues(mainBg);
+        console.log("Main bg rgb", mainBgRGB);
+        if (mainBgRGB) {
+            document.documentElement.style.setProperty('--main-bg-rgb', mainBgRGB.join(', '));
+        }
     }
 }
 

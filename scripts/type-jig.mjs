@@ -21,6 +21,7 @@ import {N, initializeButtons} from "./utils/util.mjs";
  *  id: number,
  *  expected: string,
  *  typed: string,
+ *  strokes: [number, string, string][],
  * }} PersistantWordData
  *
  */
@@ -47,6 +48,16 @@ export class TypeJig {
 
         console.log("TypeJig", exercise, hint, options);
         this.exercise = exercise;
+
+        /**
+         * @type {[
+         *   number,
+         *   number,
+         *   string,
+         *   string,
+         * ][]}
+         */
+        this.strokes = [];
 
         this.display = documentElement("exercise");
         this.answerDisplay = documentElement("answer");
@@ -103,9 +114,10 @@ export class TypeJig {
 
         this.changeHandler = this.answerChanged.bind(this);
         bindEvent(document.body, "keydown", this.keyDown.bind(this));
-        bindEvent(this.input, "input", function() {
+        bindEvent(this.input, "input", function(ev) {
             if (!self.pendingChange) {
-                self.pendingChange = setTimeout(self.changeHandler, 5);
+                self.chordTime = Math.round(ev.timeStamp);
+                self.pendingChange = setTimeout(self.changeHandler, 25);
             }
         });
 
@@ -119,6 +131,12 @@ export class TypeJig {
         bindEvent(this.display, "click", focusInput);
 
         this.reset();
+
+        /**
+         * @type {number}
+         */
+        this.chordTime = 0;
+        this.previousInput = undefined;
     }
 
     setExercise(exercise) {
@@ -133,6 +151,8 @@ export class TypeJig {
         this.persistentWordData = [];
         this.lastTypedWordID = -1;
         this.display.style.width = "100%";
+
+        this.strokes = [];
 
         console.log("this.display", this.display);
         // this.exercise.calculateBreakPoints(this.display);
@@ -335,10 +355,10 @@ export class TypeJig {
         // remove any leading spaces on typedWords
         // any blank type words if they are at the end
         let trailingSpace = false;
-        if (typedWords[typedWords.length - 1] == "" && typedWords.length > 1) {
-            typedWords.pop();
-            trailingSpace = true;
-        }
+        // if (typedWords[typedWords.length - 1] == "" && typedWords.length > 1) {
+        //     typedWords.pop();
+        //     trailingSpace = true;
+        // }
         const options = this.options;
         // Display the user's answer, marking it for correctness.
         const oldOutput = this.display.previousElementSibling;
@@ -354,21 +374,47 @@ export class TypeJig {
         let correctCount = 0;
 
         // eslint-disable-next-line no-unused-vars
-        for (const _ of typedWords) {
-            if (typedIndex >= typedWords.length) break;
+        for (const i of typedWords) {
+            if (typedIndex > typedWords.length) break;
             const typed = typedWords[typedIndex];
             const expected = expectedWords[expectedIndex];
             const matchResult = checkMatch(typed, expected);
             const lastTypedWord = typedIndex === typedWords.length - 1;
-            this.persistentWordData[typedIndex] = {
-                ...this.persistentWordData[typedIndex],
-                id: typedIndex,
-                expected: expected,
-                typed: typed,
-            };
+
+
+
+
+            if (this.persistentWordData[typedIndex] == null) {
+                this.persistentWordData[typedIndex] = {
+                    id: typedIndex,
+                    expected: expected,
+                    typed: typed,
+                    lastKnownTimeStamp: null,
+                    strokes: [],
+                    failed: false,
+                    failed_count: 0,
+                    correctTimeStamp: null,
+                    incorrectTimeStamp: null,
+                    first_typed: null,
+                }
+            }
+
+            if (typedIndex == typedWords.length) break;
+
+
+            let typedWordData = this.persistentWordData[typedIndex];
+
+
+            if(typedWordData.typed == "" && i == typedWords.length - 1) {
+                break;
+            }
+
+            typedWordData.typed = typed;
+            typedWordData.first_typed ||= typed;
+
+
             if (matchResult) {
                 correctCount++;
-
                 wordList.push({
                     correct: true,
                     expected: expected,
@@ -385,6 +431,7 @@ export class TypeJig {
                     expected: expected,
                     typed: typed,
                 });
+                typedIndex++;
                 break;
             }
 
@@ -434,15 +481,7 @@ export class TypeJig {
 
             if (addedWordsOffset == 0 && droppedWordOffset == 0) {
                 if (typed.length > 0) {
-                    this.persistentWordData[typedIndex] = {
-                        ...this.persistentWordData[typedIndex],
-                        failed: true,
-                        first_typed:
-                            this.persistentWordData[typedIndex]?.first_typed ??
-                            typed,
-                        expected: expected,
-                        typed: typed,
-                    };
+                    typedWordData.failed = true;
                 }
 
                 wordList.push({
@@ -455,6 +494,9 @@ export class TypeJig {
                 errorCount++;
                 continue;
             }
+                
+            console.log("addedWordsOffset", addedWordsOffset);
+            console.log("droppedWordOffset", droppedWordOffset);
 
             if (addedWordsOffset == 0) addedWordsOffset = Infinity;
             if (droppedWordOffset == 0) droppedWordOffset = Infinity;
@@ -474,6 +516,7 @@ export class TypeJig {
                     typed: typedWords[typedIndex + addedWordsOffset],
                     addedWords: addedWords,
                 });
+                
                 typedIndex += addedWordsOffset;
                 typedIndex++;
                 expectedIndex++;
@@ -485,6 +528,24 @@ export class TypeJig {
                 // @ts-ignore
                 // let droppedWords = [];
                 for (let i = 0; i < droppedWordOffset; i++) {
+
+                    if (this.persistentWordData[typedIndex + i] == null) {
+                        this.persistentWordData[typedIndex + i] = {
+                            id: typedIndex + i,
+                            expected:  expectedWords[expectedIndex + i],
+                            typed: "",
+                            lastKnownTimeStamp: null,
+                            strokes: [],
+                            failed: false,
+                            failed_count: 0,
+                            correctTimeStamp: null,
+                            incorrectTimeStamp: null,
+                            first_typed: null,
+                        }
+                    }
+
+
+
                     wordList.push({
                         correct: false,
                         expected: expectedWords[expectedIndex + i],
@@ -499,6 +560,26 @@ export class TypeJig {
                     expected: expectedWords[expectedIndex + droppedWordOffset],
                     typed: typed,
                 });
+
+                if (this.persistentWordData[expectedIndex + droppedWordOffset] == null) {
+                    this.persistentWordData[expectedIndex + droppedWordOffset] = {
+                        id: expectedIndex + droppedWordOffset,
+                        expected:  expectedWords[expectedIndex + i],
+                        typed: typed,
+                        lastKnownTimeStamp: null,
+                        strokes: [],
+                        failed: !checkMatch(
+                            typed,
+                            expectedWords[expectedIndex + droppedWordOffset],
+                        ),
+                        failed_count: 0,
+                        correctTimeStamp: null,
+                        incorrectTimeStamp: null,
+                        first_typed: null,
+                    }
+                }
+
+
                 expectedIndex += droppedWordOffset;
                 expectedIndex++;
                 typedIndex++;
@@ -506,12 +587,12 @@ export class TypeJig {
                 continue;
             }
         }
-
+        console.log("typedIndex",typedIndex)
         // Timestamp the last word
-        const LastWord = this.persistentWordData[wordList.length - 1];
+        const LastWord = this.persistentWordData[typedIndex - 1];
         const LastTypedWord = wordList[wordList.length - 1];
-        console.log(LastWord, "LastWord");
-        console.log(LastTypedWord, "LastWord");
+        // console.log(LastWord, "LastWord");
+        // console.log(LastTypedWord, "LastWord");
         console.log([...this.persistentWordData], "input data");
 
         // if the last typed word is correct, add the timestamp
@@ -519,12 +600,7 @@ export class TypeJig {
             const nowTime = this.clock.getTime();
             const savedTime = LastWord?.correctTimeStamp;
             console.log(nowTime, savedTime, wordList.length - 1);
-            this.persistentWordData[wordList.length - 1] = {
-                ...this.persistentWordData[wordList.length - 1],
-                correctTimeStamp:
-                    this.persistentWordData[wordList.length - 1]
-                        ?.correctTimeStamp ?? nowTime,
-            };
+            this.persistentWordData[wordList.length - 1].correctTimeStamp = nowTime;
             console.log(
                 "setting value for ",
                 wordList.length - 1,
@@ -532,17 +608,15 @@ export class TypeJig {
             );
         }
         console.log([...this.persistentWordData], "persistentWordData");
-        this.persistentWordData[wordList.length - 1] = {
-            ...this.persistentWordData[wordList.length - 1],
-            lastKnownTimeStamp: this.clock.getTime(),
-        };
-        if (trailingSpace) {
-            wordList.push({
-                correct: null,
-                expected: "placeholder",
-                typed: "",
-            });
-        }
+        LastWord.lastKnownTimeStamp = this.clock.getTime()
+        
+        // if (trailingSpace) {
+        //     wordList.push({
+        //         correct: null,
+        //         expected: "placeholder",
+        //         typed: "",
+        //     });
+        // }
         return {
             words: wordList,
             correctCount: correctCount,
@@ -594,6 +668,12 @@ export class TypeJig {
                     } else {
                         addedWordNode.className = "unknown1";
                     }
+
+
+                    if(onResults) {
+                        addedWordNode.setAttribute("results", "true");
+                        addedWordNode.setAttribute("word_id", i.toString());
+                    }
                     output.appendChild(addedWordNode);
                     output.appendChild(document.createTextNode(" "));
                 }
@@ -633,6 +713,10 @@ export class TypeJig {
                 //         : persistentData?.failed
                 //         ? "corrected"
                 //         : "correct";
+                if(onResults) {
+                    typedSpan.setAttribute("results", "true");
+                    typedSpan.setAttribute("word_id", i.toString());
+                }
                 output.appendChild(typedSpan);
                 continue;
             }
@@ -690,6 +774,11 @@ export class TypeJig {
             //     ? "correct"
             //     : "incorrect";
 
+            if(onResults) {
+                typedSpan.setAttribute("results", "true");
+                typedSpan.setAttribute("word_id", i.toString());
+            }
+
             div.appendChild(expectedSpan);
             div.appendChild(typedSpan);
 
@@ -725,6 +814,13 @@ export class TypeJig {
     }
     answerChanged() {
         delete this.pendingChange;
+        const previousInput = this.previousInput ?? "";
+
+        const previousWords = previousInput
+            .replaceAll(/^\s+/g, "")
+            .split(/\s+/);
+        const  previousWordsLength = previousWords.length;
+
         const typedWords = this.input.value
             .replaceAll(/^\s+/g, "")
             .split(/\s+/);
@@ -732,49 +828,53 @@ export class TypeJig {
         // replace all leading spaces if they exist
 
         if (this.resultsDisplay.textContent !== "") return;
-        if (!this.running && !!this.input.value.trim()) {
+      
+        if(!this.running) {
+            if(!this.input.value.trim()) return;
             this.start();
         }
+
         const gradeResults = this.gradeTypeVsResult(
             typedWords,
             this.exercise.words,
         );
 
+            console.log("gradeResults", gradeResults);
+            
         const lastWordIndex = gradeResults.words.length - 1;
 
+
+        const lastGradedWord = gradeResults.words[lastWordIndex];
+            
+        const lastPersistantWord = this.persistentWordData[lastWordIndex];
+        const nextAfterLastPersistantWord = this.persistentWordData[lastWordIndex + 1];
+
+
         let numOfFailsThisWord =
-            this.persistentWordData[lastWordIndex]?.failed_count ?? 0;
+           lastPersistantWord?.failed_count ?? 0;
 
         const numOfFailsNextWord =
-            this.persistentWordData[lastWordIndex + 1]?.failed_count ?? 0;
+            nextAfterLastPersistantWord?.failed_count ?? 0;
 
-        // this.failedThisWord = false;
 
-        const currentWordisError =
-            gradeResults.words[lastWordIndex]?.correct == false;
 
-        if (currentWordisError && this.failedThisWord == false) {
+        //If we just messed up the word
+        if (lastGradedWord?.correct === false && this.failedThisWord == false) {
             this.failedThisWord = true;
-            numOfFailsThisWord++;
-            this.persistentWordData[lastWordIndex] = {
-                ...this.persistentWordData[lastWordIndex],
-                failed_count: numOfFailsThisWord,
-            };
+            lastPersistantWord.failed_count++;
             console.log(
                 "Adding error to index:",
                 lastWordIndex,
                 "count:",
-                numOfFailsThisWord,
+                lastPersistantWord.failed_count,
             );
         }
 
-        if (
-            this.lastWordIndex != lastWordIndex ||
-            gradeResults.words[lastWordIndex].typed == ""
-        ) {
+        if (this.lastWordIndex != lastWordIndex || lastGradedWord.typed == "") {
             this.lastWordIndex = lastWordIndex;
             this.failedThisWord = false;
         }
+        
         if (this.hint_on_fail) {
             if (
                 (numOfFailsThisWord >= this.hint_on_fail_count &&
@@ -787,6 +887,75 @@ export class TypeJig {
             }
         }
 
+        
+        //Lets deal with strokes
+        if(typedWords.length  > previousWordsLength ) {
+            console.log("Increased word length")
+            //If we increased more then one word then
+            for(let i = previousWordsLength - 1; i < typedWords.length; i++) {
+                console.log("Increased, Adding stroke to index:", i)
+                let strokes = this.persistentWordData[i].strokes
+                let lastStrokeIndex = strokes?.length ?? 1
+                let lastStroke = strokes?.[lastStrokeIndex - 1] ?? []
+                let lastTyped = lastStroke?.[2] ?? "" 
+                if (lastTyped == this.persistentWordData[i].typed) {
+                    continue;
+                }
+                this.persistentWordData[i].strokes.push(
+                    [
+                        this.chordTime,
+                        lastTyped,
+                        this.persistentWordData[i].typed
+                    ]
+                )
+            }
+        } else if(typedWords.length  < previousWordsLength) {
+            console.log("Decreased word length")
+            //If we decreased more then one word then
+            for(let i = typedWords.length - 1; i < previousWordsLength; i++) {
+                console.log("Decreased, Adding stroke to index:", i)
+                let strokes = this.persistentWordData[i].strokes
+                let lastStrokeIndex = strokes?.length ?? 1
+                let lastStroke = strokes?.[lastStrokeIndex - 1] ?? []
+                let lastTyped = lastStroke?.[2] ?? "" 
+                if (lastTyped == this.persistentWordData[i].typed) {
+                    continue;
+                }
+                this.persistentWordData[i].strokes.push(
+                    [
+                        this.chordTime,
+                        lastTyped,
+                        this.persistentWordData[i].typed
+                    ]
+                )
+            }
+        } else {
+            //If we just changed the last word
+            let strokes = this.persistentWordData[lastWordIndex].strokes
+            let lastStrokeIndex = strokes?.length ?? 1
+            let lastStroke = strokes?.[lastStrokeIndex - 1]
+            let lastTyped = lastStroke?.[2] ?? "" 
+            this.persistentWordData[lastWordIndex].strokes.push(
+                [
+                    this.chordTime,
+                    lastTyped,
+                    this.persistentWordData[lastWordIndex].typed
+                ]
+            )
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
         this.typedWords = gradeResults.words;
 
         if (
@@ -797,8 +966,17 @@ export class TypeJig {
         }
         this.updateCursor(this.answerDisplay);
 
-        // Get the expected value of the next word
+        
+        
 
+        
+
+        
+        
+        
+        
+        
+        // Get the expected value of the next word
         const r = this.answerDisplay.getBoundingClientRect();
         // @ts-ignore
         // const nextWord = this.exercise.words[this.typedWords.length];
@@ -841,6 +1019,10 @@ export class TypeJig {
         this.displayTypedWords(this.typedWords);
 
         this.updateWords(this.exercise.words);
+        this.previousInput = this.input.value;
+
+        console.log("UpdateEnd", this.persistentWordData);
+
     }
 
     keyDown(e) {
@@ -1306,7 +1488,156 @@ export class TypeJig {
             // @ts-ignore
             element.duration = 0;
         }
+
+
+
+        
+
+
+
+
+
+
+
         this.showResults(persistantData);
+
+        //Select all elements that have an attribute of results="true"
+        const results = document.querySelectorAll("#answer [results=true]");
+        console.log(results);
+        //On hover of each element, add a child div that is positioned absolute
+        results.forEach((result) => {
+            console.log(result);
+            result.addEventListener("mouseover", (e) => {
+                if (result.querySelector(".word-stats")) return;
+
+                const wordID = parseInt(result.getAttribute("word_id"));
+                const wordData = persistantData.find((a) => a.id == wordID);
+
+                const prevWordData = persistantData.find(
+                    (a) => a.id == wordID - 1
+                );
+
+
+
+
+
+                const strokes = wordData.strokes;
+                const expected = wordData.expected;
+
+                const maxLength = strokes.reduce((a, b) => {
+                    let len = Math.max(b[1].length, b[2].length);
+
+                    return len > a ? len : a;
+                }, 0);
+
+
+
+                let informationString = "This word was typed perfectly";
+
+                if (wordData.expected == wordData.typed && wordData.failed_count > 0) {
+                    informationString = "You made a mistake while typing this word, but you corrected it";
+                }
+
+                if (wordData.expected != wordData.typed) {
+                    informationString = "You made a mistake while typing this word, and you did not correct it";
+                }
+
+                let durationSeconds;
+                if (wordData.correctTimeStamp == null) {
+                    durationSeconds = wordData.lastKnownTimeStamp - prevWordData.lastKnownTimeStamp;
+                }
+                else {
+                    durationSeconds = wordData.correctTimeStamp - prevWordData.lastKnownTimeStamp;
+                }
+
+
+                let durationString = "";
+                if (durationSeconds < 1) {
+                    durationString = `${Math.round(durationSeconds * 1000)}ms`;
+                }
+                else {
+                    durationString = `${Math.round(durationSeconds * 100) / 100}s`;
+                }
+
+
+
+
+
+
+
+
+                const correctionDiv = N("div", [
+                    N("h3", "Strokes: "),
+                    N("div", [
+                        strokes.map((stroke) => {
+                            return N("div", [
+                                N("div", stroke[1].padEnd(maxLength), {
+                                    class: expected.startsWith(stroke[1]) ? "text-block" : "text-block--incorrect"
+                                }),
+                                N("div","=>"),
+                                
+                                N("div",stroke[2].padEnd(maxLength),{
+                                    class: expected.startsWith(stroke[2]) ? "text-block" : "text-block--incorrect"
+                                }),
+                            ],{class: "word-stats__strokes__stroke"} );
+                        })
+                    ]),
+                ],{
+                    class: "word-stats__strokes"
+                });
+
+
+
+
+
+                const div = N("div", {
+                    style: {
+                        position: "absolute",
+                        top: "150%",
+                        left: "0",
+                    },
+                    class: "word-stats"
+                },[
+                    N("h2", "Word Stats"),
+                    N("div", [
+                        N("p", informationString, {
+                            class: "word-stats__information__description"
+                        }),
+                    ], {
+                        class: "word-stats__information"
+                    }),
+                    N("div", [
+                        N("span", "Duration: "),
+                        N("span", durationString, {
+                            class: "text-block"
+                        }),
+                    ]),
+                    correctionDiv,
+                    // N("div", [
+                    //     N("span", "Errors: "),
+                    //     N("span", "0"),
+                    // ]),
+                    // N("span", [
+                    //     N("pre", JSON.stringify({
+                    //         id: wordID,
+                    //         ...wordData
+                    //     }, null, 2 ))
+                    // ])
+
+                ]);
+
+                result.appendChild(div);
+            });
+
+            result.addEventListener("mouseout", (e) => {
+                const div = result.querySelector(".word-stats");
+                result.removeChild(div);
+            });
+        });
+
+
+
+
         this.saveDurationInLocalStorage(this.persistentWordData);
         this.saveErrorsInLocalStorage();
     }
@@ -1410,7 +1741,7 @@ export class TypeJig {
 
     showResults(persistantData) {
         // @ts-ignore
-        typedWords = this.input.value.replaceAll(/^\s+/g, "").split(/\s+/);
+        let typedWords = this.input.value.replaceAll(/^\s+/g, "").split(/\s+/);
         let seconds = this.clock.getTime(true);
         const gradingResults = this.gradeTypeVsResult(
             // @ts-ignore
