@@ -1636,6 +1636,7 @@ export class TypeJig {
         });
 
 
+        this.saveExerciseReplay(this.exercise, persistantData);
 
 
         this.saveDurationInLocalStorage(this.persistentWordData);
@@ -2131,7 +2132,7 @@ export function setExercise(name, exercise, hints = null, options = {}, jig = nu
     // @ts-ignore
     end.href = document.location.href;
 
-    // Add the settings from local storage to the options
+    // Add the options from local storage to the options
     const settings = localStorage.getItem("settings") ?? "{}";
     const customSettings = JSON.parse(
         localStorage.getItem("custom_settings") ?? "{}",
@@ -2453,6 +2454,41 @@ TypeJig.Timer = Timer;
 
 // -----------------------------------------------------------------------
 
+
+
+
+/** 
+ * @typedef {Object} ExerciseOptions
+ * 
+ * @property {string} [name] The name of the exercise
+ * @property {string[]} [words] The words to type
+ * @property {boolean} [shuffle] Whether to shuffle the words
+ * @property {string} [type] The type of exercise
+ * 
+ * @property {number} [seed] The seed to use for the random number generator, If applicable
+ * 
+ * ## Endless options
+ * @property {number} [seconds] The number of seconds to type all the words
+ * @property {boolean} [endless] Whether to keep going until the user stops
+ * @property {number} [maxLinesBeforeAppend] The number of lines to display before appending new lines
+ * 
+ * @property {function} [getNextWords] A function to call to get the next words
+ */
+
+/** 
+ * @typedef {Object} Options
+ * 
+ * @property {string} [name] The name of the exercise
+ * @property {string[]} [words] The words to type
+ * @property {number} [seconds] The number of seconds to type all the words
+ * @property {boolean} [shuffle] Whether to shuffle the words
+ * 
+ * @property {boolean} [showTimer] Whether to show the timer
+ * @property {number} [maxLinesBeforeAppend] Whether to show the word count
+ */
+
+
+
 /**
  *
  * @param {string[] | string[][]} words The words to type
@@ -2463,9 +2499,17 @@ TypeJig.Timer = Timer;
  */
 
 class Exercise {
-    constructor(words, seconds, shuffle, getNextWords, maxLinesBeforeAppend) {
-        this.name = "Unnamed Exercise";
+    /**
+     * 
+     * @param {ExerciseOptions} options 
+     */
+    constructor(options) {
+        this.options = options;
+        this.name = options.name || "Exercise";
+
         this.enterPoints = [];
+
+        let words = [...options.words];
 
         const processedWords = [];
         words = words.flat(2);
@@ -2491,18 +2535,19 @@ class Exercise {
          * @type {string[]}
          */
         this.rawWords = [...processedWords];
-        this.seconds = seconds;
-        this.shuffle = shuffle;
+        this.seconds = options.seconds || 0;
         // this.select =
         //     TypeJig.Exercise.select[select] || TypeJig.Exercise.select.random;
 
-        this.endless = typeof getNextWords === "function";
-        this.getNextWords = getNextWords;
-        this.maxLinesBeforeAppend = maxLinesBeforeAppend;
+        this.endless = options.endless || false;
+        this.getNextWords = options.getNextWords;
+        this.maxLinesBeforeAppend = options.maxLinesBeforeAppend;
 
         this.numOfExpectedWords = -1;
 
-        if (shuffle) randomize(this.words);
+
+        // this.shuffle = shuffle;
+        // if (shuffle) randomize(this.words);
     }
 
     calculateBreakPoints(display) {
@@ -2558,3 +2603,23 @@ TypeJig.Exercise = Exercise;
 // }
 
 // TypeJig.
+
+
+class ExerciseReplay {
+    /**
+     * 
+     * @param {Exercise} exercise 
+     * @param {string} url 
+     * @param {*} options
+     * @param {PersistantWordData[]} persistantData
+     */
+    constructor(exercise, url, options,persistantData) {
+
+        this.exercise = exercise;
+        this.url = url;
+        this.options = options;
+        this.persistantData = persistantData;
+    }
+}
+
+

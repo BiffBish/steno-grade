@@ -2,5 +2,6 @@
     "javascript.implicitProjectConfig.checkJs": true,
     "js/ts.implicitProjectConfig.checkJs": true,
     "js/ts.implicitProjectConfig.strictNullChecks": true,
-    "typescript.tsserver.log": "verbose"
+    "typescript.tsserver.log": "verbose",
+    "eslint.validate": ["javascript", "html"]
 }
