@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Improve your mistakes</title>
+        <link href="styles/base.css" rel="stylesheet" type="text/css" />
+        <script src="scripts/utils/theme.mjs" type="module"></script>
+        <link href="styles/style.less" rel="stylesheet/less" type="text/css" />
+
+        <script src="scripts/libs/less.js"></script>
+        <script src="scripts/libs/chart.js"></script>
+        <script src="scripts/libs/chartjs-plugin-datalabels.js"></script>
+        <script src="scripts/libs/jquery-3.6.0.min.js"></script>
+        <script src="scripts/libs/less.js"></script>
+    </head>
+    <body>
+        <div class="wrapper">
+            <div id="form">
+                <h1>Improve your mistakes</h1>
+                <div class="button-radio-row">
+                    <div class="clickable-form-section center">
+                        <h2>Mistakes</h2>
+                    </div>
+                    <div class="clickable-form-section center">
+                        <h2>Durations</h2>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-section">
+                        Words you mess up the most
+                        <ul
+                            id="most-messed-up-words"
+                            style="list-style-type: none"
+                        ></ul>
+                    </div>
+                    <div class="form-section">
+                        Words you pause the most on
+                        <ul
+                            id="most-durations-words"
+                            style="list-style-type: none"
+                        ></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="lesson" class="wrapper" style="display: none">
+            <div id="leftside">
+                <h3 id="lesson-name" class="center"></h3>
+                <p style="text-align: center; padding-bottom: 3em">
+                    <a href="raw-steno-instructions.html"
+                        >How to get raw steno output</a
+                    >
+                </p>
+                <div id="drill-content">
+                    <div id="answer"></div>
+                    <div id="exercise"></div>
+                    <div id="results"></div>
+                    <div style="height: 300px">
+                        <canvas id="chartDiv" width="400" height="400"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div id="nav">
+                <p id="stroke-hint"></p>
+                <p id="strokes"></p>
+                <p id="clock" class="clock"></p>
+                <p id="live-wpm-display" class="wpm"></p>
+
+                <p class="center">
+                    <a id="back" title="LeftArrow"
+                        >&larr; Back to Menu
+                        <span class="shortcut-key">(LeftArrow)</span></a
+                    >
+                </p>
+                <p class="center">
+                    <a id="again" title="Enter"
+                        >&#8634; Restart
+                        <span class="shortcut-key">(Enter 3x)</span></a
+                    >
+                </p>
+                <p class="center">
+                    <a id="end" title="Enter"
+                        >&Cross; End
+                        <span class="shortcut-key">(Tab 3x)</span></a
+                    >
+                </p>
+            </div>
+
+            <textarea id="input"></textarea>
+        </div>
+    </body>
+    <script src="js/improvements.mjs" type="module"></script>
+</html>

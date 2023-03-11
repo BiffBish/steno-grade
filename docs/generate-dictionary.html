@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Custom Dictionary Upload</title>
+        <link href="styles/base.css" rel="stylesheet" type="text/css" />
+        <script src="scripts/utils/theme.mjs" type="module"></script>
+        <link href="styles/style.less" rel="stylesheet/less" type="text/css" />
+
+        <script src="scripts/libs/less.js"></script>
+        <script src="scripts/libs/chart.js"></script>
+        <script src="scripts/libs/chartjs-plugin-datalabels.js"></script>
+        <script src="scripts/libs/jquery-3.6.0.min.js"></script>
+        <script src="scripts/libs/less.js"></script>
+    </head>
+    <body>
+        <div class="wrapper">
+            <div id="form">
+                <h1>Custom Dictionary Generation</h1>
+                <h2 class="subtitle">
+                    Give me a list of words to translate and I will generate a
+                    custom dictionary for you.
+                </h2>
+                <div class="form-section">
+                    <input
+                        type="text"
+                        id="words"
+                        name="words"
+                        placeholder="Words to translate"
+                    />
+                </div>
+
+                <div class="form-section">
+                    <textarea
+                        id="output"
+                        name="output"
+                        placeholder="Output"
+                        rows="10"
+                        cols="50"
+                    ></textarea>
+                </div>
+            </div>
+            <div class="field">
+                <button
+                    class="button is-primary"
+                    id="submit_1"
+                    type="submit"
+                    name="submit"
+                >
+                    Generate
+                </button>
+            </div>
+        </div>
+    </body>
+    <script></script>
+</html>

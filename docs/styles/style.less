@@ -1,0 +1,985 @@
+/* Reset Styles */
+html,
+body {
+    margin: 0;
+    padding: 0;
+    scroll-behavior: smooth;
+}
+
+* {
+    box-sizing: border-box;
+    &:before,
+    &:after {
+        box-sizing: border-box;
+    }
+    text-decoration: none;
+}
+
+:root {
+    --main-bg: #fff;
+    --main-fg: #000;
+    --link-text: #167ee8;
+    --form-border: #333;
+    --form-shadow: #eee;
+    --answer-text: #888;
+    --correct-text-bg: #cfc;
+    --corrected-text-bg: rgb(255, 237, 204);
+    --unknown-text-bg: rgb(187, 187, 187);
+    --incorrect-text-bg: #fcc;
+    --form-border-thickness: 1px;
+    --form-gap: 0.5em;
+
+    --steno-key-outline: #000;
+    --steno-key-bg: #666;
+    --steno-key-fg: #000;
+    --steno-key-primary-bg: #fe7;
+    --steno-key-primary-fg: #000;
+    --steno-key-secondary-bg: #ff9e77;
+    --steno-key-secondary-fg: #000;
+    --steno-key-tertiary-bg: #ff9;
+    --steno-key-tertiary-fg: #000;
+    --steno-alt-key-bg: #888;
+    --steno-alt-key-fg: #555;
+}
+
+[data-theme="dark"] {
+    --main-bg: #111;
+    --main-fg: #ddb;
+    --link-text: #ea3;
+    --form-border: #888;
+    --form-shadow: #332;
+    --answer-text: #aaa;
+    --correct-text-bg: #030;
+    --corrected-text-bg: rgb(51, 39, 0);
+    --unknown-text-bg: rgb(37, 37, 37);
+    --incorrect-text-bg: #300;
+
+    --steno-key-outline: #000;
+    --steno-key-primary-bg: #fbec82;
+    --steno-key-primary-fg: #000;
+    --steno-key-secondary-bg: #ff9e77;
+    --steno-key-secondary-fg: #000;
+    --steno-key-tertiary-bg: #8becf6;
+    --steno-key-tertiary-fg: #000;
+    --steno-alt-key-bg: #888;
+    --steno-alt-key-fg: #555;
+}
+
+[data-theme="oasis"] {
+    --main-bg: #fff;
+    --main-fg: #0d1f2d;
+    --link-text: #167ee8;
+    --form-border: #e5e5e5;
+    --form-shadow: #ccc;
+    --answer-text: #555;
+    --correct-text-bg: #cfc;
+    --corrected-text-bg: rgb(255, 237, 204);
+    --unknown-text-bg: rgb(187, 187, 187);
+    --incorrect-text-bg: #fcc;
+
+    --steno-key-primary-bg: #fbec82;
+    --steno-key-primary-fg: #000;
+    --steno-key-secondary-bg: #ff9e77;
+    --steno-key-secondary-fg: #000;
+    --steno-key-tertiary-bg: #8becf6;
+    --steno-key-tertiary-fg: #000;
+    --steno-alt-key-bg: #c2c2c2;
+    --steno-alt-key-fg: #131313;
+    --steno-key-outline: #000;
+    --steno-key-bg: #e4e4e4;
+    --steno-key-fg: #000;
+}
+
+[data-theme="breeze"] {
+    --main-bg: #273740;
+    --main-fg: #deebf2;
+    --link-text: #68a2c2;
+    --form-border: #a2c2d8;
+    --form-shadow: #273740;
+    --answer-text: #deebf2;
+    --correct-text-bg: #68a2c2;
+    --corrected-text-bg: #4d748c;
+    --unknown-text-bg: #1e3346;
+    --incorrect-text-bg: #8c4d4d;
+
+    --steno-key-primary-bg: #7ec2c5;
+    --steno-key-primary-fg: #000;
+    --steno-key-secondary-bg: #76c067;
+    --steno-key-secondary-fg: #000;
+    --steno-key-tertiary-bg: #60d947;
+    --steno-key-tertiary-fg: #000;
+    --steno-alt-key-bg: #42525e;
+    --steno-alt-key-fg: #131313;
+    --steno-key-outline: #000;
+    --steno-key-bg: #647a8b;
+    --steno-key-fg: #000;
+}
+
+[data-theme="rustic"] {
+    --main-bg: #593e36;
+    --main-fg: #f3eade;
+    --link-text: #f08a5d;
+    --form-shadow: #c2a59c;
+    --answer-text: #ffd6c2;
+    --correct-text-bg: #99765c;
+    --corrected-text-bg: #906262;
+    --incorrect-text-bg: #8c3d2f;
+
+    --steno-key-outline: #000;
+    --steno-key-bg: #957e7e;
+    --steno-key-fg: #000;
+    --steno-key-primary-bg: #f09a9a;
+    --steno-key-primary-fg: #000;
+    --steno-key-secondary-bg: #e86464;
+    --steno-key-secondary-fg: #000;
+    --steno-key-tertiary-bg: #ff9;
+    --steno-key-tertiary-fg: #000;
+    --steno-alt-key-bg: #736060;
+    --steno-alt-key-fg: #0a0a0a;
+}
+
+// [data-theme="vibrant"] {
+// 	--main-bg: #7F5C5A;
+// 	--main-fg: #F8F8F8;
+// 	--link-text: #F65058;
+// 	--form-border: #D7D7D7;
+// 	--form-shadow: #D7D7D7;
+// 	--answer-text: #C1C1C1;
+// 	--correct-text-bg: #4F4F4F;
+// 	--corrected-text-bg: #6F6F6F;
+// 	--unknown-text-bg: #B3B3B3;
+// 	--incorrect-text-bg: #E62B1E;
+// }
+
+// [data-theme="serenity"] {
+// 	--main-bg: #6B7F8C;
+// 	--main-fg: #F2F2F2;
+// 	--link-text: #40798C;
+// 	--form-border: #B5D4DD;
+// 	--form-shadow: #6B7F8C;
+// 	--answer-text: #BFD4D4;
+// 	--correct-text-bg: #40798C;
+// 	--corrected-text-bg: #A3C1B8;
+// 	--unknown-text-bg: #9FA8B3;
+// 	--incorrect-text-bg: #B83232;
+// }
+
+[data-theme="retro-pop"] {
+    --main-bg: #4a4e4d;
+    --main-fg: #f0d9b5;
+    --link-text: #ff5757;
+    --form-border: #c5d5cb;
+    --form-shadow: #4a4e4d;
+    --answer-text: #f0d9b5;
+    --correct-text-bg: #ae7f5b;
+    --corrected-text-bg: #70554c;
+    --unknown-text-bg: #9e9e9e;
+    --incorrect-text-bg: #b84930;
+
+    --steno-key-outline: #000;
+    --steno-key-bg: #a2a2a2;
+    --steno-key-fg: #000;
+    --steno-key-primary-bg: #e7d5a0;
+    --steno-key-primary-fg: #000;
+    --steno-key-secondary-bg: #dd8282;
+    --steno-key-secondary-fg: #000;
+    --steno-key-tertiary-bg: #99f1ff;
+    --steno-key-tertiary-fg: #000;
+    --steno-alt-key-bg: #847979;
+    --steno-alt-key-fg: #0a0a0a;
+}
+
+[data-theme="ocean"] {
+    --main-bg: #316598;
+    --main-fg: #b6e8e8;
+    --link-text: #74c8ff;
+    --form-border: #bdc3c7;
+    --form-shadow: #2c3e50;
+    --answer-text: #c9fbf4;
+    --correct-text-bg: #61bbcc;
+    --corrected-text-bg: #68a6d4;
+    --unknown-text-bg: #7f8c8d;
+    --incorrect-text-bg: #bd5f55;
+
+    --steno-key-outline: #000;
+    --steno-key-bg: #80b0d1;
+    --steno-key-fg: #000;
+    --steno-key-primary-bg: #17bbee;
+    --steno-key-primary-fg: #000;
+    --steno-key-secondary-bg: #009fff;
+    --steno-key-secondary-fg: #000;
+    --steno-key-tertiary-bg: #99f1ff;
+    --steno-key-tertiary-fg: #000;
+    --steno-alt-key-bg: #69879b;
+    --steno-alt-key-fg: #000;
+}
+
+[data-theme="autumn"] {
+    --main-bg: #392c50;
+    --main-fg: #fdebd0;
+    --link-text: #c37cdf;
+    --form-border: #d7bde2;
+    --form-shadow: #2c3e50;
+    --answer-text: #fadbd8;
+    --correct-text-bg: #a474de;
+    --corrected-text-bg: #7b79b5;
+    --unknown-text-bg: #7f8c8d;
+    --incorrect-text-bg: #c02b63;
+
+    --steno-key-outline: #000;
+    --steno-key-bg: #9680d1;
+    --steno-key-fg: #000;
+    --steno-key-primary-bg: #aa41c7;
+    --steno-key-primary-fg: #000;
+    --steno-key-secondary-bg: #6d3ed5;
+    --steno-key-secondary-fg: #000;
+    --steno-key-tertiary-bg: #ff67d2;
+    --steno-key-tertiary-fg: #000;
+    --steno-alt-key-bg: #715c91;
+    --steno-alt-key-fg: #000;
+}
+
+[data-theme="odyssey"] {
+    --main-bg: #2c5030;
+    --main-fg: #fff;
+    --link-text: #f1c40f;
+    --form-border: #abb2b9;
+    --form-shadow: #2c3e50;
+    --answer-text: #c9ffd2;
+    --correct-text-bg: #2ef31266;
+    --corrected-text-bg: #bedb3487;
+    --unknown-text-bg: #7f8c8d;
+    --incorrect-text-bg: #e7443cc4;
+
+    --steno-key-bg: #729771;
+    --steno-key-fg: #000;
+    --steno-key-primary-bg: #94da6d;
+    --steno-key-primary-fg: #000;
+    --steno-key-secondary-bg: #3ed556;
+    --steno-key-secondary-fg: #000;
+    --steno-key-tertiary-bg: #1cbfbf;
+    --steno-key-tertiary-fg: #000;
+    --steno-alt-key-bg: #566a49;
+    --steno-alt-key-fg: #000;
+}
+
+.red {
+    color: #f55;
+}
+
+// /* Main Layout and Visual Styling of Block Elements */
+html,
+body {
+    font: 15px Roboto, sans-serif;
+    color: var(--main-fg);
+}
+
+.wrapper {
+    max-width: 50em;
+    margin: 0 auto;
+    padding: 1em;
+}
+
+.welcome-text {
+    max-width: 44em;
+    margin: 0 auto; /* Center it on screen */
+    text-align: center;
+}
+
+select {
+    .form-border();
+}
+
+select,
+option {
+    font: 15px Roboto, sans-serif;
+    background-color: var(--main-bg);
+    color: var(--main-fg);
+}
+
+#nav {
+    flex: 0 0;
+    height: min-content;
+    min-width: 8em;
+    margin-left: 1.5em;
+    position: sticky;
+    top: 0;
+}
+
+.custom-settings-input {
+    position: sticky;
+    top: 20px;
+    background: var(--main-bg);
+}
+
+.form-border {
+    border: var(--form-border-thickness) solid var(--form-border);
+    border-radius: 0.2em;
+    box-shadow: 0.1em 0.2em 0.4em var(--form-shadow);
+}
+
+.form-section {
+    .form-border();
+    padding: 0.8em 1em;
+    margin: var(--form-gap) 0;
+
+    position: relative;
+
+    .form-section__submit-button {
+        .form-border();
+        position: absolute;
+        top: 0em;
+        left: calc(100% + var(--form-gap));
+
+        height: 100%;
+        width: 5em;
+        .center();
+
+        //Act like a form button
+        &::after {
+            content: "\2192";
+            font-size: 4em;
+            font-weight: bold;
+            color: var(--main-fg);
+        }
+
+        &:hover {
+            border-color: var(--link-text);
+            cursor: pointer;
+            color: var(--link-text);
+        }
+        background: none;
+    }
+
+    &:has(.form-section__submit-button:hover) {
+        border-color: var(--link-text);
+        cursor: pointer;
+        color: var(--link-text);
+    }
+}
+
+.clickable-form-section {
+    .form-section();
+    color: var(--main-fg);
+    &:hover {
+        border-color: var(--link-text);
+        cursor: pointer;
+        color: var(--link-text);
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        margin: 0;
+    }
+}
+a .clickable-form-section * {
+    text-decoration: none;
+}
+.form-section--disabled {
+    .form-section();
+    opacity: 0.5;
+
+    &:hover {
+        border-color: var(--form-border);
+        cursor: default;
+        color: var(--main-fg);
+    }
+    * {
+        pointer-events: none;
+    }
+}
+
+.form-section--selected {
+    border-color: red;
+}
+
+//A text block like ` ` in markdown
+.text-block {
+    //A the main bg but a little darker
+    // background: var(--main-bg) + 0.1;
+    // background: var(--main-bg);
+    // filter: brightness(0.7);
+    background-color: hsl(
+        var(--main-bg-h),
+        var(--main-bg-s),
+        calc(var(--main-bg-l) * 0.7)
+    );
+    border-radius: 0.2em;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.2); /* use box-shadow to create a subtle drop shadow effect */
+    padding: 0.2em;
+
+    font-family: monospace;
+}
+
+.text-block--incorrect {
+    .text-block();
+
+    background-color: hsl(
+        var(--incorrect-text-bg-h),
+        var(--incorrect-text-bg-s),
+        calc(var(--incorrect-text-bg-l) * 0.3)
+    );
+
+    position: relative;
+
+    //add a strike through
+
+    text-decoration: line-through;
+}
+
+.ps:hover {
+    background-color: #aaaaaa;
+}
+.word-stats {
+    .form-border();
+    background: var(--main-bg);
+    color: var(--main-fg);
+    padding: 0.8em 1em;
+    display: flex;
+    flex-direction: column;
+    min-width: 300px;
+
+    > h2 {
+        .center();
+        margin: 0;
+        line-height: 1em;
+    }
+
+    .word-stats__information {
+        .word-stats__information__description {
+            white-space: normal;
+            line-height: 1.2em;
+            // position: absolute;
+            // top: 0;
+            // left: 0;
+            // width: 100%;
+            // height: 100%;
+            .center();
+        }
+    }
+
+    .word-stats__strokes {
+        display: inline-block;
+        width: auto;
+
+        flex: 1;
+        h3 {
+            margin: 0;
+        }
+        .word-stats__strokes__stroke {
+            line-height: 1em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0.2em 0;
+
+            > div {
+                > div {
+                    // text-align: right;
+                    // height: 1.5em;
+                    font-size: 1em;
+                    line-height: 1.2em;
+                }
+            }
+        }
+    }
+}
+
+/* On hover */
+
+.no-link-formatting {
+    text-decoration: none;
+    color: inherit !important;
+}
+
+/*
+	Form Controls
+ */
+
+input[type="number"] {
+    width: 3.5em;
+}
+@supports (-moz-appearance: none) {
+    input[type="number"] {
+        width: 5em;
+    }
+}
+input[type="number"][name="timeLimit"] {
+    width: 2.5em;
+}
+
+form.drill-options {
+    margin: 0.8em 0 0.1em 0;
+    box-sizing: border-box;
+}
+
+form.drill-options input {
+    // padding: 0.1em 1em;
+    margin: 0.5em 0.2em;
+}
+
+form.drill-options input[type="radio"]:first-child + label {
+    margin-right: 1em;
+}
+form.drill-options input[type="radio"] + label {
+    cursor: pointer;
+}
+
+a,
+a:visited {
+    color: var(--link-text);
+}
+
+#lesson {
+    display: flex;
+    flex-direction: row;
+    font-size: 1.3em;
+}
+
+#lesson-name {
+    margin-bottom: 3em;
+}
+
+#input {
+    position: fixed;
+    left: -10000px;
+}
+
+#leftside {
+    flex: 1 0;
+}
+
+#drill-content {
+    margin: 0 auto;
+    position: relative;
+}
+
+#exercise,
+#answer,
+#results {
+    margin-top: -0.8em;
+    line-height: 3;
+}
+#results {
+    line-height: 1;
+    white-space: pre-wrap;
+}
+#exercise {
+    position: relative;
+    white-space: pre-wrap;
+}
+
+#answer {
+    position: absolute;
+    padding-top: 2em;
+    color: var(--answer-text);
+    white-space: pre;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    width: 100%;
+    float: left;
+}
+#exercise p:not(:last-child)::after {
+    content: "¶";
+    font-weight: bold;
+}
+
+.notYet {
+    color: var(--answer-text);
+}
+.correct {
+    background: var(--correct-text-bg);
+}
+.corrected {
+    background: var(--corrected-text-bg);
+}
+.unknown {
+    background: var(--unknown-text-bg);
+}
+.blankWord {
+    background: var(--incorrect-text-bg);
+    border-bottom-color: var(--answer-text);
+    border-bottom-style: solid;
+    border-bottom-width: 2px;
+}
+
+#answer {
+    //Select elements with the results=true attribute
+    [results="true"] {
+        z-index: 10;
+        position: relative;
+
+        &:hover {
+            cursor: cell;
+        }
+    }
+}
+
+.complex-word-container {
+    display: inline-block;
+    line-height: 1;
+    position: relative;
+}
+
+.incorrect {
+    background: var(--incorrect-text-bg);
+    text-decoration: line-through;
+}
+.cursor {
+    border-right: 2px solid var(--main-fg);
+}
+
+.clock {
+    font-size: 300%;
+    text-align: center;
+}
+
+.wpm {
+    font-size: 170%;
+    text-align: center;
+}
+.center {
+    text-align: center;
+    /* Vertical centering */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.half-scale {
+    transform: scale(0.5);
+}
+
+/* Navigation */
+.navigation a {
+    text-decoration: none;
+}
+.navigation a:not(:last-child) {
+    margin-right: 30px;
+}
+
+.shortcut-key {
+    font-size: small;
+    vertical-align: middle;
+}
+
+.caption {
+    font-size: x-large;
+    vertical-align: middle;
+}
+/* Configure these to tune the stroke display to your liking. */
+
+/* Setting it to `smaller` usually means about 83% (1 / 1.2),
+ * but there's no standard. */
+
+/* allign elements side by side */
+.word-pair {
+    display: inline-block;
+    margin: 0.2em;
+    display: flex;
+}
+.strokes {
+    font-size: 14px;
+    font-weight: bold;
+    opacity: 1;
+    text-align: center;
+}
+
+.strokes > *:not(:last-child) {
+    margin-bottom: 5em;
+}
+
+.strokes td {
+    background: var(--steno-key-bg);
+    color: var(--steno-key-fg);
+    border: thin solid var(--steno-key-outline);
+    border-radius: 0.5ex;
+    padding: 0.25ex 0.33ex;
+    text-align: center;
+}
+
+.strokes .numberBar {
+    min-height: 0.5em;
+    margin: 0;
+    padding: 0;
+}
+.strokes td.wide {
+    min-width: 2em;
+}
+.strokes .leftVowel {
+    transform: translate(+0.8em, 10%);
+}
+.strokes .rightVowel {
+    transform: translate(-0.8em, 10%);
+}
+
+.strokes table tr td.asterisk-pressed {
+    color: var(--steno-key-secondary-fg);
+    background: var(--steno-key-secondary-bg);
+}
+.strokes table tr td.pressed {
+    color: var(--steno-key-primary-fg);
+    background: var(--steno-key-primary-bg);
+}
+
+.strokes table tr td.number-pressed {
+    color: var(--steno-key-tertiary-fg);
+    background: var(--steno-key-tertiary-bg);
+}
+
+.strokes td.alt {
+    color: var(--steno-alt-key-fg);
+    background: var(--steno-alt-key-bg);
+}
+
+.strokes > * {
+    vertical-align: top;
+}
+
+.strokes span.big-slash {
+    font-size: 300%;
+}
+
+/* But don't change these ones */
+
+.strokes .hide {
+    display: none;
+}
+
+.strokes table {
+    display: inline-block;
+    empty-cells: hide;
+}
+
+.strokes > div {
+    display: inline-block;
+    margin: 0.2em;
+}
+
+.steno-group-strokes {
+    display: inline-block;
+    margin: 0.2em;
+}
+
+.steno-group-title {
+    font-size: 1.5em;
+    font-weight: bold;
+    .form-border();
+}
+
+#corrections {
+    /* display: inline-block; */
+    /* margin: 0.5em 0; */
+    width: 100%;
+    border-spacing: 0px 10px;
+}
+
+#corrections tr:first-child th {
+    padding: 0px;
+    border-bottom: thick solid var(--main-fg);
+}
+
+#corrections td {
+    text-align: center;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+}
+
+.row--gap {
+    .row();
+    gap: var(--form-gap);
+}
+
+.flex {
+    flex: 1 0;
+}
+
+.button-radio-row {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5em;
+
+    /* Affect children elements */
+}
+
+.button-styling {
+    .form-border();
+
+    &:hover {
+        cursor: pointer;
+        color: var(--link-text);
+        border: 1px solid var(--link-text);
+    }
+
+    padding: 0.5em;
+}
+
+.button-radio-row > * {
+    flex: 1 0;
+
+    /* Align children elements in the center */
+    align-self: stretch;
+}
+
+.radio-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5em;
+    position: relative;
+
+    //I want an outline above and below the buttons
+    // &::before {
+    // 	content: "";
+    // 	display: block;
+    // 	position: absolute;
+    // 	border-top: 1px solid var(--main-fg);
+    // 	width: 100%;
+    // 	top: calc((-1 * var(--form-gap))/3);
+    // }
+
+    // &::after {
+    // 	content: "";
+    // 	display: block;
+    // 	position: absolute;
+    // 	border-bottom: 1px solid var(--main-fg);
+    // 	width: 100%;
+    // 	bottom: calc((-1 * var(--form-gap))/3);
+    // }
+
+    label {
+        .button-styling();
+        border-color: var(--main-fg);
+        padding: 0.5em;
+        .center();
+
+        //The min width is the basis,
+        //Then expand to fit the content
+
+        flex: 1 0 auto;
+
+        &.active {
+            color: var(--link-text);
+            border: 1px solid var(--link-text);
+        }
+
+        &:not(.active):hover {
+            cursor: pointer;
+            color: var(--link-text);
+            border: 1px solid var(--main-fg);
+        }
+
+        //Mouse down
+        &:hover:active {
+            border: 1px solid var(--link-text);
+        }
+
+        input {
+            display: none;
+            margin-right: 0.5em;
+        }
+    }
+}
+
+.radio-buttons--row {
+    .radio-buttons();
+    flex-direction: row;
+}
+
+.radio-buttons--column {
+    .radio-buttons();
+    flex-direction: column;
+    display: flex;
+}
+
+.checkbox-label {
+    .button-styling();
+    border-color: var(--main-fg);
+    padding: 0.5em;
+
+    &.active {
+        color: var(--link-text);
+        border: 1px solid var(--link-text);
+    }
+
+    &:not(.active):hover {
+        cursor: pointer;
+        color: var(--link-text);
+        border: 1px solid var(--main-fg);
+    }
+
+    //Mouse down
+    &:hover:active {
+        border: 1px solid var(--link-text);
+    }
+
+    input {
+        display: none;
+        margin-right: 0.5em;
+    }
+}
+
+.checkbox {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5em;
+
+    label {
+        .checkbox-label();
+    }
+}
+
+//All input fields
+input,
+textarea {
+    .form-border();
+    padding: 0.5em;
+    background: var(--main-bg);
+    color: var(--main-fg);
+}
+
+button {
+    .form-border();
+    padding: 0.5em;
+    background: var(--main-bg);
+    color: var(--main-fg);
+    cursor: pointer;
+}
+
+//I want to make a skeleton for the exercise page
+
+//The fade in and out animation and loop
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 0.3;
+    }
+}
+
+.exersize__placeholder {
+    display: flex;
+    flex-direction: column;
+    gap: 1.8em;
+    margin-top: 4.7em;
+    padding-left: 0.5em;
+    .exersize__placeholder__text {
+        .center();
+        font-size: 2em;
+        font-weight: bold;
+        color: var(--main-fg);
+        height: 0.58em;
+        width: 38vw;
+        animation: fade-in 0.5s ease-in-out infinite alternate;
+        border-radius: 50em;
+        background-color: var(--main-fg);
+    }
+}

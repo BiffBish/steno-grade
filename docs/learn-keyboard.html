@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Learn the steno keyboard</title>
+        <link href="styles/base.css" rel="stylesheet" type="text/css" />
+        <script src="scripts/utils/theme.mjs" type="module"></script>
+        <link href="styles/style.less" rel="stylesheet/less" type="text/css" />
+
+        <script src="scripts/libs/less.js"></script>
+        <script src="scripts/libs/chart.js"></script>
+        <script src="scripts/libs/chartjs-plugin-datalabels.js"></script>
+        <script src="scripts/libs/jquery-3.6.0.min.js"></script>
+        <script src="scripts/libs/less.js"></script>
+    </head>
+    <body>
+        <div class="wrapper">
+            <div id="form">
+                <h1>Learn the Steno Keyboard</h1>
+                <p style="text-align: center">
+                    <a href="raw-steno-instructions.html"
+                        >How to get raw steno output</a
+                    >
+                </p>
+                <a href="index.html">
+                    <div class="clickable-form-section center" id="word-drill">
+                        <h2>Go back</h2>
+                    </div>
+                </a>
+                <div class="form-section">
+                    <div class="caption">Pick a lesson and hint settings</div>
+                    <br />
+
+                    <div name="hints" class="radio-buttons--row">
+                        <label>
+                            <input
+                                id="hints"
+                                type="radio"
+                                name="hints"
+                                value="true"
+                                checked
+                            />
+                            Show hints
+                        </label>
+                        <label>
+                            <input
+                                id="hints"
+                                type="radio"
+                                name="hints"
+                                value="fail-1"
+                                checked
+                            />Hint on fail</label
+                        >
+                        <label
+                            ><input
+                                id="hints"
+                                type="radio"
+                                name="hints"
+                                value="fail-2"
+                                checked
+                            />Hint on failed twice</label
+                        >
+                        <label
+                            ><input
+                                id="hints"
+                                type="radio"
+                                name="hints"
+                                value="fail-3"
+                                checked
+                            />Hint on failed three times</label
+                        >
+                        <label
+                            ><input
+                                id="hints"
+                                type="radio"
+                                name="hints"
+                                value="false"
+                                checked
+                            />No hints</label
+                        >
+                    </div>
+
+                    <form id="selectDrill" action="exersize/keyboard.html">
+                        <br />
+                        <select title="drill" name="drill"></select>
+
+                        <button
+                            type="submit"
+                            class="form-section__submit-button"
+                        ></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script type="module" src="js/learn-keyboard.mjs"></script>
+    </body>
+</html>

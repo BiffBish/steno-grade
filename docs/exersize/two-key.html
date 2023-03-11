@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Steno Grade</title>
+        <link href="../styles/base.css" rel="stylesheet" type="text/css" />
+        <script src="../scripts/utils/theme.mjs" type="module"></script>
+        <link
+            href="../styles/style.less"
+            rel="stylesheet/less"
+            type="text/css"
+        />
+
+        <script src="../scripts/libs/less.js"></script>
+        <script src="../scripts/libs/chart.js"></script>
+        <script src="../scripts/libs/chartjs-plugin-datalabels.js"></script>
+        <script src="../scripts/libs/jquery-3.6.0.min.js"></script>
+        <script src="../scripts/libs/less.js"></script>
+    </head>
+    <body>
+        <p class="wrapper">
+            To capitalize the first word, hit <code>KPA</code> or
+            <code>KPA*</code>, or tell plover to start capitalized (Configure
+            -&gt; Output -&gt; Start Capitalized). If your keyboard has
+            conflicts with the longer strokes (like <code>TP-PL</code> for
+            period), you can hold one key and press the others in succesion.
+        </p>
+        <div id="lesson" class="wrapper"></div>
+    </body>
+    <script type="module" src="../js/exersize/two-key.mjs"></script>
+</html>

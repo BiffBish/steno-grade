@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Custom Dictionary Upload</title>
+        <link href="styles/base.css" rel="stylesheet" type="text/css" />
+        <script src="scripts/utils/theme.mjs" type="module"></script>
+        <link href="styles/style.less" rel="stylesheet/less" type="text/css" />
+
+        <script src="scripts/libs/less.js"></script>
+        <script src="scripts/libs/chart.js"></script>
+        <script src="scripts/libs/chartjs-plugin-datalabels.js"></script>
+        <script src="scripts/libs/jquery-3.6.0.min.js"></script>
+    </head>
+    <body>
+        <div class="wrapper">
+            <div id="form">
+                <h1>Custom Dictionary Upload</h1>
+                <a href="index.html">
+                    <div class="clickable-form-section center" id="word-drill">
+                        <h2>Go back</h2>
+                    </div>
+                </a>
+                <div class="form-section">
+                    <div class="caption">
+                        Upload a <strong>Custom</strong> dictionary file and
+                        give it a name.
+                    </div>
+                    <br />
+
+                    <form
+                        action=""
+                        method="post"
+                        enctype="multipart/form-data"
+                        style="margin: 0 auto"
+                    >
+                        <label class="label"
+                            >Files (Priority top to bottom)</label
+                        >
+                        <!-- Allow unload of many files and have drag and drop encouraged-->
+                        <div
+                            class="control"
+                            style="margin-bottom: 1em; margin-top: 1em"
+                        >
+                            <input
+                                title="File Name"
+                                class="input"
+                                type="file"
+                                name="fileToUpload[]"
+                                id="fileToUpload1"
+                            />
+                        </div>
+                        <div class="control" style="margin-bottom: 1em">
+                            <input
+                                title="File Name"
+                                class="input"
+                                type="file"
+                                name="fileToUpload[]"
+                                id="fileToUpload2"
+                            />
+                        </div>
+
+                        <div class="control" style="margin-bottom: 1em">
+                            <input
+                                title="File Name"
+                                class="input"
+                                type="file"
+                                name="fileToUpload[]"
+                                id="fileToUpload3"
+                            />
+                        </div>
+
+                        <div class="control" style="margin-bottom: 1em">
+                            <input
+                                title="File Name"
+                                class="input"
+                                type="file"
+                                name="fileToUpload[]"
+                                id="fileToUpload4"
+                            />
+                        </div>
+
+                        <button
+                            class=""
+                            id="submit"
+                            type="submit"
+                            name="submit"
+                            style="
+                                border: none;
+                                outline: none;
+                                background: none;
+                                margin-top: 1em;
+                                box-shadow: none;
+                                padding: 0;
+                                width: 100%;
+                            "
+                        >
+                            <div
+                                class="clickable-form-section center"
+                                id="word-drill"
+                            >
+                                <h2>Save</h2>
+                            </div>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script type="module" src="js/custom-dictionary-upload.mjs"></script>
+</html>

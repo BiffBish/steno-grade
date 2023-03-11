@@ -4,7 +4,7 @@
         "module": "commonjs",
         "checkJs": true,
         "types": ["jquery"],
-        "lib": ["ES2016", "DOM", "ES2019"]
+        "lib": ["ES2016", "DOM", "ES2021"]
     },
 
     "exclude": [
@@ -18,6 +18,6 @@
         "**/data/*.mjs",
         "**/data/*.js",
         "**/libs/*.js"
-    ],
-    "files": ["**/*/.html"]
+    ]
+    // "files": ["**/*/.html"]
 }

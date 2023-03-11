@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Introductory Lessons</title>
+        <link href="styles/base.css" rel="stylesheet" type="text/css" />
+        <script src="scripts/utils/theme.mjs" type="module"></script>
+        <link href="styles/style.less" rel="stylesheet/less" type="text/css" />
+
+        <script src="scripts/libs/less.js"></script>
+        <script src="scripts/libs/chart.js"></script>
+        <script src="scripts/libs/chartjs-plugin-datalabels.js"></script>
+        <script src="scripts/libs/jquery-3.6.0.min.js"></script>
+    </head>
+    <body>
+        <div class="wrapper">
+            <div id="form">
+                <h1>Introductory Lessons</h1>
+                <a href="index.html">
+                    <div class="clickable-form-section center" id="word-drill">
+                        <h2>Go back</h2>
+                    </div>
+                </a>
+                <div class="form-section">
+                    <form
+                        id="selectDrill"
+                        action="exersize/intro.html"
+                        method="get"
+                    >
+                        <ul style="list-style-type: none">
+                            <li>
+                                <select
+                                    title="Select a drill (or multiple drills)"
+                                    name="drill"
+                                    multiple
+                                ></select>
+                            </li>
+                            <li>
+                                <label
+                                    ><input
+                                        name="hints"
+                                        type="checkbox"
+                                        value="yes"
+                                        checked
+                                    />
+                                    Show hints?</label
+                                >
+                            </li>
+                            <li>
+                                <label>Randomly</label> for
+                                <input
+                                    title="Number of minutes to run the drill."
+                                    name="timeLimit"
+                                    type="text"
+                                    size="2"
+                                    ,
+                                    value="1"
+                                />
+                                minutes.
+                            </li>
+                            <li>
+                                <label
+                                    ><input
+                                        name="wpm"
+                                        type="number"
+                                        value=""
+                                        step="5"
+                                    />
+                                    Speed (WPM).</label
+                                >
+                            </li>
+                            <li><input type="submit" value="Go" /></li>
+                            <input type="hidden" name="seed" value="0" />
+                        </ul>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script type="module" src="js/intro.mjs"></script>
+</html>

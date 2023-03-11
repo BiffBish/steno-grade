@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Steno Grade</title>
+        <link href="styles/base.css" rel="stylesheet" type="text/css" />
+        <script src="scripts/utils/theme.mjs" type="module"></script>
+        <link href="styles/style.less" rel="stylesheet/less" type="text/css" />
+
+        <script src="scripts/libs/less.js"></script>
+        <script src="scripts/libs/chart.js"></script>
+        <script src="scripts/libs/chartjs-plugin-datalabels.js"></script>
+        <script src="scripts/libs/jquery-3.6.0.min.js"></script>
+        <script src="scripts/libs/less.js"></script>
+    </head>
+    <body>
+        <h1 class="center title">Custom Settings</h1>
+
+        <!-- A code block with the current settings -->
+
+        <div id="form" class="wrapper">
+            <a href="index.html">
+                <div class="clickable-form-section center" id="word-drill">
+                    <h2>Go back</h2>
+                </div>
+            </a>
+
+            <div class="form-section">
+                <div class="caption">Current Settings</div>
+                <div class="code-block">
+                    <pre><code id="current-settings"></code></pre>
+                </div>
+                <div class="caption red">Custom Settings</div>
+                <pre><code id="custom-settings" class="red"></code></pre>
+            </div>
+            <!-- two inputs that aloow you to enter your own custom key value pairs -->
+            <div class="form-section">
+                <div class="caption">Add a Custom Setting</div>
+                <div class="code-block">
+                    <pre><code id="custom-settings"></code></pre>
+                </div>
+                <input
+                    type="text"
+                    style="width: 80%"
+                    id="custom-settings-input"
+                    placeholder="key=value, key (to remove)"
+                />
+                <button id="custom-settings-button">Add</button>
+                <br />
+                <br />
+                <button id="custom-settings-reset">Reset All To Default</button>
+            </div>
+
+            <!-- A list of all the custom settings and a short description for each of them -->
+            <div class="form-section">
+                <div class="caption">Custom Setting List</div>
+                <div class="code-block">
+                    <code id="custom-settings-list">
+                        <pre>
+theme_form_border_thickness : The thickness of the border around each box
+theme_background_color : The background color of the website
+                    </pre
+                        >
+                    </code>
+
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    If you have a setting you want to add, please contact me at
+                    BiffBish#0001 on discord. Or join the Plover discord server
+                    at
+                    <a href="https://discord.gg/75aZxNM7VY"
+                        >https://discord.gg/75aZxNM7VY</a
+                    >
+                </div>
+            </div>
+        </div>
+
+        <script src="js/custom-settings.mjs" type="module"></script>
+    </body>
+</html>

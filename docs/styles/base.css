@@ -1,0 +1,83 @@
+/* Reset Styles */
+html,
+body {
+    margin: 0;
+    padding: 0;
+    scroll-behavior: smooth;
+}
+
+* {
+    box-sizing: border-box;
+
+    text-decoration: none;
+}
+
+:root {
+    --main-bg: #fff;
+    --main-fg: #000;
+    --link-text: #167ee8;
+    --form-border: #333;
+    --form-shadow: #eee;
+    --answer-text: #888;
+    --correct-text-bg: #cfc;
+    --corrected-text-bg: rgb(255, 237, 204);
+    --unknown-text-bg: rgb(187, 187, 187);
+    --incorrect-text-bg: #fcc;
+    --form-border-thickness: 1px;
+    --form-gap: 0.5em;
+
+    --steno-key-outline: #000;
+    --steno-key-bg: #666;
+    --steno-key-fg: #000;
+    --steno-key-primary-bg: #fe7;
+    --steno-key-primary-fg: #000;
+    --steno-key-secondary-bg: #ff9e77;
+    --steno-key-secondary-fg: #000;
+    --steno-key-tertiary-bg: #ff9;
+    --steno-key-tertiary-fg: #000;
+    --steno-alt-key-bg: #888;
+    --steno-alt-key-fg: #555;
+}
+
+[data-theme="dark"] {
+    --main-bg: #111;
+}
+
+[data-theme="oasis"] {
+    --main-bg: #fff;
+}
+
+[data-theme="breeze"] {
+    --main-bg: #273740;
+}
+
+[data-theme="rustic"] {
+    --main-bg: #593e36;
+}
+
+[data-theme="retro-pop"] {
+    --main-bg: #4a4e4d;
+}
+
+[data-theme="ocean"] {
+    --main-bg: #316598;
+}
+
+[data-theme="autumn"] {
+    --main-bg: #392c50;
+}
+
+[data-theme="odyssey"] {
+    --main-bg: #2c5030;
+}
+
+.red {
+    color: #f55;
+}
+
+/* Main Layout and Visual Styling of Block Elements */
+html,
+body {
+    background: var(--main-bg);
+    overflow-x: hidden;
+}

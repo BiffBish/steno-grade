@@ -1,22 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Steno Grade</title>
+        <link href="styles/base.css" rel="stylesheet" type="text/css" />
+        <script src="scripts/utils/theme.mjs" type="module"></script>
+        <link href="styles/style.less" rel="stylesheet/less" type="text/css" />
 
-<head>
-	<meta charset="utf-8">
-	<title>Steno Grade</title>
-    <link href="../base.css" rel="stylesheet" type="text/css" />
-	<script src="../scripts/utils/theme.mjs" type="module"></script>
-	<link href="../style.less" rel="stylesheet/less" type="text/css" />
-	<link rel="../stylesheet" type="text/css" href="font-roboto.css">
-	<script src="../scripts/libs/less.js"></script>
-	<script src="../scripts/libs/jquery-3.6.0.min.js"></script>
-	<script src="../scripts/utils/util.mjs" type="module"></script>
-</head>
-
-<body>
-
-	<h1 class="center title">Steno Grade</h1>
-	<!-- <p class="welcome-text">This is a forked widget of steno-jig: you can
+        <script src="scripts/libs/less.js"></script>
+        <script src="scripts/libs/chart.js"></script>
+        <script src="scripts/libs/chartjs-plugin-datalabels.js"></script>
+        <script src="scripts/libs/jquery-3.6.0.min.js"></script>
+        <script src="scripts/libs/less.js"></script>
+    </head>
+    <body>
+        <h1 class="center title">Steno Grade</h1>
+        <!-- <p class="welcome-text">This is a forked widget of steno-jig: you can
 		<a href="learn-keyboard.html">learn the steno keyboard</a>, do <a href="form.html">our lessons</a> or the <a
 			href="learn-plover.html">Learn Plover ones</a>, or fork the <a
 			href="https://github.com/BiffBish/steno-jig">GitHub repo</a>
@@ -24,113 +24,65 @@
 		<a href="custom-dictionary-upload.html">Upload it here</a>(Sorry for the flashbang darkmode users).
 	</p> -->
 
-	<div id="form" class="wrapper">
-		<h1>Welcome!</h1>
-		<a href="learn-keyboard.html" class="button no-link-formatting ">
-			<div class="clickable-form-section">
-				<div class="caption">
-					<strong>Learn</strong> the steno keyboard
-				</div>
-				Learn how to use the steno keyboard. 
-			</div>
-		</a>
-		<a href="form.html" class="button no-link-formatting ">
-			<div class="clickable-form-section">
-				<div class="caption">
-					<strong>Drill</strong> our lessons
-				</div>
-				Improve your overall WPM and accuracy by drilling these custom made exercises.
-			</div>
-		</a>
-		<a href="learn-plover.html" class="button no-link-formatting ">
-			<div class="clickable-form-section">
-				<div class="caption">
-					Try out <strong>Learn Plover</strong> lessons
-				</div>
-				Try out these exercises from Learn Plover
-			</div>
-		</a>
-		<br />
-		<a href="custom-dictionary-upload.html" class="button no-link-formatting ">
-			<div class="clickable-form-section">
-				<!-- <b class="red">Under repair</b> -->
+        <div id="form" class="wrapper">
+            <h1>Welcome!</h1>
+            <a href="learn-keyboard.html" class="button no-link-formatting">
+                <div class="clickable-form-section">
+                    <div class="caption">
+                        <strong>Learn</strong> the steno keyboard
+                    </div>
+                    Learn how to use the steno keyboard.
+                </div>
+            </a>
+            <a href="form.html" class="button no-link-formatting">
+                <div class="clickable-form-section">
+                    <div class="caption">
+                        <strong>Drill</strong> our lessons
+                    </div>
+                    Improve your overall WPM and accuracy by drilling these
+                    custom made exercises.
+                </div>
+            </a>
+            <a href="learn-plover.html" class="button no-link-formatting">
+                <div class="clickable-form-section">
+                    <div class="caption">
+                        Try out <strong>Learn Plover</strong> lessons
+                    </div>
+                    Try out these exercises from Learn Plover
+                </div>
+            </a>
+            <br />
+            <a
+                href="custom-dictionary-upload.html"
+                class="button no-link-formatting"
+            >
+                <div class="clickable-form-section">
+                    <div class="caption">
+                        Upload a custom <strong>Dictionary</strong>
+                    </div>
+                    Do you have a custom made dictionary that differs from
+                    plovers default? Upload it here to improve the dynamic hint
+                    system
+                </div>
+            </a>
+            <div class="form-section--disabled">
+                <b class="red">Under repair</b>
+                <div class="caption">View <strong>Statistics</strong></div>
+                Have you been using this site for a while? View your statistics
+                here!
+            </div>
+            <h1>Nerd Zone</h1>
 
-				<div class="caption">
-					Upload a custom <strong>Dictionary</strong>
-				</div>
-				Do you have a custom made dictionary that differs from plovers default? Upload it here to improve the dynamic hint system
-			</div>
-		</a>
-		<!-- <a href="improvements.html" class="button no-link-formatting "> -->
-			<div class="form-section--disabled">
-				<b class="red">Under repair</b>
-				<div class="caption">
-					View <strong>Statistics</strong>
-				</div>
-				Have you been using this site for a while? View your statistics here!
-			</div>
-		<!-- </a> -->
-		<h1>Nerd Zone</h1>
-
-			<a href="custom-settings.html" class="button no-link-formatting ">
-			<div class="clickable-form-section">
-				<div class="caption">
-					Set some custom <strong>Settings</strong>
-				</div>
-				Experiment with some custom settings that don't fit in the other options
-			</div>
-		</a>
-	</div>
-
-	</div>
-
-	<script type="module">
-		import { setTheme, storageAvailable, N } from './scripts/utils/util.mjs'
-		setTheme()
-		if (storageAvailable('localStorage')) {
-
-			let wrapper = document.querySelector('.wrapper')
-			let theme_select = N(
-				"select",
-				{
-					id: "themeable",
-					onchange: (e) => {
-						console.log(e.target.value);
-						// let theme = e.target.value;
-						// localStorage.setItem("theme", theme);
-						// setTheme();
-					},
-				},
-				[
-					N("optgroup", { label: "Light Themes" }, [
-						N("option", { value: "light" }, "Light"),
-						N("option", { value: "oasis" }, "Oasis"),
-						N("option", { value: "ocean" }, "Ocean"),
-						N("option", { value: "rustic" }, "Rustic"),
-					]),
-					N("optgroup", { label: "Dark Themes" }, [
-						N("option", { value: "dark" }, "Dark"),
-						N("option", { value: "breeze" }, "Breeze"),
-						N("option", { value: "retro-pop" }, "Retro Pop"),
-						N("option", { value: "autumn" }, "Autumn"),
-						N("option", { value: "odyssey" }, "Odyssey"),
-					]),
-				]
-			);
-			theme_select.value = localStorage.getItem("theme") || "light";
-			theme_select.onchange = (e) => {
-				let theme = e.target.value;
-				localStorage.setItem("theme", theme);
-				setTheme();
-			};
-			N($('.wrapper'), [
-				N("p", { class: "center" }, "Choose your theme:", [theme_select]),
-			])
-		} else {
-			document.body.appendChild(document.createTextNode('localStorage not available.'))
-		}
-	</script>
-
-</body>
-
+            <a href="custom-settings.html" class="button no-link-formatting">
+                <div class="clickable-form-section">
+                    <div class="caption">
+                        Set some custom <strong>Settings</strong>
+                    </div>
+                    Experiment with some custom settings that don't fit in the
+                    other options
+                </div>
+            </a>
+        </div>
+    </body>
+    <script type="module" src="js/index.mjs"></script>
 </html>

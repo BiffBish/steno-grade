@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Steno Grade</title>
+        <link href="styles/base.css" rel="stylesheet" type="text/css" />
+        <script src="scripts/utils/theme.mjs" type="module"></script>
+        <link href="styles/style.less" rel="stylesheet/less" type="text/css" />
+
+        <script src="scripts/libs/less.js"></script>
+        <script src="scripts/libs/chart.js"></script>
+        <script src="scripts/libs/chartjs-plugin-datalabels.js"></script>
+        <script src="scripts/libs/jquery-3.6.0.min.js"></script>
+        <script src="scripts/libs/less.js"></script>
+    </head>
+    <body>
+        <div id="form" class="wrapper">
+            <a href="learn-keyboard.html">
+                <div class="clickable-form-section center" id="word-drill">
+                    <h2>Go back</h2>
+                </div>
+            </a>
+            <p>
+                For finger drills and learning the keys on the steno keyboard,
+                you'll want to make Plover send the raw output instead of
+                translating it into words. To do this, show Plover's main window
+                (<code>PHROBGS</code> is the usual chord for this, or there
+                should be an icon in the task bar). Then un-check the checkboxes
+                next to <code>main.json</code> and <code>user.json</code> to
+                turn them off temporarily.
+            </p>
+
+            <div style="text-align: center">
+                <img
+                    src="plover-4.png"
+                    alt="Plover main window, showing the
+	dictionary list with checkboxes to disable each one."
+                />
+            </div>
+
+            <hr style="margin: 2em 0px 3em" />
+
+            <p>
+                Alternatively, you can open the Plugins Manager from the Plover
+                main window and install the
+                <code>plover_dict_commands</code> plugin. You may need to
+                restart Plover after installing the plugin? Not sure about that.
+            </p>
+
+            <p>
+                Define a dictionary entry to switch to raw steno: maybe in
+                <code>commands.json</code>. I think many people use
+                <code>RA*U</code> as
+                <code>{PLOVER:solo_dict:+commands.json}</code>. This will ensure
+                that <code>commands.json</code> is enabled, and will disable all
+                other dictionaries. Then you'll need a definition to enable your
+                dictionaries again. The command for this is
+                <code>{PLOVER:end_solo_dict}</code>.
+            </p>
+
+            <p>
+                Personally I do this slightly differently: I have a special
+                dictionary <code>return-from-raw.json</code> (which I put at the
+                very bottom of the dictionary list) with the following contents:
+            </p>
+
+            <div>
+                <code>
+                    <pre>
+{
+	"RA*U": "{PLOVER:end_solo_dict}",
+	"R-R": "{^~|\n^}",
+	"STK-G": "{#right}"
+}</pre
+                    >
+                </code>
+            </div>
+
+            <p>
+                Then my normal <code>RA*U</code> command is
+                <code>{PLOVER:solo_dict:+return-from-raw.json}</code>. So I can
+                use <code>RA*U</code> to toggle raw-mode on and off, and in raw
+                mode I only have Return (which you press three times to repeat
+                an exercise in Steno Grade) and the right arrow (which randomly
+                generates a new exercise).
+            </p>
+        </div>
+    </body>
+</html>
