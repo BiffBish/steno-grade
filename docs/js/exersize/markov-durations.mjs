@@ -148,7 +148,7 @@ function generateMarkovExercise(ngrams, word_count, rnd, bias) {
 //JQuery document ready
 $(async function () {
     populatePage();
-
+    setTheme();
     let fields = parseQueryString(document.location.search);
     let bias = parseFloat(fields["bias"] ?? 40) / 100;
 

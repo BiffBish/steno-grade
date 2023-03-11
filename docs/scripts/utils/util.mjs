@@ -345,16 +345,40 @@ export function setTheme() {
             ];
         };
 
-        //Go through all propertyValues and if they are colors then lets populate a crap ton of variables
-        const propertyValues = getComputedStyle(document.documentElement);
+        const propertyKeys = [
+            "--main-bg",
+            "--main-fg",
+            "--link-text",
+            "--form-border",
+            "--form-shadow",
+            "--answer-text",
+            "--correct-text-bg",
+            "--corrected-text-bg",
+            "--unknown-text-bg",
+            "--incorrect-text-bg",
+            "--form-border-thickness",
+            "--form-gap",
+            "--steno-key-outline",
+            "--steno-key-bg",
+            "--steno-key-fg",
+            "--steno-key-primary-bg",
+            "--steno-key-primary-fg",
+            "--steno-key-secondary-bg",
+            "--steno-key-secondary-fg",
+            "--steno-key-tertiary-bg",
+            "--steno-key-tertiary-fg",
+            "--steno-alt-key-bg",
+            "--steno-alt-key-fg",
+        ];
 
+        const styles = getComputedStyle(document.documentElement);
         // @ts-ignore
-        for (const element of propertyValues) {
+        for (const element of propertyKeys) {
             const property = element;
-            const value = propertyValues.getPropertyValue(property);
-            // console.log(property, value);
+            const value = styles.getPropertyValue(property);
+            console.log(property, value);
             // if (value.startsWith("rgb")) {
-            const rgb = getRGBValues(value);
+            const rgb = getRGBValues(value.trim());
             if (!rgb) continue;
             const hsl = RGBToHSL(rgb[0], rgb[1], rgb[2]);
 
