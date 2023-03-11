@@ -155,6 +155,7 @@ $(async function () {
     let rng = newRNG(fields.seed);
 
     let word_count = fields.word_count == null ? 100 : parseInt(fields.word_count);
+    fields.menu = "../form";
     let jig = setExercise(
         "Markov-chain generated sentences",
         {
@@ -168,7 +169,6 @@ $(async function () {
     // console.log(ngrams)
     let exercise = generateMarkovExercise(ngrams, word_count, rng, bias);
 
-    fields.menu = "../form";
     jig.setExercise(exercise);
     // let jig = setExercise(name, exercise, null, fields);
 
