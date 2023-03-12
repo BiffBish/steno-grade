@@ -1,5 +1,5 @@
 // this data file is way too big, something must be done about it.
-window.sentences_by_top_100 = [[
+export const sentences_by_top_100 = [[
 
 
 // drill 1

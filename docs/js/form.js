@@ -1,6 +1,12 @@
 if (document.location.search !== "") {
     displayOnly("lesson");
 }
+
+let numberSentences = import("../scripts/number-sentences.mjs").then((m) => m.numberSentences);
+let setExercise = import("../scripts/type-jig.mjs").then((m) => m.setExercise);
+let wordDrill = import("../scripts/word-drill.mjs").then((m) => m.wordDrill);
+let WordSets = import("../scripts/word-sets.mjs").then((m) => m.WordSets);
+
 import {
     setTheme,
     displayOnly,
@@ -11,23 +17,21 @@ import {
     getFormFields,
     parseQueryString,
     newRNG,
+    shuffle,
 } from "../scripts/utils/util.mjs";
-import { numberSentences } from "../scripts/number-sentences.mjs";
-import { setExercise, shuffle } from "../scripts/type-jig.mjs";
-import { wordDrill } from "../scripts/word-drill.mjs";
-import { WordSets } from "../scripts/word-sets.mjs";
+
 prepareInput("monkeytype-quote-length");
 setTheme();
-function runExercise(fields) {
-    let exercise = fields.drill === "NumberSentences" ? numberSentences(fields) : wordDrill(fields);
+async function runExercise(fields) {
+    let exercise = fields.drill === "NumberSentences" ? (await numberSentences)(fields) : (await wordDrill)(fields);
     console.log("Setting Exersize" + exercise);
     if (exercise) {
         displayOnly("lesson");
-        return setExercise(exercise.name, exercise, null, fields);
+        return (await setExercise)(exercise.name, exercise, null, fields);
     }
 }
 
-function runCustom(evt) {
+async function runCustom(evt) {
     evt.preventDefault();
     let fields = getFormFields(this);
     if (storageAvailable("localStorage")) {
@@ -39,10 +43,11 @@ function runCustom(evt) {
     }
     let drill = fields.drill.trim().split(/\s+/m);
     let n = +fields.repeat || 1;
-    WordSets.custom = [];
-    for (let i = 0; i < n; ++i) WordSets.custom.push(...drill);
+
+    (await WordSets).custom = [];
+    for (let i = 0; i < n; ++i) (await WordSets).custom.push(...drill);
     fields.drill = "custom";
-    runExercise(fields);
+    await runExercise(fields);
 }
 
 loadSettings();
@@ -50,7 +55,7 @@ if (storageAvailable("localStorage") && localStorage.custom != null) {
     $("#custom input[name=drill]").val(localStorage.custom);
 }
 
-$(function () {
+$(async function () {
     populatePage();
 
     /**
@@ -63,7 +68,7 @@ $(function () {
     let jig;
 
     if (document.location.search !== "") {
-        jig = runExercise(parseQueryString(document.location.search));
+        jig = await runExercise(parseQueryString(document.location.search));
         // initializeButtons(jig);
     } else {
         // Add event listeners to get settings before submitting.
@@ -74,16 +79,16 @@ $(function () {
             }
         }
     }
-    $("#new").click(function () {
+    $("#new").on("on", async function () {
         let fields = parseQueryString(document.location.search);
-        let exercise = fields.drill === "NumberSentences" ? numberSentences(fields) : wordDrill(fields);
+        let exercise = fields.drill === "NumberSentences" ? (await numberSentences)(fields) : (await wordDrill)(fields);
         console.log("Setting Exersize", exercise);
 
         jig?.setExercise(exercise);
     });
 
     // Get keyboard input from entire page
-    $("body").keydown(function (e) {
+    $("body").on("keydown", function (e) {
         // console.log(e);
         //prevent deafault
         //If key is down find the div with the class "form-section--selected".
@@ -135,6 +140,17 @@ $(function () {
             break;
         default:
             break;
+        }
+    });
+
+    $("#gutnum").on("change", function () {
+        console.log("changed", $("#gutnum").val());
+        var num = $("#gutnum").val();
+        console.log(num);
+        if (num == 0) {
+            $("#sentences-form").attr("action", "exersize/short-sentences.html");
+        } else {
+            $("#sentences-form").attr("action", "exersize/gutenberg.html");
         }
     });
 });

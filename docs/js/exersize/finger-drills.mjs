@@ -1,6 +1,13 @@
-import { setTheme, populatePage, parseQueryString, updateURLParameter } from "../../scripts/utils/util.mjs";
-import { TypeJig, setExercise } from "../../scripts/type-jig.mjs";
-import { dreadedDuo } from "../../data/finger-drill-data.mjs";
+let TJ = import("../../scripts/type-jig.mjs");
+let dreadedDuo = import("../../data/finger-drill-data.mjs").then((m) => m.dreadedDuo);
+
+import {
+    setTheme,
+    populatePage,
+    parseQueryString,
+    updateURLParameter,
+    parseQueryStringFlat,
+} from "../../scripts/utils/util.mjs";
 
 setTheme();
 
@@ -19,47 +26,62 @@ function addSet(strokes, iterations, drill) {
     return drill;
 }
 
-function generateFingerDrill(drills, iterations, name) {
+async function generateFingerDrill(drills, iterations, name) {
     let out = [];
     for (const drill of drills) addSet(drill, iterations, out);
-    return new TypeJig.Exercise({
+    return new (await TJ).TypeJig.Exercise({
         name: name ?? "Finger Drill: " + drills.join(" "),
         words: out,
     });
 }
 
-function generateDreadedDuoDrill(section, drill, iterations) {
-    let n = dreadedDuo[section - 1].length;
+async function generateDreadedDuoDrill(section, drill, iterations) {
+    let n = (await dreadedDuo)[section - 1].length;
     let name = "Da Dreaded Dueling Digit Duo Drills";
     name += " (Section " + section + ", #" + drill + " of " + n + ")";
-    let drills = [dreadedDuo[section - 1][drill - 1]];
-    let exercise = generateFingerDrill(drills, iterations, name);
+    let drills = [(await dreadedDuo)[section - 1][drill - 1]];
+    let exercise = await generateFingerDrill(drills, iterations, name);
     return exercise;
 }
 
-$(function () {
+async function generateExercise() {
+    let flatFields = parseQueryStringFlat(document.location.search);
+
+    let fields = parseQueryString(document.location.search);
+    let iterations = fields.iterations || 20;
+
+    if (fields.strokes) {
+        const drills = flatFields.strokes.split(/\s+/);
+        return await generateFingerDrill(drills, iterations);
+    } else if (fields.book === "Stenotype Finger Technique") {
+        let section = fields.section;
+        let name = fields.book + ": " + section;
+        const drills = stenotypeFingerTechnique[section];
+        return await generateFingerDrill(drills, iterations, name);
+    } else {
+        let section = Math.max(1, Math.min(parseInt(flatFields.section) || 1, (await dreadedDuo).length));
+        let drill = Math.max(
+            1,
+            Math.min(parseInt(flatFields.drill) || 1, (await dreadedDuo)[parseInt(flatFields.section) - 1].length)
+        );
+        return await generateDreadedDuoDrill(section, drill, iterations);
+    }
+}
+
+$(async function () {
     populatePage({
         require_raw_steno: true,
     });
-    let fields = parseQueryString(document.location.search);
-    fields.iterations = fields.iterations || 20;
-    fields.actualWords = { unit: "strokes per minute", u: "SPM" };
 
-    let exercise;
-    if (fields.strokes) {
-        const drills = fields.strokes.split(/\s+/);
-        exercise = generateFingerDrill(drills, fields.iterations);
-    } else if (fields.book === "Stenotype Finger Technique") {
-        let name = fields.book + ": " + fields.section;
-        const drills = stenotypeFingerTechnique[fields.section];
-        exercise = generateFingerDrill(drills, fields.iterations, name);
-    } else {
-        fields.section = Math.max(1, Math.min(fields.section || 1, dreadedDuo.length));
-        fields.drill = Math.max(1, Math.min(fields.drill || 1, dreadedDuo[fields.section - 1].length));
-        exercise = generateDreadedDuoDrill(fields.section, fields.drill, fields.iterations);
-        console.log(exercise);
-    }
-
-    fields.menu = "../form";
-    setExercise(exercise.name, exercise, null, fields);
+    (await TJ).setExercise(
+        null,
+        generateExercise(),
+        null,
+        {
+            ...parseQueryString(document.location.search),
+            menu: "../form",
+        },
+        null,
+        generateExercise
+    );
 });

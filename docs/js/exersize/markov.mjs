@@ -6,62 +6,73 @@ let sentences = import("../../data/tatoeba-sentences.mjs")
     .catch((err) => {
         console.log(err);
     });
+let TJ = import("../../scripts/type-jig.mjs");
 
-import { TypeJig, setExercise } from "../../scripts/type-jig.mjs";
+import { PRNG } from "../../scripts/alea-prng.mjs";
 import {
     setTheme,
     populatePage,
-    initializeButtons,
-    newRNG,
-    parseQueryString,
-    prepareNextSeed,
     updateURLParameter,
+    parseQueryStringFlat,
+    assureSeed,
+    getNextSeedUrl,
 } from "../../scripts/utils/util.mjs";
-
-// import { sentences } from "../../data/tatoeba-sentences.mjs";
 
 setTheme();
 
-function compute_ngrams(sentences, order) {
-    console.log("compute_ngrams");
-
-    const ngrams = { "": [] };
-    for (const element of sentences) {
+let NGrams = sentences.then((sentences) => {
+    const order = 3;
+    const NGrams = new Map([["", []]]);
+    const uniqueGrams = new Set();
+    for (let i = 0, len = sentences.length; i < len; i++) {
+        const element = sentences[i];
         const words = element.split(/\s+/);
-        for (let j = 0; j < words.length - order; ++j) {
+        const maxIndex = words.length - order;
+
+        for (let j = 0; j < maxIndex; ++j) {
             const Gram = words.slice(j, j + order).join(" ");
-            if (j === 0) ngrams[""].push(Gram);
+            if (j === 0) NGrams.get("").push(Gram);
             const gram = Gram.toLowerCase();
+            if (!uniqueGrams.has(gram)) {
+                uniqueGrams.add(gram);
+                NGrams.set(gram, []);
+            }
             const next = words[j + order];
-            if (ngrams[gram] == null) ngrams[gram] = [];
-            ngrams[gram].push(next);
+            NGrams.get(gram).push(next);
         }
     }
-    return ngrams;
-}
+    return NGrams;
+});
 
-function generate_sentence(ngrams, rnd) {
+async function generate_sentence(rnd) {
     const choose = (a) => a[Math.floor(rnd() * a.length)];
-    let sentence = choose(ngrams[""]).split(" ");
+
+    let awaitedNGrams = await NGrams;
+
+    let sentence = choose(awaitedNGrams.get("")).split(" ");
     const order = sentence.length;
     while (true) {
         const last = sentence.slice(-order).join(" ").toLowerCase();
-        const following = ngrams[last];
+        const following = awaitedNGrams.get(last);
         if (following == null) break;
         sentence.push(choose(following));
     }
     return sentence;
 }
 
-function generateMarkovExercise(ngrams, word_count, rnd) {
+async function generateMarkovExercise() {
+    let fields = parseQueryStringFlat(document.location.search);
+    let rng = PRNG(fields.seed);
+    let word_count = fields.word_count == null ? 100 : parseInt(fields.word_count);
+
     let words = [];
     let chars_left = word_count * 5 + 1;
     while (chars_left > 0) {
-        const sentence = generate_sentence(ngrams, rnd);
+        const sentence = await generate_sentence(rng);
         chars_left -= 1 + sentence.join(" ").length;
         words.splice(words.length, 0, ...sentence);
     }
-    return new TypeJig.Exercise({
+    return new (await TJ).TypeJig.Exercise({
         name: "Markov-chain generated sentences",
         words: words,
     });
@@ -70,33 +81,16 @@ function generateMarkovExercise(ngrams, word_count, rnd) {
 //JQuery document ready
 $(async function () {
     populatePage();
-
-    let fields = parseQueryString(document.location.search);
-
-    let rng = newRNG(fields.seed);
-
-    let word_count = fields.word_count == null ? 100 : parseInt(fields.word_count);
-
-    let name = "Markov-chain generated sentences";
-    const ngrams = compute_ngrams(await sentences, 3);
-    // console.log(ngrams)
-    let exercise = generateMarkovExercise(ngrams, word_count, rng);
-
-    fields.menu = "../form";
-
-    let jig = setExercise(name, exercise, null, fields);
-
-    let another = document.getElementById("new");
-    let nextSeed = prepareNextSeed(another);
-    another.addEventListener("click", function (evt) {
-        evt.preventDefault();
-        window.history.replaceState("", "", updateURLParameter(window.location.href, "seed", nextSeed));
-        let rng = newRNG(nextSeed);
-        let exercise = generateMarkovExercise(ngrams, word_count, rng);
-        jig.exercise = exercise;
-        jig.reset();
-        nextSeed = prepareNextSeed(another);
-    });
-
-    initializeButtons(jig);
+    assureSeed();
+    (await TJ).setExercise(
+        null,
+        generateMarkovExercise(),
+        null,
+        {
+            ...parseQueryStringFlat(document.location.search),
+            menu: "../form",
+        },
+        getNextSeedUrl,
+        generateMarkovExercise
+    );
 });

@@ -1,4 +1,5 @@
-import { TypeJig, shuffle, shuffleTail } from "./type-jig.mjs";
+import { TypeJig, shuffleTail } from "./type-jig.mjs";
+import { shuffle } from "./utils/util.mjs";
 import { WordSets } from "./word-sets.mjs";
 
 // Word-based drills

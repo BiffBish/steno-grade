@@ -1,21 +1,28 @@
+let wordDrill = import("../../scripts/word-drill.mjs").then((module) => module.wordDrill);
+let TJ = import("../../scripts/type-jig.mjs");
+let LearnKeyboard = import("../../scripts/learn-keyboard.mjs").then((module) => module.LearnKeyboard);
+
 import { setTheme, populatePage, parseQueryString } from "../../scripts/utils/util.mjs";
-let setExercise = import("../../scripts/type-jig.mjs").then((m) => m.setExercise);
-import { wordDrill } from "../../scripts/word-drill.mjs";
-import { LearnKeyboard } from "../../scripts/learn-keyboard.mjs";
 
 setTheme();
 
+async function getNewExercise() {
+    let fields = parseQueryString(document.location.search);
+    return (await wordDrill)(fields, await LearnKeyboard);
+}
+
 $(async function () {
     populatePage();
-    const fields = parseQueryString(document.location.search);
-    // WordSets = WordSets.LearnKeyboard;
-    const exercise = wordDrill(fields, LearnKeyboard);
-    if (exercise) {
-        fields.menu = "../learn-keyboard";
 
-        (await setExercise)(exercise.name, exercise, null, fields);
-    }
-
-    const back = $("#back");
-    back.prop("href", back.prop("href").replace("markov", "form"));
+    (await TJ).setExercise(
+        null,
+        getNewExercise(),
+        null,
+        {
+            ...parseQueryString(document.location.search),
+            menu: "../learn-keyboard",
+        },
+        null,
+        getNewExercise
+    );
 });

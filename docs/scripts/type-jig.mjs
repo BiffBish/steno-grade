@@ -9,7 +9,7 @@
 import { StenoDisplay } from "./utils/steno-display.mjs";
 //@ts-ignore
 let PloverTranslations = import("./../data/plover-translations.mjs").then((m) => m.PloverTranslations);
-import { N, initializeButtons, newRNG } from "./utils/util.mjs";
+import { N, initializeButtons, newRNG, shuffle } from "./utils/util.mjs";
 /**
  * @typedef {{
  *  correctTimeStamp: number,
@@ -48,6 +48,9 @@ export class TypeJig {
 
         console.log("TypeJig", exercise, hint, options);
         this.exercise = exercise;
+
+        this.getNewExercise = options.getNewExercise;
+        this.getNewURL = options.getNewURL;
 
         /**
          * @type {[
@@ -161,9 +164,7 @@ export class TypeJig {
         this.typedWords = [];
 
         this.resultsDisplay.textContent = "";
-        if (this.exercise && !this.exercise.started) {
-            // this.display.textContent = "";
-        }
+
         const spans = this.display.querySelectorAll("span");
         if (this.speed) {
             for (const element of spans) {
@@ -172,7 +173,8 @@ export class TypeJig {
         }
         console.log("105", this.hint);
 
-        if (this.exercise.placeholder) {
+        //If the exercise is a promise, wait for it to resolve.
+        if (this.exercise instanceof Promise) {
             let fakeLines = [];
 
             for (let i = 0; i < 10; i++) {
@@ -180,6 +182,11 @@ export class TypeJig {
             }
 
             N(this.display, [N("div", { class: "exersize__placeholder" }, [...fakeLines])]);
+
+            this.exercise.then((exercise) => {
+                this.exercise = exercise;
+                this.reset();
+            });
 
             return;
         }
@@ -194,9 +201,6 @@ export class TypeJig {
             this.hint.startupPrecompute(this.exercise.words);
         }
 
-        // if (this.hint && this.hint_on_fail) this.hint.show();
-
-        // this.display.previousElementSibling.textContent = '';
         /**
          * @type { true | number | undefined}
          */
@@ -1492,7 +1496,7 @@ export class TypeJig {
         this.saveErrorsInLocalStorage();
     }
     saveExerciseReplay(exercise, persistantData) {
-        throw new Error("Method not implemented.");
+        console.error("saveExerciseReplay is not implemented");
     }
 
     getAggregateStats() {
@@ -1934,8 +1938,9 @@ class LiveWPM {
 }
 TypeJig.LiveWPM = LiveWPM;
 
-export function setExercise(name, exercise, hints = null, options = {}, jig = null) {
+export function setExercise(name, exercise, hints = null, options = {}, getNewURL = null, getNewExercise = null) {
     const h = document.getElementById("lesson-name");
+    name ??= exercise.name;
     h.textContent = name;
     document.title = name + " - Steno Grade";
 
@@ -1960,12 +1965,14 @@ export function setExercise(name, exercise, hints = null, options = {}, jig = nu
             ...(JSON.parse(settings) ?? {}),
             ...customSettings,
             ...options,
+            getNewExercise,
+            getNewURL,
         };
     }
     console.log("Setting exersize", exercise, hints, options);
 
-    if (jig != null) jig.exercise = exercise;
-    else jig = new TypeJig(exercise, options, hints);
+    // if (jig != null) jig.exercise = exercise;
+    const jig = new TypeJig(exercise, options, hints);
     initializeButtons(jig);
     return jig;
 }
@@ -2086,15 +2093,6 @@ export function wordCombos(combos) {
  * Randomize array element order in-place.
  * Using Durstenfeld shuffle algorithm.
  */
-export function shuffle(a, rnd) {
-    for (let i = a.length - 1; i >= 1; i--) {
-        const j = Math.floor(rnd() * (i + 1));
-        const aI = a[i];
-        a[i] = a[j];
-        a[j] = aI;
-    }
-    return a;
-}
 
 export function randomIntLessThan(n) {
     return Math.floor(n * Math.random()) % n;

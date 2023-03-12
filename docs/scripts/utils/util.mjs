@@ -1,11 +1,24 @@
 /* eslint-disable guard-for-in */
 /// <reference path="../libs/jquery-3.6.0.min.js" />
 
+import { PRNG } from "../alea-prng.mjs";
+import { TypeJig } from "../type-jig.mjs";
+
 // @ts-ignore
 // import {StenoDisplay} from "./steno-display.mjs";
 
 //q: How do i do an optional parameter in jsdoc?
 //a: https://stackoverflow.com/questions/43946379/how-to-document-an-optional-parameter-in-jsdoc
+
+export function shuffle(a, rnd) {
+    for (let i = a.length - 1; i >= 1; i--) {
+        const j = Math.floor(rnd() * (i + 1));
+        const aI = a[i];
+        a[i] = a[j];
+        a[j] = aI;
+    }
+    return a;
+}
 /**
  *
  * @param {{
@@ -143,7 +156,14 @@ export function populatePage(options) {
     console.log("Populated page");
 }
 
+/**
+ * @param {string} query
+ * @returns {Object.<string, string|Array.<string>>}
+ */
 export function parseQueryString(query) {
+    /**
+     * @type {Object.<string, string|Array.<string>>}
+     */
     const vars = {};
     query = query.substring(1); // remove leading '?'
     const pairs = query.replace(/\+/g, "%20").split("&");
@@ -157,11 +177,24 @@ export function parseQueryString(query) {
             value = decodeURIComponent(element.substring(n + 1));
         }
         if (vars.hasOwnProperty(name)) {
-            if (!Array.isArray(vars[name])) vars[name] = [vars[name]];
-            vars[name].push(value);
+            let val = vars[name];
+            if (!Array.isArray(val)) {
+                vars[name] = [val];
+            } else {
+                val.push(value);
+            }
         } else vars[name] = value;
     }
     return vars;
+}
+
+/**
+ * @param {string} query
+ * @returns {Object.<string, string>}
+ */
+export function parseQueryStringFlat(query) {
+    // @ts-ignore
+    return parseQueryString(query);
 }
 
 export function getFormFields(form) {
@@ -573,30 +606,62 @@ export function loadSettings() {
     loadSetting("multi_word_hints", false);
 }
 
-export function initializeButtons(jig) {
-    const again = document.getElementById("again");
-    again.addEventListener("click", function (evt) {
+/**
+ *
+ * @param {TypeJig} jig
+ */
+export async function initializeButtons(jig) {
+    const again = $("#again");
+    again.on("click", function (evt) {
         evt.preventDefault();
         jig.reset();
     });
 
-    const end = document.getElementById("end");
-    end.addEventListener("click", function (evt) {
+    const end = $("#end");
+    end.on("click", function (evt) {
         evt.preventDefault();
         jig.endExercise();
     });
 
-    const showHint = document.getElementById("show-hint");
-    showHint?.addEventListener("click", function (evt) {
+    const showHint = $("#show-hint");
+    showHint.on("click", function (evt) {
         evt.preventDefault();
         jig.hint.show();
     });
 
-    const hideHint = document.getElementById("hide-hint");
-    hideHint?.addEventListener("click", function (evt) {
+    const hideHint = $("#hide-hint");
+    hideHint.on("click", function (evt) {
         evt.preventDefault();
         jig.hint.hide();
     });
+
+    const next = $("#new");
+    next.on("click", async function (evt) {
+        //If ctrl click then open in new tab
+        if (evt.ctrlKey || evt.metaKey || evt.shiftKey) {
+            return;
+        }
+
+        if (jig?.getNewURL) {
+            evt.preventDefault();
+            const newURL = await jig.getNewURL();
+            window.history.replaceState("", "", newURL);
+
+            next.attr("href", await jig.getNewURL());
+            if (!jig.getNewExercise) {
+                window.location.reload();
+            }
+        }
+        if (jig?.getNewExercise) {
+            evt.preventDefault();
+            jig.setExercise(jig.getNewExercise());
+        }
+    });
+
+    if (jig.getNewURL) {
+        const newURL = await jig.getNewURL();
+        next.attr("href", newURL);
+    }
 }
 /**
  * Update a URL parameter and return the new URL.
@@ -713,4 +778,22 @@ export class LS {
         localStorage.setItem(key, JSON.stringify(val));
         return val;
     }
+}
+
+export function assureSeed() {
+    let fields = parseQueryStringFlat(document.location.search);
+    if (!fields.seed) {
+        fields.seed = "" + Math.random();
+        window.history.replaceState("", "", updateURLParameter(window.location.href, "seed", fields.seed));
+    }
+    return fields.seed;
+}
+
+export function getNextSeedUrl() {
+    assureSeed();
+    let fields = parseQueryStringFlat(document.location.search);
+    let currentSeed = fields.seed ?? Math.random();
+
+    let newSeed = PRNG(currentSeed)();
+    return updateURLParameter(window.location.href, "seed", newSeed);
 }

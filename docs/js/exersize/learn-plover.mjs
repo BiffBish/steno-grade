@@ -1,24 +1,27 @@
+let TJ = import("../../scripts/type-jig.mjs");
+let LearnPlover = import("../../scripts/learn-plover.mjs").then((module) => module.LearnPlover);
+let wordDrill = import("../../scripts/word-drill.mjs").then((module) => module.wordDrill);
+
 import { setTheme, populatePage, parseQueryString } from "../../scripts/utils/util.mjs";
-import { setExercise } from "../../scripts/type-jig.mjs";
-import { wordDrill } from "../../scripts/word-drill.mjs";
-import { WordSets } from "../../scripts/word-sets.mjs";
-import { LearnPlover } from "../../scripts/learn-plover.mjs";
 
 setTheme();
 
-$(function () {
-    populatePage();
+async function getNewExercise() {
     let fields = parseQueryString(document.location.search);
-    let exercise = wordDrill(fields, LearnPlover);
-    let jig = setExercise("Learn Plover", exercise, null, fields);
+    return (await wordDrill)(fields, await LearnPlover);
+}
 
-    $("#again")[0].addEventListener("click", function (evt) {
-        evt.preventDefault();
-        evt.stopImmediatePropagation();
-        let exercise = wordDrill(fields, LearnPlover);
-        exercise.name = "Learn Plover";
-        jig.setExercise(exercise);
-    });
-
-    // initializeButtons(jig);
+$(async function () {
+    populatePage();
+    (await TJ).setExercise(
+        "Learn Plover",
+        getNewExercise(),
+        null,
+        {
+            ...parseQueryString(document.location.search),
+            menu: "../learn-plover",
+        },
+        null,
+        getNewExercise
+    );
 });

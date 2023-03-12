@@ -1,19 +1,26 @@
+let TJ = import("../../scripts/type-jig.mjs");
 // @ts-ignore
-import { shortSentences } from "../../data/short-sentences-data.mjs";
-import { TypeJig, setExercise } from "../../scripts/type-jig.mjs";
-import { newRNG, parseQueryString, populatePage, setTheme, updateURLParameter } from "../../scripts/utils/util.mjs";
+let shortSentences = import("../../data/short-sentences-data.mjs").then((m) => m.shortSentences);
+
+import { PRNG } from "../../scripts/alea-prng.mjs";
+import { assureSeed, getNextSeedUrl, parseQueryStringFlat, populatePage, setTheme } from "../../scripts/utils/util.mjs";
 
 setTheme();
-const choose = (a, rnd) => a[Math.floor(rnd() * a.length)];
 
-function generateExercise(wordCount, rnd) {
+const choose = (a, rnd) => a[Math.floor(rnd() * a.length)];
+async function generateExercise() {
+    let fields = parseQueryStringFlat(document.location.search);
+
+    let wordCount = fields.word_count == null ? 100 : parseInt(fields.word_count);
+    let rnd = PRNG(fields.seed);
+
     let prevElements = [],
         element;
     let words = [];
     let charsLeft = wordCount * 5 + 1;
     while (charsLeft > 0) {
         do {
-            element = choose(shortSentences, rnd);
+            element = choose(await shortSentences, rnd);
         } while (prevElements.includes(element));
         if (prevElements.length > 20) prevElements.shift();
         prevElements.push(element);
@@ -22,37 +29,24 @@ function generateExercise(wordCount, rnd) {
         charsLeft -= 1 + string.length;
         words.splice(words.length, 0, ...array);
     }
-    return new TypeJig.Exercise({
+    return new (await TJ).TypeJig.Exercise({
         name: "Short Sentences",
         words: words,
     });
 }
 
-$(function () {
+$(async function () {
     populatePage();
-    let fields = parseQueryString(document.location.search);
-
-    if (!fields.seed) {
-        fields.seed = "" + Math.random();
-        window.history.replaceState("", "", updateURLParameter(window.location.href, "seed", fields.seed));
-    }
-    let rng = newRNG(fields.seed);
-
-    let wordCount = fields.word_count == null ? 100 : parseInt(fields.word_count);
-
-    let name = "Short Sentences";
-
-    let exercise = generateExercise(wordCount, rng);
-
-    fields.menu = "../form";
-
-    setExercise(name, exercise, null, fields);
-    // another.addEventListener("click", function (evt) {
-    //     evt.preventDefault();
-    //     window.history.replaceState("", "", updateURLParameter(window.location.href, "seed", nextSeed));
-    //     let exercise = generateExercise(wordCount, PRNG(nextSeed));
-    //     jig.exercise = exercise;
-    //     jig.reset();
-    //     nextSeed = prepareNextSeed(another);
-    // });
+    assureSeed();
+    (await TJ).setExercise(
+        "Short Sentences",
+        generateExercise(),
+        null,
+        {
+            ...parseQueryStringFlat(document.location.search),
+            menu: "../form",
+        },
+        getNextSeedUrl,
+        generateExercise
+    );
 });

@@ -304,6 +304,7 @@
                 <form
                     class="drill-options"
                     action="exersize/short-sentences.html"
+                    id="sentences-form"
                 >
                     <p>
                         <b class="red">NEW</b>: top "0" words gives a set of
@@ -339,16 +340,6 @@
                                 Math.random().toString() +
                                 '">'
                         );
-                        document
-                            .getElementById("gutnum")
-                            .addEventListener("input", function (evt) {
-                                const num = evt.target,
-                                    form = num.form;
-                                form.action =
-                                    num.value === "0"
-                                        ? "short-sentences.html"
-                                        : "gutenberg.html";
-                            });
                     </script>
                     <button
                         type="submit"

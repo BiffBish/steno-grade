@@ -1,27 +1,41 @@
-import { setTheme, populatePage, parseQueryString, newRNG, updateURLParameter } from "../../scripts/utils/util.mjs";
-import { TypeJig, setExercise, shuffle, shuffleTail } from "../../scripts/type-jig.mjs";
-import { WordSets } from "../../scripts/word-sets.mjs";
+let TJ = import("../../scripts/type-jig.mjs");
+let WordSets = import("../../scripts/word-sets.mjs").then((module) => module.WordSets);
 
-$(function () {
+import {
+    setTheme,
+    populatePage,
+    newRNG,
+    parseQueryStringFlat,
+    assureSeed,
+    getNextSeedUrl,
+    shuffle,
+} from "../../scripts/utils/util.mjs";
+
+setTheme();
+
+async function generateExercise() {
+    let sentences = (await WordSets).twoKeySentences;
+
+    let fields = parseQueryStringFlat(document.location.search);
+
+    return new (await TJ).TypeJig.Exercise({
+        name: "Two-Key Sentences",
+        words: shuffle([...sentences], newRNG(fields.seed)),
+    });
+}
+
+$(async function () {
     populatePage();
-    let sentances = WordSets.twoKeySentences;
-
-    let parameters = parseQueryString(document.location.search);
-
-    if (!parameters.seed) {
-        parameters.seed = Math.random().toString();
-        window.history.replaceState("", "", updateURLParameter(window.location.href, "seed", parameters.seed));
-    }
-
-    parameters.menu = "../form";
-    setExercise(
+    assureSeed();
+    (await TJ).setExercise(
         "Two-Key Sentences",
-        new TypeJig.Exercise({
-            name: "Two-Key Sentences",
-            words: shuffle([...sentances], newRNG(parameters.seed)),
-        }),
+        generateExercise(),
         null,
-        parameters
+        {
+            ...parseQueryStringFlat(document.location.search),
+            menu: "../form",
+        },
+        getNextSeedUrl,
+        generateExercise
     );
 });
-setTheme();
