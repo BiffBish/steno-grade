@@ -209,6 +209,7 @@ export class TypeJig {
         this.input.blur();
         this.input.focus();
         delete this.pendingChange;
+        this.previousInput = undefined;
 
         this.running = false;
         this.clock.reset();
@@ -1543,7 +1544,7 @@ export class TypeJig {
         words.forEach((element) => {
             const duration = element.duration;
             if (duration == null || isNaN(duration)) return;
-
+            if (element.expected == null) return;
             const expected = element.expected.replace(/[.,;"]/, "").toLowerCase();
             console.log("Expected, ", expected, element);
             const current = durations[expected] ?? null;
