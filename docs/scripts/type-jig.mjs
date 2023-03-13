@@ -571,7 +571,7 @@ export class TypeJig {
         }
         console.log("typedIndex", typedIndex);
         // Timestamp the last word
-        const LastWord = this.persistentWordData[typedIndex - 1];
+        const LastWord = this.persistentWordData[expectedIndex - 1];
         const LastTypedWord = wordList[wordList.length - 1];
         // console.log(LastWord, "LastWord");
         // console.log(LastTypedWord, "LastWord");
