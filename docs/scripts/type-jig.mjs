@@ -391,9 +391,9 @@ export class TypeJig {
             const matchResult = checkMatch(typed, expected);
             const lastTypedWord = typedIndex === typedWords.length - 1;
 
-            if (this.persistentWordData[typedIndex] == null) {
-                this.persistentWordData[typedIndex] = {
-                    id: typedIndex,
+            if (this.persistentWordData[expectedIndex] == null) {
+                this.persistentWordData[expectedIndex] = {
+                    id: expectedIndex,
                     expected: expected,
                     typed: typed,
                     lastKnownTimeStamp: null,
