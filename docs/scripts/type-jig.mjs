@@ -408,7 +408,7 @@ export class TypeJig {
 
             if (typedIndex == typedWords.length) break;
 
-            let typedWordData = this.persistentWordData[typedIndex];
+            let typedWordData = this.persistentWordData[expectedIndex];
 
             if (typedWordData.typed == "" && i == typedWords.length - 1) {
                 break;
